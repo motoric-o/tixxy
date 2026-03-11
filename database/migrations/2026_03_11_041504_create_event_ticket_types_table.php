@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('event_ticket_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('event_id')->constrained()->onDelete('cascade');
-            $table->foreignId('ticket_type_id')->constrained()->onDelete('set null');
-            $table->decimal('price',10,2)->default(0)->comment('');
+            $table->foreignId('event_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('ticket_type_id')->constrained()->onDelete('set null')->onUpdate('cascade');
+            $table->decimal('price',10,2)->default(0);
             $table->integer('capacity')->default(20);
             $table->timestamps();
         });

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('qr_code_hash')->unique();
             $table->boolean('is_scanned')->default(false);
-            $table->foreignId('order_id')->constrained()->onDelete('set null');
+            $table->foreignId('order_id')->constrained()->onDelete('set null')->onUpdate('cascade');
             $table->timestamps();
         });
     }

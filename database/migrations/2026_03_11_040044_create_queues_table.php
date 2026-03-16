@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('queues', function (Blueprint $table) {
             $table->foreignId('event_id')->constrained()->onDelete('set null');
             $table->id();
-            $table->enum('status', ['waiting','canceled', 'completed'])->default('');
+            $table->enum('status', ['waiting','canceled', 'completed'])->default('waiting');
             $table->timestamps();
             $table->primary(['event_id','id']);
         });

@@ -1,39 +1,43 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
+<x-layouts.guest>
+    <x-slot name="title">Reset Password</x-slot>
+
+    <h1 class="sr-only">Reset password</h1>
+    <p class="text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+        You are only one step a way from your new password, recover your password now.
+    </p>
+    <form action="{{ route('password.store') ?? '#' }}" method="POST" class="space-y-6 mt-6">
         @csrf
-
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
-
-        <!-- Email Address -->
+        <input type="hidden" name="token" value="{{ $request->route('token') ?? 'dummy' }}">
+        <input
+            class="w-full px-4 py-2 border rounded-md dark:bg-darker dark:border-gray-700 focus:outline-none focus:ring focus:ring-primary-100 dark:focus:ring-primary-darker"
+            type="email"
+            name="email"
+            placeholder="Email address"
+            value="{{ old('email', $request->email ?? '') }}"
+            required
+            autofocus
+        />
+        <input
+            class="w-full px-4 py-2 border rounded-md dark:bg-darker dark:border-gray-700 focus:outline-none focus:ring focus:ring-primary-100 dark:focus:ring-primary-darker"
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+        />
+        <input
+            class="w-full px-4 py-2 border rounded-md dark:bg-darker dark:border-gray-700 focus:outline-none focus:ring focus:ring-primary-100 dark:focus:ring-primary-darker"
+            type="password"
+            name="password_confirmation"
+            placeholder="Confirm Password"
+            required
+        />
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
+            <button
+                type="submit"
+                class="w-full px-4 py-2 font-medium text-center text-white transition-colors duration-200 rounded-md bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 dark:focus:ring-offset-darker"
+            >
+                Reset password
+            </button>
         </div>
     </form>
-</x-guest-layout>
+</x-layouts.guest>

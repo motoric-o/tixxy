@@ -1,25 +1,33 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+<x-layouts.guest>
+    <x-slot name="title">Forgot Password</x-slot>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('password.email') }}">
+    <h1 class="sr-only">Request new password</h1>
+    <p class="text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+        You forgot your password? Here you can easily retrieve a new password.
+    </p>
+    <form action="{{ route('password.email') ?? '#' }}" method="POST" class="space-y-6 mt-6">
         @csrf
+        <input
+            class="w-full px-4 py-2 border rounded-md dark:bg-darker dark:border-gray-700 focus:outline-none focus:ring focus:ring-primary-100 dark:focus:ring-primary-darker"
+            type="email"
+            name="email"
+            placeholder="Email address"
+            required
+            autofocus
+        />
 
-        <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
+            <button
+                type="submit"
+                class="w-full px-4 py-2 font-medium text-center text-white transition-colors duration-200 rounded-md bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 dark:focus:ring-offset-darker"
+            >
+                Request new password
+            </button>
         </div>
     </form>
-</x-guest-layout>
+
+    <!-- Reset password link -->
+    <div class="mt-6 text-sm text-gray-600 dark:text-gray-400">
+        <a href="{{ route('password.reset', ['token' => 'dummy']) ?? 'reset-password.html' }}" class="text-blue-600 hover:underline">Reset password</a>
+    </div>
+</x-layouts.guest>

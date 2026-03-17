@@ -12,9 +12,18 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Dark Mode Init -->
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
 
-<body class="flex min-h-screen flex-col bg-gray-50">
+<body class="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
     <x-header />
 
     <main class="flex-grow min-h-screen">

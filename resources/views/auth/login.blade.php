@@ -2,12 +2,9 @@
 
 @section('content')
 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Masuk ke akun Anda</h2>
-    </div>
-
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form class="space-y-6" action="{{ route('login') }}" method="POST">
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm bg-white p-8 rounded-[10px] shadow-[0_0_10px_#d1d5db]">
+        <h2 class="mt-3 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Masuk ke akun Anda</h2>
+        <form class="space-y-6 mb-5" action="{{ route('login') }}" method="POST">
             @csrf
 
             <div>

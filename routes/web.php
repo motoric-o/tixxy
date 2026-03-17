@@ -12,7 +12,7 @@ Route::get('/events', function () {
 });
 
 Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
+    return view('layouts.admin.dashboard');
 });
 
 Route::get('/register', function () {

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>{{ config('app.name', 'Tixxy') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -14,8 +14,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body>
-    @include('layouts.header')
+<body class="flex min-h-screen flex-col bg-gray-50">
+    <x-header />
+
+    <main class="flex-grow min-h-screen">
+        @yield('content')
+    </main>
+
+    <x-footer />
 </body>
 
 </html>

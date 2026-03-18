@@ -33,7 +33,7 @@
                 <!-- Lupa Password -->
                 @if (Route::has('password.request'))
                     <div class="text-sm text-end">
-                        <a href="{{ route('password.request') }}" class="font-semibold text-indigo-600 hover:text-indigo-500">Lupa password?</a>
+                        <a href="{{ route('password.request') }}" class="font-medium text-purple-600 hover:underline dark:text-purple-500">Lupa password?</a>
                     </div>
                 @endif
 

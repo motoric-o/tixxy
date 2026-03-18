@@ -14,7 +14,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="flex min-h-screen flex-col bg-gray-50">
+<body class="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900">
     <x-header />
 
     <main class="flex-grow min-h-screen">

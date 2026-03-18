@@ -1,4 +1,4 @@
-<div class="flex flex-col py-4 px-[14px] w-full sticky top-5 h-[calc(100vh-40px)] bg-gray-800 rounded-xl transition-all duration-300 overflow-y-auto overflow-x-hidden shrink-0" :class="sidebarOpen ? 'w-1/6' : 'w-[88px]'">
+<div class="flex flex-col py-4 px-[14px] w-full sticky top-5 h-[calc(100vh-40px)] dark:bg-gray-800 rounded-xl transition-all duration-300 overflow-y-auto overflow-x-hidden shrink-0" :class="sidebarOpen ? 'w-1/6' : 'w-[88px]'">
     <div class="flex flex-row items-center justify-start gap-4 mb-5 whitespace-nowrap overflow-hidden">
         <button @click="sidebarOpen = !sidebarOpen" class="ml-[6px] p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-[#4a00e0] transition-colors duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] focus:outline-none border border-transparent hover:border-white/20 shrink-0">
             <svg class="w-7 h-7 drop-shadow-[0_0_5px_rgba(233,213,255,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

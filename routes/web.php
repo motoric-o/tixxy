@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,25 +14,10 @@ Route::get('/events', function () {
     return view('events');
 });
 
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-});
+Route::get('/admin/dashboard', [DashboardController::class, 'index']);
 
 // --- Admin Events CRUD ---
-Route::get('/admin/events', function () {
-    return view('admin.crud.index', [
-        'title' => 'Events',
-        'columns' => [
-            ['key' => 'name', 'label' => 'Name'],
-            ['key' => 'date', 'label' => 'Date'],
-            ['key' => 'location', 'label' => 'Location'],
-            ['key' => 'status', 'label' => 'Status'],
-        ],
-        'rows' => [],
-        'createUrl' => '/admin/events/create',
-        'editUrl' => '/admin/events',
-    ]);
-});
+Route::get('/admin/events', [EventController::class, 'index']);
 
 Route::get('/admin/events/create', function () {
     return view('admin.crud.form', [
@@ -66,20 +54,7 @@ Route::get('/admin/events/{id}/edit', function ($id) {
 });
 
 // --- Admin Users CRUD ---
-Route::get('/admin/users', function () {
-    return view('admin.crud.index', [
-        'title' => 'Users',
-        'columns' => [
-            ['key' => 'name', 'label' => 'Name'],
-            ['key' => 'email', 'label' => 'Email'],
-            ['key' => 'role', 'label' => 'Role'],
-            ['key' => 'created_at', 'label' => 'Joined'],
-        ],
-        'rows' => [],
-        'createUrl' => '/admin/users/create',
-        'editUrl' => '/admin/users',
-    ]);
-});
+Route::get('/admin/users', [UserController::class, 'index']);
 
 Route::get('/admin/users/create', function () {
     return view('admin.crud.form', [

@@ -13,6 +13,22 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Events organised by this user.
+     */
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    /**
+     * Orders placed by this user (as a customer).
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

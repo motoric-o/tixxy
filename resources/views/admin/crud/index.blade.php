@@ -1,13 +1,47 @@
 @extends('layouts.admin.default')
 
 @section('content')
-<!-- Page Header -->
-<div class="flex items-center justify-between mb-6">
+<div class="flex items-center justify-between mb-6 gap-4">
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $title }}</h1>
-    <a href="{{ $createUrl }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] transition-all duration-300 shadow-md hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-        Create {{ Str::singular($title) }}
-    </a>
+    
+    <div class="flex items-center gap-4 ml-auto">
+        <!-- Search & Filters -->
+        <form action="{{ url()->current() }}" method="GET" class="flex items-center gap-3">
+            @if(isset($filters))
+                @foreach($filters as $filterKey => $filterParams)
+                    <div class="relative">
+                        <select name="{{ $filterKey }}" onchange="this.form.submit()" class="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 text-sm rounded-lg focus:ring-[#8e2de2] focus:border-[#8e2de2] block pl-3 pr-10 py-2 transition-colors duration-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <option value="">All {{ $filterParams['label'] ?? ucfirst($filterKey) }}</option>
+                            @foreach($filterParams['options'] as $value => $label)
+                                <option value="{{ $value }}" {{ request($filterKey) !== null && request($filterKey) !== '' && request($filterKey) == (string)$value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+
+            <div class="relative w-64">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search..." class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 text-sm rounded-lg focus:ring-[#8e2de2] focus:border-[#8e2de2] block w-full pl-10 p-2 transition-colors duration-300">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+            
+            @if(request()->hasAny(array_merge(['search'], array_keys($filters ?? []))))
+                <a href="{{ url()->current() }}" class="p-2 text-gray-500 hover:text-red-500 transition-colors duration-300" title="Clear Filters">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </a>
+            @endif
+        </form>
+
+        <a href="{{ $createUrl }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] transition-all duration-300 shadow-md hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] whitespace-nowrap ml-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Create {{ Str::singular($title) }}
+        </a>
+    </div>
 </div>
 
 <!-- Table -->
@@ -24,14 +58,14 @@
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             @forelse($rows as $index => $row)
-                <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200 cursor-pointer" onclick="window.location='{{ $editUrl }}/{{ data_get($row, 'id') }}/edit'">
                     <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ $index + 1 }}</td>
                     @foreach($columns as $col)
                         <td class="px-6 py-4 text-gray-900 dark:text-gray-200">
                             {{ data_get($row, $col['key']) }}
                         </td>
                     @endforeach
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4" onclick="event.stopPropagation()">
                         <div class="flex items-center justify-center gap-2">
                             <!-- Edit -->
                             <a href="{{ $editUrl }}/{{ data_get($row, 'id') }}/edit" class="p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-[#4a00e0] hover:shadow-[0_0_10px_rgba(168,85,247,0.4)] transition-all duration-300 border border-transparent hover:border-white/20" title="Edit">
@@ -60,4 +94,10 @@
         </tbody>
     </table>
 </div>
+
+@if(method_exists($rows, 'hasPages') && $rows->hasPages())
+    <div class="mt-6">
+        {{ $rows->appends(request()->query())->links() }}
+    </div>
+@endif
 @endsection

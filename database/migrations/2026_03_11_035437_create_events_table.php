@@ -16,6 +16,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('title');
             $table->string('type');
+            $table->string('location');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->enum('status', ['preparation','ongoing', 'completed', 'canceled', 'pending'])->default('preparation');

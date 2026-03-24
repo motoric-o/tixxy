@@ -14,11 +14,11 @@ class UserRoleGiver
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!Auth::check() || Auth::user()->role !== $role) {
-            abort(403, 'Unauthorized action, Nice Try.');
+        if (in_array(Auth::user()->role, $roles)) {
+            return $next($request);
         }
-        return $next($request);
+        abort(403, 'Unauthorized action, Nice Try.');
     }
 }

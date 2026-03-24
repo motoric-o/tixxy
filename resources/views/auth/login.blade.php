@@ -40,7 +40,7 @@
             <button type="submit" class="flex w-full justify-center rounded-md bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] transition-all duration-300 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600">Masuk</button>
             <div class="text-sm font-light text-gray-500 dark:text-gray-400 mt-4 text-center">
                 Belum punya akun?
-                <a href="{{ url('/register') }}" class="font-medium text-[#8e2de2] hover:text-[#4a00e0] dark:text-[#a855f7] dark:hover:text-[#d8b4fe] transition-colors">Daftar disini.</a>
+                <a href="{{ route('register') }}" class="font-medium text-[#8e2de2] hover:text-[#4a00e0] dark:text-[#a855f7] dark:hover:text-[#d8b4fe] transition-colors">Daftar disini.</a>
             </div>
 
         </form>

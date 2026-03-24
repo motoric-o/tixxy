@@ -31,8 +31,8 @@
 
                 <!-- Tanggal Lahir -->
                 <div>
-                    <label for="date-of-birth" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tanggal Lahir</label>
-                    <input type="date" name="date-of-birth" id="date-of-birth" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-colors duration-300" required>
+                    <label for="date_of_birth" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tanggal Lahir</label>
+                    <input type="date" name="date_of_birth" id="date_of_birth" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-colors duration-300" required>
                 </div>
 
                 <!-- Password -->
@@ -46,10 +46,10 @@
 
                 <!-- Konfirmasi Password -->
                 <div>
-                    <label for="confirm-password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Konfirmasi Password</label>
-                    <input type="password" name="confirm-password" id="confirm-password" placeholder="Konfirmasi Password Anda" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-colors duration-300" required>
+                    <label for="password_confirmation" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Konfirmasi Password</label>
+                    <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Konfirmasi Password Anda" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-colors duration-300" required>
                 </div>
-                @error('confirm-password')
+                @error('password_confirmation')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
 
@@ -66,7 +66,7 @@
             <button type="submit" class="flex w-full justify-center rounded-md bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] transition-all duration-300 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600">Daftar</button>
             <div class="text-sm font-light text-gray-500 dark:text-gray-400 mt-4 text-center">
                 Sudah punya akun?
-                <a href="{{ url('/login') }}" class="font-medium text-[#8e2de2] hover:text-[#4a00e0] dark:text-[#a855f7] dark:hover:text-[#d8b4fe] transition-colors">Masuk disini.</a>
+                <a href="{{ route('login') }}" class="font-medium text-[#8e2de2] hover:text-[#4a00e0] dark:text-[#a855f7] dark:hover:text-[#d8b4fe] transition-colors">Masuk disini.</a>
             </div>
 
         </form>

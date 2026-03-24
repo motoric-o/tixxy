@@ -55,9 +55,14 @@
                 <!-- VDivider -->
                 <div class="hidden md:block h-8 w-px bg-gradient-to-b from-transparent via-[#d8b4fe]/30 to-transparent"></div>
 
-                <!-- User Avatar Dropdown -->
-                <!-- User Avatar Dropdown Component -->
-                <x-avatar />
+                <!-- Auth-based Component -->
+                @if (Auth::check())
+                    <!-- User Avatar Dropdown Component -->
+                    <x-avatar />
+                @else
+                    <!-- Auth Button Group Component -->
+                    <x-auth-group />
+                @endif
             </div>
 
             <!-- Mobile menu button -->

@@ -36,7 +36,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'date_of_birth',
+        'password_hash',
     ];
 
     /**
@@ -60,5 +61,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Override the get password name method for authorization, since the default is 'password'
+     *
+     * @return string
+     */
+    public function getAuthPasswordName(): string
+    {
+        return 'password_hash';
     }
 }

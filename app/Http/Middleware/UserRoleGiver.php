@@ -16,7 +16,8 @@ class UserRoleGiver
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (in_array(Auth::user()->role, $roles)) {
+
+        if (Auth::check() && in_array(Auth::user()->role, $roles)) {
             return $next($request);
         }
         abort(403, 'Unauthorized action, Nice Try.');

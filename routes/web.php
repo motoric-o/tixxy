@@ -23,9 +23,6 @@ Route::get('/events', function () {
 // ticketing
 Route::get('/tickets', [TicketController::class, 'index']);
 
-// ticketing
-Route::get('/tickets', [TicketController::class, 'index']);
-
 Route::get('/register', function () {
     return view('auth.register');
 });

@@ -111,10 +111,10 @@
 {{-- ═══════════════════════════════════════════════════════════════
      ROW 2 – Financial Charts
 ═══════════════════════════════════════════════════════════════ --}}
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
 
     {{-- Bar Chart: Monthly Revenue (spans 2/3) --}}
-    <div class="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/40 p-5 shadow-sm">
+    <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/40 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-4">
             <div>
                 <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Monthly Revenue</h3>

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserRoleGiver
@@ -13,8 +14,11 @@ class UserRoleGiver
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, $role): Response
     {
+        if (!Auth::check() || Auth::user()->role !== $role) {
+            abort(403, 'Unauthorized action, Nice Try.');
+        }
         return $next($request);
     }
 }

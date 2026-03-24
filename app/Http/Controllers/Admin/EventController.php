@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\ViewModels\ManageEventViewModel;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\ViewModels\EventCrudViewModel;
@@ -31,9 +32,9 @@ class EventController extends Controller
 
     public function edit($id) {
         $event = Event::find($id);
-        $viewModel = new EventCrudViewModel($event);
+        $viewModel = new ManageEventViewModel($event);
 
-        return view('admin.crud.form', $viewModel->toArray());
+        return view('admin.event', $viewModel->toArray());
     }
 
     public function update($id, Request $request) {

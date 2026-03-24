@@ -1,13 +1,13 @@
-<div class="flex flex-col py-4 px-[14px] sticky top-5 h-[calc(100vh-40px)] dark:bg-gray-800 rounded-xl transition-all duration-300 overflow-y-auto overflow-x-hidden shrink-0" :class="sidebarOpen ? 'w-1/6' : 'w-[88px]'">
+<div class="flex flex-col py-4 px-[14px] sticky top-5 h-[calc(100vh-40px)] bg-gray-200 dark:bg-gray-800 rounded-xl transition-all duration-300 overflow-y-auto overflow-x-hidden shrink-0" :class="sidebarOpen ? 'w-1/6' : 'w-[88px]'">
     <div class="flex flex-row items-center justify-start gap-4 mb-5 whitespace-nowrap overflow-hidden">
         <button @click="sidebarOpen = !sidebarOpen" class="ml-[6px] p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-[#4a00e0] transition-colors duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] focus:outline-none border border-transparent hover:border-white/20 shrink-0">
             <svg class="w-7 h-7 drop-shadow-[0_0_5px_rgba(233,213,255,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
         </button>
-        <h1 x-show="sidebarOpen" x-transition class="text-white text-2xl font-bold">Admin</h1>
+        <h1 x-show="sidebarOpen" x-transition class="dark:text-white text-2xl font-bold">Admin</h1>
     </div>
-    <div class="flex flex-col px-[8px] py-1 bg-[#2b3544] rounded-xl transition-all duration-300">
+    <div class="flex flex-col px-[8px] py-1 bg-gray-300 dark:bg-[#2b3544] rounded-xl transition-all duration-300">
         <a class="p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-[#4a00e0] transition-colors duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] focus:outline-none border border-transparent hover:border-white/20 my-2 flex items-center gap-3 overflow-hidden" href="/admin/dashboard" title="Dashboard">
             <svg class="w-7 h-7 drop-shadow-[0_0_5px_rgba(233,213,255,0.8)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
             <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">Dashboard</span>

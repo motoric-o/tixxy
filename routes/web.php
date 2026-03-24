@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\EventManagement\EventPanelController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +18,10 @@ Route::get('/events', function () {
 
 Route::get('/admin/dashboard', [DashboardController::class, 'index']);
 
-// --- Admin Events CRUD ---
+// --- Events CRUD ---
+Route::get('/events/manage/{id}', [EventPanelController::class, 'index']);
+Route::put('/events/manage/{id}', [EventPanelController::class, 'update']);
+
 Route::get('/admin/events', [EventController::class, 'index']);
 
 Route::get('/admin/events/create', function () {

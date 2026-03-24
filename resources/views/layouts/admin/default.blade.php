@@ -23,12 +23,12 @@
     </script>
 </head>
 
-<body class="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+<body class="flex min-h-screen flex-col dark:bg-gray-900 transition-colors duration-300">
     <x-header />
 
     <main x-data="{ sidebarOpen: false }" class="flex flex-row items-start gap-5 min-w-screen m-5">
         <x-admin.sidebar />
-        <div id="content" class="flex-1 flex flex-col min-h-screen dark:bg-gray-800 rounded-xl transition-all duration-300 p-5">
+        <div id="content" class="flex-1 flex flex-col min-h-screen bg-gray-200 dark:bg-gray-800 rounded-xl transition-all duration-300 p-5">
             <!-- Temporary filler to demonstrate scrolling -->
             @yield('content')
         </div>

@@ -7,8 +7,15 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+use App\Models\Event;
+
 Route::get('/', function () {
-    return view('home');
+    $musicCount = Event::where('type', 'music')->count();
+    $techCount = Event::where('type', 'tech')->count();
+    $artCount = Event::where('type', 'art')->count();
+    $sportsCount = Event::where('type', 'sports')->count();
+
+    return view('home', compact('musicCount', 'techCount', 'artCount', 'sportsCount'));
 });
 
 Route::get('/events', function () {

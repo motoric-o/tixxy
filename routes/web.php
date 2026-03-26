@@ -9,12 +9,19 @@ use App\Http\Controllers\EventManagement\EventPanelController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+use App\Models\Event;
+
 /*
  * No Role
  */
 Route::get('/', function () {
-    return view('home');
-})->name('home');
+    $musicCount = Event::where('type', 'music')->count();
+    $techCount = Event::where('type', 'tech')->count();
+    $artCount = Event::where('type', 'art')->count();
+    $sportsCount = Event::where('type', 'sports')->count();
+
+    return view('home', compact('musicCount', 'techCount', 'artCount', 'sportsCount'));
+});
 
 Route::get('/events', function () {
     return view('events');

@@ -8,6 +8,7 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\EventManagement\EventPanelController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PaymentController;
 
 use App\Models\Event;
 
@@ -29,6 +30,8 @@ Route::get('/events', function () {
 
 // ticketing
 Route::get('/tickets', [TicketController::class, 'index']);
+Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
+
 
 Route::get('/register', function () {
     return view('auth.register');

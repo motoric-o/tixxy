@@ -43,4 +43,38 @@ class EventController extends Controller
 
         return redirect('/admin/events')->with('success', 'Event updated successfully.');
     }
+
+    public function store(Request $request) {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'type' => 'required|string|max:255',
+            'start_time' => 'required|date_format:Y-m-d\TH:i|after_or_equal:today',
+            'end_time' => 'required|date_format:Y-m-d\TH:i|after:start_time',
+            'location' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'quota' => 'required|integer|min:1',
+        ]);
+
+        Event::create(
+            [
+                'description'=> $request->description,
+                'title'=> $request->title,
+                'type'=> $request->type,
+                'location'=> $request->location,
+                'start_time'=> $request->start_time,
+                'end_time'=> $request->end_time,
+                'status'=> 'preparation',
+                'quota'=> $request->quota,
+            ]
+        );
+
+        return redirect('/admin/events')->with('success', 'Event created successfully.');
+    }
+
+    public function destroy($id) {
+        $event = Event::findOrFail($id);
+        $event->delete();
+
+        return redirect('/admin/events')->with('success', 'Event deleted successfully.');
+    }
 }

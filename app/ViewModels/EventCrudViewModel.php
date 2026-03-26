@@ -49,7 +49,8 @@ class EventCrudViewModel implements Arrayable
                     'ongoing' => 'Ongoing',
                     'completed' => 'Completed',
                     'canceled' => 'Canceled',
-                    'pending' => 'Pending'
+                    'pending' => 'Pending',
+                    'preparation' => 'Preparation'
                 ]
             ]
         ];

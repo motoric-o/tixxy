@@ -61,17 +61,21 @@ Route::put('/events/manage/{id}', [EventPanelController::class, 'update']);
         return view('admin.crud.form', [
             'title' => 'Create Event',
             'fields' => [
-                ['name' => 'name', 'label' => 'Event Name', 'type' => 'text', 'placeholder' => 'Enter event name', 'required' => true],
-                ['name' => 'date', 'label' => 'Date', 'type' => 'date', 'required' => true],
+                ['name' => 'title', 'label' => 'Event Title', 'type' => 'text', 'placeholder' => 'Enter event name', 'required' => true],
+                ['name'=> 'type', 'label'=> 'Event Type', 'type'=> 'text', 'placeholder' => 'Enter event type (e.g. music, tech, art, sports)', 'required' => true],
+                ['name' => 'start_time', 'label' => 'Start Time', 'type' => 'datetime-local', 'required' => true],
+                ['name'=> 'end_time', 'label'=> 'End Time', 'type'=> 'datetime-local', 'required' => true],
                 ['name' => 'location', 'label' => 'Location', 'type' => 'text', 'placeholder' => 'Enter location', 'required' => true],
                 ['name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'placeholder' => 'Describe the event...'],
-                ['name' => 'price', 'label' => 'Price', 'type' => 'number', 'placeholder' => '0'],
-                ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => ['draft' => 'Draft', 'published' => 'Published', 'cancelled' => 'Cancelled'], 'required' => true],
+                ['name'=> 'quota', 'label'=> 'Quota', 'type'=> 'number', 'required' => true],
             ],
             'action' => '/admin/events',
             'backUrl' => '/admin/events',
         ]);
     });
+
+    Route::post('/admin/events', [EventController::class, 'store']);
+    Route::delete('/admin/events/{id}', [EventController::class, 'destroy']);
 
     Route::get('/admin/events/{id}/edit', [EventController::class, 'edit']);
     Route::put('/admin/events/{id}', [EventController::class, 'update']);
@@ -90,12 +94,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
                 ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'placeholder' => 'Enter full name', 'required' => true],
                 ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'placeholder' => 'Enter email address', 'required' => true],
                 ['name' => 'password', 'label' => 'Password', 'type' => 'password', 'placeholder' => 'Enter password', 'required' => true],
-                ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'user' => 'User'], 'required' => true],
+                ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'organizer' => 'Organizer'], 'required' => true],
             ],
             'action' => '/admin/users',
             'backUrl' => '/admin/users',
         ]);
     });
+
+    Route::post('/admin/users', [UserController::class, 'store']);
+    Route::delete('/admin/users/{id}', [UserController::class, 'destroy']);
 
     Route::get('/admin/users/{id}/edit', [UserController::class, 'edit']);
     Route::put('/admin/users/{id}', [UserController::class, 'update']);

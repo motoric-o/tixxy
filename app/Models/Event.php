@@ -13,6 +13,7 @@ class Event extends Model
         'title',
         'description',
         'type',
+        'location',
         'start_time',
         'end_time',
         'status',

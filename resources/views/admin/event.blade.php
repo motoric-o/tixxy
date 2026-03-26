@@ -11,7 +11,12 @@
             </p>
         </div>
         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
-            Assigned Organizer: {{ $item->organizer->name }}
+            Assigned Organizer:
+            @if ($item->organizer)
+                {{ $item->organizer->name }}
+            @else
+                <span class="text-sm text-gray-500 dark:text-gray-400">Unassigned</span>    
+            @endif
         </h2>
     </div>
 

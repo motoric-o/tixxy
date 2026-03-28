@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\OrderController;
@@ -15,10 +16,10 @@ use App\Models\Event;
  * No Role
  */
 Route::get('/', function () {
-    $musicCount = Event::where('type', 'music')->count();
-    $techCount = Event::where('type', 'tech')->count();
-    $artCount = Event::where('type', 'art')->count();
-    $sportsCount = Event::where('type', 'sports')->count();
+    $musicCount = Event::where('category_id', 1)->count();
+    $techCount = Event::where('category_id', 2)->count();
+    $artCount = Event::where('category_id', 3)->count();
+    $sportsCount = Event::where('category_id', 4)->count();
 
     return view('home', compact('musicCount', 'techCount', 'artCount', 'sportsCount'));
 });
@@ -58,16 +59,17 @@ Route::put('/events/manage/{id}', [EventPanelController::class, 'update']);
     Route::get('/admin/events', [EventController::class, 'index'])->name('organizer.home');
 
     Route::get('/admin/events/create', function () {
+        $categories = \App\Models\Category::orderBy('name')->pluck('name', 'id');
         return view('admin.crud.form', [
             'title' => 'Create Event',
             'fields' => [
-                ['name' => 'title', 'label' => 'Event Title', 'type' => 'text', 'placeholder' => 'Enter event name', 'required' => true],
-                ['name'=> 'type', 'label'=> 'Event Type', 'type'=> 'text', 'placeholder' => 'Enter event type (e.g. music, tech, art, sports)', 'required' => true],
-                ['name' => 'start_time', 'label' => 'Start Time', 'type' => 'datetime-local', 'required' => true],
-                ['name'=> 'end_time', 'label'=> 'End Time', 'type'=> 'datetime-local', 'required' => true],
-                ['name' => 'location', 'label' => 'Location', 'type' => 'text', 'placeholder' => 'Enter location', 'required' => true],
-                ['name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'placeholder' => 'Describe the event...'],
-                ['name'=> 'quota', 'label'=> 'Quota', 'type'=> 'number', 'required' => true],
+                ['name' => 'title',       'label' => 'Event Title', 'type' => 'text',           'placeholder' => 'Enter event name', 'required' => true],
+                ['name' => 'category_id', 'label' => 'Category',    'type' => 'select',          'options' => $categories, 'required' => true],
+                ['name' => 'start_time',  'label' => 'Start Time',  'type' => 'datetime-local',  'required' => true],
+                ['name' => 'end_time',    'label' => 'End Time',    'type' => 'datetime-local',  'required' => true],
+                ['name' => 'location',    'label' => 'Location',    'type' => 'text',            'placeholder' => 'Enter location', 'required' => true],
+                ['name' => 'description', 'label' => 'Description', 'type' => 'textarea',        'placeholder' => 'Describe the event...'],
+                ['name' => 'quota',       'label' => 'Quota',       'type' => 'number',          'required' => true],
             ],
             'action' => '/admin/events',
             'backUrl' => '/admin/events',
@@ -83,6 +85,14 @@ Route::put('/events/manage/{id}', [EventPanelController::class, 'update']);
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.home');
+
+    // --- Admin Categories CRUD ---
+    Route::get('/admin/categories',            [CategoryController::class, 'index']);
+    Route::get('/admin/categories/create',     [CategoryController::class, 'create']);
+    Route::post('/admin/categories',           [CategoryController::class, 'store']);
+    Route::get('/admin/categories/{id}/edit',  [CategoryController::class, 'edit']);
+    Route::put('/admin/categories/{id}',       [CategoryController::class, 'update']);
+    Route::delete('/admin/categories/{id}',    [CategoryController::class, 'destroy']);
 
     // --- Admin Users CRUD ---
     Route::get('/admin/users', [UserController::class, 'index']);

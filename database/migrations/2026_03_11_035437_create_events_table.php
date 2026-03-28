@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->text('description');
             $table->string('title');
-            $table->string('type');
             $table->string('location');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->enum('status', ['preparation','ongoing', 'completed', 'canceled', 'pending'])->default('preparation');
             $table->integer('quota')->default(20);
+            $table->unsignedBigInteger('category_id')->nullable();
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->timestamps();

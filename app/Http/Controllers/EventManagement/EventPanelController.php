@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\EventManagement;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Event;
 use App\ViewModels\ManageEventViewModel;
 use Illuminate\Http\Request;
@@ -12,7 +13,8 @@ class EventPanelController extends Controller
     public function index($id)
     {
         $event = Event::where('id', $id)->first();
-        $viewModel = new ManageEventViewModel($event);
+        $categories = Category::orderBy('name')->pluck('name', 'id');
+        $viewModel = new ManageEventViewModel($event, 'index', $categories);
         return view('admin.event', $viewModel->toArray());
     }
 
@@ -24,7 +26,8 @@ class EventPanelController extends Controller
             return response()->json(['success' => true]);
         }
 
-        $viewModel = new ManageEventViewModel($event);
+        $categories = Category::orderBy('name')->pluck('name', 'id');
+        $viewModel = new ManageEventViewModel($event, 'index', $categories);
         return view('admin.event', $viewModel->toArray());
     }
 }

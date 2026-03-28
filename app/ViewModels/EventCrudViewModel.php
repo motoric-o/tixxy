@@ -3,40 +3,47 @@
 namespace App\ViewModels;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Collection;
 
 class EventCrudViewModel implements Arrayable
 {
     private $events;
     private $action;
+    private $categories;
 
-    public function __construct($events, $action = 'index')
+    public function __construct($events, $action = 'index', $categories = [])
     {
-        $this->events = $events;
-        $this->action = $action;
+        $this->events     = $events;
+        $this->action     = $action;
+        $this->categories = $categories;
     }
 
     public function toArray(): array
     {
         return [
-            'title' => $this->action == 'index' ? 'Events' : 'Edit Event: ' . $this->events->title,
-            'columns' => $this->columns(),
-            'rows' => $this->events,
-            'filters' => $this->filters(),
+            'title'     => $this->action == 'index' ? 'Events' : 'Edit Event: ' . $this->events->title,
+            'columns'   => $this->columns(),
+            'rows'      => $this->events,
+            'filters'   => $this->filters(),
             'createUrl' => '/admin/events/create',
-            'editUrl' => '/admin/events',
-            'backUrl' => '/admin/events',
-            'action' => $this->action,
-            'item' => $this->events,
-            'fields' => [
-                ['name' => 'title', 'label' => 'Event Name', 'type' => 'text', 'required' => true],
-                ['name' => 'start_time', 'label' => 'Start Time', 'type' => 'datetime-local', 'required' => true],
-                ['name' => 'end_time', 'label' => 'End Time', 'type' => 'datetime-local', 'required' => true],
-                ['name' => 'location', 'label' => 'Location', 'type' => 'text', 'required' => true],
-                ['name' => 'description', 'label' => 'Description', 'type' => 'textarea'],
-                ['name' => 'quota', 'label' => 'Quota', 'type' => 'number'],
-                ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => ['ongoing' => 'Ongoing', 'completed' => 'Completed', 'canceled' => 'Canceled', 'pending' => 'Pending'], 'required' => true],
-            ],
+            'editUrl'   => '/admin/events',
+            'backUrl'   => '/admin/events',
+            'action'    => $this->action,
+            'item'      => $this->events,
+            'fields'    => $this->fields(),
+        ];
+    }
+
+    private function fields(): array
+    {
+        return [
+            ['name' => 'title',       'label' => 'Event Name',  'type' => 'text',           'required' => true],
+            ['name' => 'category_id', 'label' => 'Category',    'type' => 'select',          'options' => $this->categories, 'required' => true],
+            ['name' => 'start_time',  'label' => 'Start Time',  'type' => 'datetime-local',  'required' => true],
+            ['name' => 'end_time',    'label' => 'End Time',    'type' => 'datetime-local',  'required' => true],
+            ['name' => 'location',    'label' => 'Location',    'type' => 'text',            'required' => true],
+            ['name' => 'description', 'label' => 'Description', 'type' => 'textarea'],
+            ['name' => 'quota',       'label' => 'Quota',       'type' => 'number'],
+            ['name' => 'status',      'label' => 'Status',      'type' => 'select',          'options' => ['ongoing' => 'Ongoing', 'completed' => 'Completed', 'canceled' => 'Canceled', 'pending' => 'Pending', 'preparation' => 'Preparation'], 'required' => true],
         ];
     }
 
@@ -44,29 +51,29 @@ class EventCrudViewModel implements Arrayable
     {
         return [
             'status' => [
-                'label' => 'Status',
+                'label'   => 'Status',
                 'options' => [
-                    'ongoing' => 'Ongoing',
-                    'completed' => 'Completed',
-                    'canceled' => 'Canceled',
-                    'pending' => 'Pending',
-                    'preparation' => 'Preparation'
-                ]
-            ]
+                    'ongoing'     => 'Ongoing',
+                    'completed'   => 'Completed',
+                    'canceled'    => 'Canceled',
+                    'pending'     => 'Pending',
+                    'preparation' => 'Preparation',
+                ],
+            ],
         ];
     }
 
     private function columns(): array
     {
         return [
-            ['key' => 'title', 'label' => 'Title'],
-            ['key' => 'type', 'label' => 'Type'],
-            ['key' => 'description', 'label' => 'Description'],
-            ['key' => 'location', 'label' => 'Location'],
-            ['key' => 'start_time', 'label' => 'Start Time'],
-            ['key' => 'end_time', 'label' => 'End Time'],
-            ['key' => 'quota', 'label' => 'Quota'],
-            ['key' => 'status', 'label' => 'Status'],
+            ['key' => 'title',         'label' => 'Title'],
+            ['key' => 'category.name', 'label' => 'Category'],
+            ['key' => 'description',   'label' => 'Description'],
+            ['key' => 'location',      'label' => 'Location'],
+            ['key' => 'start_time',    'label' => 'Start Time'],
+            ['key' => 'end_time',      'label' => 'End Time'],
+            ['key' => 'quota',         'label' => 'Quota'],
+            ['key' => 'status',        'label' => 'Status'],
         ];
     }
 }

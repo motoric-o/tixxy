@@ -46,6 +46,16 @@
                         <p x-show="!editing" class="text-gray-900 dark:text-white font-medium" x-text="formData.title">{{ $item->title }}</p>
                         <input x-show="editing" type="text" x-model="formData.title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-colors duration-300" style="display: none;">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                        <p x-show="!editing" class="text-gray-900 dark:text-white" x-text="categoryName">{{ $item->category->name ?? 'None' }}</p>
+                        <select x-show="editing" x-model="formData.category_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-colors duration-300" style="display: none;">
+                            <option value="">Select Category</option>
+                            @foreach($categories as $id => $name)
+                                <option value="{{ $id }}" @if($item->category_id == $id) selected @endif>{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Time</label>
@@ -210,10 +220,15 @@
                 title: @json($item->title),
                 start_time: '{{ $item->start_time->format("Y-m-d\TH:i") }}',
                 end_time: '{{ $item->end_time->format("Y-m-d\TH:i") }}',
+                category_id: {{ $item->category_id ?? 'null' }},
                 location: @json($item->location),
                 description: @json($item->description),
                 status: @json($item->status),
                 quota: {{ $item->quota }}
+            },
+            categories: @json($categories),
+            get categoryName() {
+                return this.categories[this.formData.category_id] || 'None';
             },
             init() {
                 // Initial update for text displays if needed

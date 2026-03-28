@@ -12,12 +12,12 @@ class Event extends Model
     protected $fillable = [
         'title',
         'description',
-        'type',
         'location',
         'start_time',
         'end_time',
         'status',
         'quota',
+        'category_id',
         'user_id',
     ];
 
@@ -25,6 +25,14 @@ class Event extends Model
         'start_time' => 'datetime',
         'end_time'   => 'datetime',
     ];
+
+    /**
+     * The category this event belongs to.
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     /**
      * The organizer (user) who owns this event.

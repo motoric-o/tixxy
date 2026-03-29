@@ -1,0 +1,48 @@
+<?php
+
+namespace App\ViewModels;
+
+use Illuminate\Contracts\Support\Arrayable;
+
+class TicketTypeCrudViewModel implements Arrayable
+{
+    private $ticketTypes;
+    private $action;
+    private $events;
+
+    public function __construct($ticketTypes, $action = 'index')
+    {
+        $this->ticketTypes = $ticketTypes;
+        $this->action      = $action;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'title'     => $this->action == 'index' ? 'Ticket Types' : ($this->action == 'create' ? 'Create Ticket Type' : 'Edit Ticket Type: ' . $this->ticketTypes->name),
+            'columns'   => $this->columns(),
+            'rows'      => $this->ticketTypes,
+            'createUrl' => '/admin/ticket-types/create',
+            'editUrl'   => '/admin/ticket-types',
+            'backUrl'   => '/admin/ticket-types',
+            'action'    => $this->action,
+            'item'      => $this->ticketTypes,
+            'fields'    => $this->fields(),
+        ];
+    }
+
+    private function fields(): array
+    {
+        return [
+            ['name' => 'name', 'label' => 'Ticket Type Name',  'type' => 'text', 'required' => true],
+        ];
+    }
+
+    private function columns(): array
+    {
+        return [
+            ['key' => 'id', 'label' => 'ID'],
+            ['key' => 'name', 'label' => 'Name'],
+        ];
+    }
+}

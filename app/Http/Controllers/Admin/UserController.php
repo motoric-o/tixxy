@@ -28,6 +28,12 @@ class UserController extends Controller
         return view('admin.crud.index', $viewModel->toArray());
     }
 
+    public function create() {
+        $viewModel = new UserCrudViewModel(null, 'create');
+
+        return view('admin.crud.form', $viewModel->toArray());
+    }
+
     public function edit($id) {
         $user = User::find($id);
 

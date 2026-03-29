@@ -19,7 +19,7 @@ class UserCrudViewModel implements Arrayable
     public function toArray(): array
     {
         return [
-            'title' => $this->action == 'index' ? 'Users' : 'Edit User: ' . $this->users->name,
+            'title' => $this->action == 'index' ? ($this->action == 'create' ? 'Create User' : 'Users') : 'Edit User: ' . $this->users->name,
             'columns' => $this->columns(),
             'rows' => $this->users,
             'filters' => $this->filters(),
@@ -28,11 +28,15 @@ class UserCrudViewModel implements Arrayable
             'backUrl' => '/admin/users',
             'action' => $this->action,
             'item' => $this->users,
-            'fields' => [
-                ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'required' => true],
-                ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true],
-                ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'user' => 'User'], 'required' => true],
-            ],
+            'fields' => $this->fields(),
+        ];
+    }
+
+    private function fields() : array {
+        return [
+            ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'required' => true],
+            ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true],
+            ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'user' => 'User'], 'required' => true],
         ];
     }
 
@@ -52,6 +56,7 @@ class UserCrudViewModel implements Arrayable
     private function columns(): array
     {
         return [
+            ['key' => 'id', 'label' => 'ID'],
             ['key' => 'name', 'label' => 'Name'],
             ['key' => 'email', 'label' => 'Email'],
             ['key' => 'role', 'label' => 'Role'],

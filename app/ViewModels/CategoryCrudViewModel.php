@@ -27,18 +27,23 @@ class CategoryCrudViewModel implements Arrayable
             'backUrl'   => '/admin/categories',
             'action'    => $this->action,
             'item'      => $this->categories,
-            'fields'    => [
-                ['name' => 'name', 'label' => 'Category Name', 'type' => 'text', 'placeholder' => 'e.g. Music, Sports, Tech', 'required' => true],
-            ],
+            'fields'    => $this->fields(),
         ];
     }
 
     private function columns(): array
     {
         return [
-            ['key' => 'id',         'label' => '#'],
-            ['key' => 'name',       'label' => 'Name'],
+            ['key' => 'id', 'label' => 'ID'],
+            ['key' => 'name', 'label' => 'Name'],
             ['key' => 'created_at', 'label' => 'Created At'],
+        ];
+    }
+
+    private function fields(): array
+    {
+        return [
+            ['name' => 'name', 'label' => 'Category Name', 'type' => 'text', 'placeholder' => 'e.g. Music, Sports, Tech', 'required' => true],
         ];
     }
 }

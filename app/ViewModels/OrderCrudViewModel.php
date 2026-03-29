@@ -51,11 +51,12 @@ class OrderCrudViewModel implements Arrayable
     private function columns(): array
     {
         return [
+            ['key' => 'id', 'label' => 'ID'],
             ['key' => 'amount', 'label' => 'Amount'],
             ['key' => 'status', 'label' => 'Status'],
             ['key' => 'user.name', 'label' => 'User'],
             ['key' => 'event.title', 'label' => 'Event'],
-            ['key' => 'created_at', 'label' => 'Created At'],
+            ['key' => 'created_at', 'label' => 'Ordered At'],
         ];
     }
 }

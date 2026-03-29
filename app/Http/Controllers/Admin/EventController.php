@@ -26,13 +26,20 @@ class EventController extends Controller
             ->when($status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->latest()
+            ->orderBy('start_time', 'asc')
             ->paginate(10);
 
         $categories = Category::orderBy('name')->pluck('name', 'id');
         $viewModel  = new EventCrudViewModel($rows, 'index', $categories);
 
         return view('admin.crud.index', $viewModel->toArray());
+    }
+
+    public function create() {
+        $categories = Category::orderBy('name')->pluck('name', 'id');
+        $viewModel  = new EventCrudViewModel(null, 'create', $categories);
+
+        return view('admin.crud.form', $viewModel->toArray());
     }
 
     public function edit($id)

@@ -20,7 +20,7 @@ class EventCrudViewModel implements Arrayable
     public function toArray(): array
     {
         return [
-            'title'     => $this->action == 'index' ? 'Events' : 'Edit Event: ' . $this->events->title,
+            'title'     => $this->action == 'index' ? 'Events' : ($this->action == 'create' ? 'Create Event' : 'Edit Event: ' . $this->events->title),
             'columns'   => $this->columns(),
             'rows'      => $this->events,
             'filters'   => $this->filters(),
@@ -66,14 +66,15 @@ class EventCrudViewModel implements Arrayable
     private function columns(): array
     {
         return [
-            ['key' => 'title',         'label' => 'Title'],
+            ['key' => 'id', 'label' => 'ID'],
+            ['key' => 'title', 'label' => 'Title'],
             ['key' => 'category.name', 'label' => 'Category'],
-            ['key' => 'description',   'label' => 'Description'],
-            ['key' => 'location',      'label' => 'Location'],
-            ['key' => 'start_time',    'label' => 'Start Time'],
-            ['key' => 'end_time',      'label' => 'End Time'],
-            ['key' => 'quota',         'label' => 'Quota'],
-            ['key' => 'status',        'label' => 'Status'],
+            ['key' => 'description', 'label' => 'Description'],
+            ['key' => 'location', 'label' => 'Location'],
+            ['key' => 'start_time', 'label' => 'Start Time'],
+            ['key' => 'end_time', 'label' => 'End Time'],
+            ['key' => 'quota', 'label' => 'Quota'],
+            ['key' => 'status', 'label' => 'Status'],
         ];
     }
 }

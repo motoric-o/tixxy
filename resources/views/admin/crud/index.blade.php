@@ -49,7 +49,6 @@
     <table class="w-full text-sm text-left">
         <thead class="text-xs uppercase bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-[#d8b4fe]">
             <tr>
-                <th class="px-6 py-4">#</th>
                 @foreach($columns as $col)
                     <th class="px-6 py-4">{{ $col['label'] }}</th>
                 @endforeach
@@ -57,9 +56,8 @@
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            @forelse($rows as $index => $row)
+            @forelse($rows as $row)
                 <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200 cursor-pointer" onclick="window.location='{{ $editUrl }}/{{ data_get($row, 'id') }}/edit'">
-                    <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ $index + 1 }}</td>
                     @foreach($columns as $col)
                         <td class="px-6 py-4 text-gray-900 dark:text-gray-200">
                             {{ data_get($row, $col['key']) }}

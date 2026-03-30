@@ -115,8 +115,13 @@
         {{-- Ticket Types --}}
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div class="p-6 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-t-xl flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Ticket Types</h3>
-                <button type="button" @click="addTicketType()" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Ticket Types</h3>
+                    <div class="text-xs px-2.5 py-1 rounded-md transition-colors duration-300" :class="totalTicketCapacity > formData.quota ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border border-purple-200 dark:border-purple-800'">
+                        <span class="font-bold" x-text="totalTicketCapacity"></span> / <span x-text="formData.quota"></span> Quota
+                    </div>
+                </div>
+                <button type="button" @click="addTicketType()" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="totalTicketCapacity >= formData.quota">
                     + Add Ticket Type
                 </button>
             </div>
@@ -162,11 +167,12 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Capacity</label>
-                                        <input type="number" x-model="ticket.capacity" placeholder="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500">
+                                        <input type="number" x-model.number="ticket.capacity" placeholder="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500">
                                     </div>
                                 </div>
-                                <div class="flex gap-2 justify-end">
-                                    <button type="button" @click="ticket.editMode = false; saveTicketTypes()" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white rounded-lg bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] shadow-sm">
+                                <div class="flex gap-2 justify-end items-center">
+                                    <span x-show="totalTicketCapacity > formData.quota" class="text-xs text-red-500 dark:text-red-400 mr-2">Exceeds total event quota!</span>
+                                    <button type="button" :disabled="totalTicketCapacity > formData.quota" @click="if(totalTicketCapacity <= formData.quota) { ticket.editMode = false; saveTicketTypes(); }" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white rounded-lg bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                         Save
                                     </button>
@@ -266,6 +272,9 @@
             categories: @json($categories),
             organizers: @json($organizers),
             allTicketTypes: @json($ticketTypesData),
+            get totalTicketCapacity() {
+                return this.formData.ticket_types.reduce((sum, ticket) => sum + (parseInt(ticket.capacity) || 0), 0);
+            },
             get categoryName() {
                 return this.categories[this.formData.category_id] || 'None';
             },
@@ -332,6 +341,12 @@
             },
             async save() {
                 if (this.saving) return;
+                
+                if (this.totalTicketCapacity > this.formData.quota) {
+                    alert('Cannot save event. Ticket capacities exceed total event quota.');
+                    return;
+                }
+
                 this.saving = true;
                 
                 try {

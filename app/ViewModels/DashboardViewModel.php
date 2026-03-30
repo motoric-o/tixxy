@@ -137,7 +137,7 @@ class DashboardViewModel implements Arrayable
                 'queues as queues_completed_count' => fn ($q) => $q->where('status', 'completed'),
             ])
             ->with(['eventTicketTypes'])
-            ->orderBy('start_time')
+            ->orderBy('start_time', 'asc')
             ->get();
 
         foreach ($ongoingEvents as $event) {

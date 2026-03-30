@@ -44,9 +44,27 @@ class EventController extends Controller
 
     public function edit($id)
     {
-        $event      = Event::findOrFail($id);
+        $event = Event::with('eventTicketTypes.ticketType')->findOrFail($id);
         $categories = Category::orderBy('name')->pluck('name', 'id');
-        $viewModel  = new ManageEventViewModel($event, 'index', $categories);
+        $ticketTypes = \App\Models\TicketType::orderBy('name')->get();
+        $organizers = \App\Models\User::whereIn('role', ['organizer', 'admin'])->pluck('name', 'id');
+
+        $ticketTypesData = $ticketTypes->map(function ($t) {
+            return ['id' => (string) $t->id, 'name' => $t->name];
+        })->values();
+
+        $eventTicketTypesData = $event->eventTicketTypes->map(function ($tt) {
+            return [
+                'id'             => $tt->id,
+                'ticket_type_id' => (string) $tt->ticket_type_id,
+                'price'          => $tt->price,
+                'capacity'       => $tt->capacity,
+                'editMode'       => false,
+                'isNew'          => false,
+            ];
+        })->values();
+
+        $viewModel = new ManageEventViewModel($event, 'index', $categories, $ticketTypes, $organizers, $ticketTypesData, $eventTicketTypesData);
 
         return view('admin.event', $viewModel->toArray());
     }

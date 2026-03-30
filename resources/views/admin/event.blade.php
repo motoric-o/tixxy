@@ -3,21 +3,27 @@
 @section('content')
 
 <div x-data="eventManager({{ $item->id }})">
-    <div class="mb-6 flex flex-row justify-between">
-        <div class="flex flex-col">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white" x-text="formData.title">{{ $title }}</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Overview as of {{ now()->format('l, d F Y') }}
-            </p>
+    <div class="mb-6 flex flex-row justify-between items-center">
+        <div class="flex flex-row items-center gap-5">
+            <a href="{{ $backUrl }}" class="p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-[#4a00e0] transition-colors duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] border border-transparent hover:border-white/20" title="Back">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </a>
+            <div class="flex flex-col">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white" x-text="formData.title">{{ $title }}</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Overview as of {{ now()->format('l, d F Y') }}
+                </p>
+            </div>
         </div>
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
-            Assigned Organizer:
-            @if ($item->organizer)
-                {{ $item->organizer->name }}
-            @else
-                <span class="text-sm text-gray-500 dark:text-gray-400">Unassigned</span>    
-            @endif
-        </h2>
+        <div class="flex flex-col items-end gap-1">
+            <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Assigned Organizer</label>
+            <select x-model="formData.user_id" @change="saveOrganizer()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-colors duration-300 min-w-[180px]">
+                <option value="">Unassigned</option>
+                @foreach($organizers as $orgId => $orgName)
+                    <option value="{{ $orgId }}">{{ $orgName }}</option>
+                @endforeach
+            </select>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -110,38 +116,67 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div class="p-6 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-t-xl flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Ticket Types</h3>
-                <button class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                <button type="button" @click="addTicketType()" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
                     + Add Ticket Type
                 </button>
             </div>
             <div class="p-6">
                 <div class="space-y-4">
-                    <!-- Example Ticket Type -->
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-white">General Admission</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Early Bird</p>
+                    <template x-for="(ticket, index) in formData.ticket_types" :key="index">
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                            {{-- View mode --}}
+                            <div x-show="!ticket.editMode">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white" x-text="getTicketTypeName(ticket.ticket_type_id) || 'Unknown Type'"></h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Ticket configuration</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-semibold text-gray-900 dark:text-white" x-text="'Rp ' + parseFloat(ticket.price).toLocaleString('id-ID')"></p>
+                                        <span class="text-xs text-green-600 dark:text-green-400">Available</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3 grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <div><span class="font-medium">Capacity:</span> <span x-text="ticket.capacity"></span></div>
+                                </div>
+                                <div class="mt-3 flex gap-2 justify-end">
+                                    <button type="button" @click="ticket.editMode = true" class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700">Edit</button>
+                                    <button type="button" @click="removeTicketType(index)" class="text-xs font-medium text-red-500 dark:text-red-400 hover:text-red-700">Remove</button>
+                                </div>
                             </div>
-                            <div class="text-right">
-                                <p class="font-semibold text-gray-900 dark:text-white">$49.00</p>
-                                <span class="text-xs text-green-600 dark:text-green-400">Available</span>
+                            {{-- Edit mode --}}
+                            <div x-show="ticket.editMode" style="display:none;">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Ticket Type</label>
+                                        <select x-model="ticket.ticket_type_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500">
+                                            <option value="">Select Type</option>
+                                            @foreach($ticketTypes as $type)
+                                                <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Price (Rp)</label>
+                                        <input type="number" step="0.01" x-model="ticket.price" placeholder="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Capacity</label>
+                                        <input type="number" x-model="ticket.capacity" placeholder="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500">
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 justify-end">
+                                    <button type="button" @click="ticket.editMode = false; saveTicketTypes()" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white rounded-lg bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        Save
+                                    </button>
+                                    <button type="button" @click="cancelEdit(ticket, index)" class="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 px-3 py-1.5">Cancel</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
-                            <div>
-                                <span class="font-medium">Sales Start:</span> 25 Mar 2024, 10:00 AM
-                            </div>
-                            <div>
-                                <span class="font-medium">Sales End:</span> 10 Apr 2024, 11:59 PM
-                            </div>
-                            <div>
-                                <span class="font-medium">Total Tickets:</span> 500
-                            </div>
-                            <div>
-                                <span class="font-medium">Sold:</span> 123
-                            </div>
-                        </div>
+                    </template>
+                    <div x-show="formData.ticket_types.length === 0" class="text-center py-6 text-gray-500 dark:text-gray-400 text-sm border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+                        No ticket types configured for this event.
                     </div>
                 </div>
             </div>
@@ -221,14 +256,66 @@
                 start_time: '{{ $item->start_time->format("Y-m-d\TH:i") }}',
                 end_time: '{{ $item->end_time->format("Y-m-d\TH:i") }}',
                 category_id: {{ $item->category_id ?? 'null' }},
+                user_id: '{{ $item->user_id ?? '' }}',
                 location: @json($item->location),
                 description: @json($item->description),
                 status: @json($item->status),
-                quota: {{ $item->quota }}
+                quota: {{ $item->quota }},
+                ticket_types: @json($eventTicketTypesData),
             },
             categories: @json($categories),
+            organizers: @json($organizers),
+            allTicketTypes: @json($ticketTypesData),
             get categoryName() {
                 return this.categories[this.formData.category_id] || 'None';
+            },
+            getTicketTypeName(id) {
+                const tt = this.allTicketTypes.find(t => t.id == id);
+                return tt ? tt.name : null;
+            },
+            addTicketType() {
+                this.formData.ticket_types.push({
+                    id: null,
+                    ticket_type_id: '',
+                    price: 0,
+                    capacity: 0,
+                    editMode: true,
+                    isNew: true
+                });
+            },
+            cancelEdit(ticket, index) {
+                if (ticket.isNew) {
+                    this.formData.ticket_types.splice(index, 1);
+                } else {
+                    ticket.editMode = false;
+                }
+            },
+            removeTicketType(index) {
+                this.formData.ticket_types.splice(index, 1);
+                this.saveTicketTypes();
+            },
+            async saveOrganizer() {
+                await fetch(`/events/manage/${eventId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id: this.formData.user_id || null })
+                });
+            },
+            async saveTicketTypes() {
+                const payload = this.formData.ticket_types.map(({ ticket_type_id, price, capacity }) => ({ ticket_type_id, price, capacity }));
+                await fetch(`/events/manage/${eventId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ ticket_types: payload })
+                });
             },
             init() {
                 // Initial update for text displays if needed

@@ -43,7 +43,7 @@
                 Admin Dashboard
             </a>
         @elseif ($role == 'Organizer')
-            <a href="/admin/events"
+            <a href="/organizer/dashboard"
                 class="px-4 py-2.5 text-sm text-[#e9d5ff] hover:bg-[#a855f7]/20 hover:text-white transition-colors flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -11,6 +11,12 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 
+use App\Http\Controllers\Organizer\DashboardController as OrganizerDashboardController;
+use App\Http\Controllers\Organizer\EventController as OrganizerEventController;
+use App\Http\Controllers\Organizer\OrderController as OrganizerOrderController;
+use App\Http\Controllers\Organizer\UserController as OrganizerUserController;
+
+
 use App\Models\Event;
 
 /*
@@ -56,10 +62,12 @@ Route::middleware('auth')->group(function () {
  */
 Route::middleware(['auth', 'role:organizer,admin'])->group (function () {
     // --- Events CRUD ---
-Route::get('/events/manage/{id}', [EventPanelController::class, 'index']);
-Route::put('/events/manage/{id}', [EventPanelController::class, 'update']);
+    Route::get('/events/manage/{id}', [EventPanelController::class, 'index']);
+    Route::put('/events/manage/{id}', [EventPanelController::class, 'update']);
 
-    Route::get('/admin/events', [EventController::class, 'index'])->name('organizer.home');
+    Route::get('/organizer/dashboard', [OrganizerDashboardController::class, 'index'])->name('organizer.home');
+    Route::get('/organizer/events', [OrganizerEventController::class, 'index']);
+    
 
     Route::get('/admin/events/create', function () {
         $categories = \App\Models\Category::orderBy('name')->pluck('name', 'id');
@@ -124,6 +132,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/admin/orders/{id}/edit', [OrderController::class, 'edit']);
     Route::put('/admin/orders/{id}', [OrderController::class, 'update']);
+
+    Route::get('/admin/events', [EventController::class, 'index']);
 });
 
 require __DIR__ . '/auth.php';

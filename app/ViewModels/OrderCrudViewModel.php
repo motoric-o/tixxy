@@ -24,13 +24,15 @@ class OrderCrudViewModel implements Arrayable
             'columns' => $this->columns(),
             'rows' => $this->orders,
             'filters' => $this->filters(),
-            'createUrl' => '/admin/orders/create',
-            'editUrl' => '/admin/orders',
-            'backUrl' => '/admin/orders',
-            'action' => $this->action,
+            'createUrl' => '/manage/orders/create',
+            'editUrl' => '/manage/orders',
+            'backUrl' => '/manage/orders',
+            'canDelete' => false,
+            'action' => $this->action == 'create' ? '/manage/orders/create' : ($this->action == 'edit' ? '/manage/orders/' . $this->orders->id : '/manage/orders'),
+            'method' => $this->action == 'edit' ? 'PUT' : 'POST',
             'item' => $this->orders,
             'fields' => [
-                ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => ['pending' => 'Pending', 'completed' => 'Completed', 'canceled' => 'Canceled'], 'required' => true],
+                ['name' => 'status', 'label' => 'Status', 'type' => 'select', 'options' => \App\Models\Order::getStatuses(), 'required' => true],
             ],
             'detailFields' => $this->action !== 'index' ? $this->detailFields() : [],
         ];
@@ -71,7 +73,7 @@ class OrderCrudViewModel implements Arrayable
                     'label' => substr($ticket->qr_code_hash, 0, 12) . '...',
                     'badge' => $ticket->is_scanned ? 'Scanned' : 'Active',
                     'color' => $ticket->is_scanned ? 'gray' : 'green',
-                    'url'   => '/admin/tickets/' . $ticket->id . '/edit',
+                    'url'   => '/manage/tickets/' . $ticket->id . '/edit',
                 ];
             })->toArray();
 
@@ -90,11 +92,7 @@ class OrderCrudViewModel implements Arrayable
         return [
             'status' => [
                 'label' => 'Status',
-                'options' => [
-                    'pending' => 'Pending',
-                    'completed' => 'Completed',
-                    'canceled' => 'Canceled'
-                ]
+                'options' => \App\Models\Order::getStatuses()
             ]
         ];
     }

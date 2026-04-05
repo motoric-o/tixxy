@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('queues', function (Blueprint $table) {
-            $table->foreignId('event_id')->constrained()->onDelete('set null');
+            $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->id();
             $table->enum('status', ['waiting','canceled', 'completed'])->default('waiting');
             $table->timestamps();

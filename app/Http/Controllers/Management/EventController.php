@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Organizer;
+namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\TicketType;
+use App\Models\User;
 use App\ViewModels\EventCrudViewModel;
 use App\ViewModels\ManageEventViewModel;
 use Illuminate\Http\Request;
@@ -16,47 +18,34 @@ class EventController extends Controller
     {
         $search = request('search');
         $status = request('status');
-        $rows = Event::where('user_id', Auth::id())
-            ->with('category')
+        $rows = Event::with('category')
+            ->when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                          ->orWhere('location', 'like', "%{$search}%")
-                          ->orWhereHas('category', function ($sub) use ($search) {
-                              $sub->where('name', 'like', "%{$search}%");
-                          });
+                      ->orWhere('location', 'like', "%{$search}%")
+                      ->orWhereHas('category', function ($sub) use ($search) {
+                          $sub->where('name', 'like', "%{$search}%");
+                      });
                 });
             })
             ->when($status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->latest()
+            ->orderBy('start_time', 'asc')
             ->paginate(10);
 
         $categories = Category::orderBy('name')->pluck('name', 'id');
         $viewModel  = new EventCrudViewModel($rows, 'index', $categories);
 
-        return view('organizer.crud.index', $viewModel->toArray());
+        return view('admin.crud.index', $viewModel->toArray());
     }
 
-    public function edit($id)
-    {
-        $event      = Event::where('user_id', Auth::id())->findOrFail($id);
+    public function create() {
         $categories = Category::orderBy('name')->pluck('name', 'id');
-        $viewModel  = new ManageEventViewModel($event, 'index', $categories);
+        $viewModel  = new EventCrudViewModel(null, 'create', $categories);
 
-        return view('organizer.event', $viewModel->toArray());
-    }
-
-    public function update($id, Request $request)
-    {
-        $event = Event::where('user_id', Auth::id())->findOrFail($id);
-        $event->update($request->only([
-            'title', 'description', 'location', 'start_time', 'end_time',
-            'status', 'quota', 'category_id',
-        ]));
-
-        return redirect('/organizer/events')->with('success', 'Event updated successfully.');
+        return view('admin.crud.form', $viewModel->toArray());
     }
 
     public function store(Request $request)
@@ -80,17 +69,19 @@ class EventController extends Controller
             'end_time'    => $request->end_time,
             'status'      => 'preparation',
             'quota'       => $request->quota,
-            'user_id'     => Auth::id(),
+            'user_id'     => Auth::user()->role === 'admin' ? $request->user_id ?? Auth::id() : Auth::id(),
         ]);
 
-        return redirect('/organizer/events')->with('success', 'Event created successfully.');
+        return redirect('/manage/events')->with('success', 'Event created successfully.');
     }
 
     public function destroy($id)
     {
-        $event = Event::where('user_id', Auth::id())->findOrFail($id);
+        $event = Event::when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
+            ->findOrFail($id);
+        
         $event->delete();
 
-        return redirect('/organizer/events')->with('success', 'Event deleted successfully.');
+        return redirect('/manage/events')->with('success', 'Event deleted successfully.');
     }
 }

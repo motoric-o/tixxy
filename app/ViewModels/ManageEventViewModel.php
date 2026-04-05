@@ -13,6 +13,7 @@ class ManageEventViewModel implements Arrayable
     private $organizers;
     private $ticketTypesData;
     private $eventTicketTypesData;
+    private $statuses;
 
     public function __construct($event, $action = 'index', $categories = [], $ticketTypes = [], $organizers = [], $ticketTypesData = [], $eventTicketTypesData = [])
     {
@@ -23,13 +24,14 @@ class ManageEventViewModel implements Arrayable
         $this->organizers          = $organizers;
         $this->ticketTypesData     = $ticketTypesData;
         $this->eventTicketTypesData = $eventTicketTypesData;
+        $this->statuses             = \App\Models\Event::getStatuses();
     }
 
     public function toArray(): array
     {
         return [
             'title'                => $this->action == 'index' ? 'Manage Event: ' . $this->event->title : 'Edit Event: ' . $this->event->title,
-            'backUrl'              => '/admin/events',
+            'backUrl'              => '/manage/events',
             'action'               => $this->action,
             'item'                 => $this->event,
             'categories'           => $this->categories,
@@ -38,6 +40,7 @@ class ManageEventViewModel implements Arrayable
             'ticketTypesData'      => $this->ticketTypesData,
             'eventTicketTypesData' => $this->eventTicketTypesData,
             'fields'               => $this->fields(),
+            'statuses'             => $this->statuses,
         ];
     }
 
@@ -51,7 +54,7 @@ class ManageEventViewModel implements Arrayable
             ['name' => 'location',    'label' => 'Location',    'type' => 'text',           'required' => true],
             ['name' => 'description', 'label' => 'Description', 'type' => 'textarea'],
             ['name' => 'quota',       'label' => 'Quota',       'type' => 'number'],
-            ['name' => 'status',      'label' => 'Status',      'type' => 'select',         'options' => ['ongoing' => 'Ongoing', 'completed' => 'Completed', 'canceled' => 'Canceled', 'pending' => 'Pending', 'preparation' => 'Preparation'], 'required' => true],
+            ['name' => 'status',      'label' => 'Status',      'type' => 'select',         'options' => $this->statuses, 'required' => true],
         ];
     }
 }

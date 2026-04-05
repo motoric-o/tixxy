@@ -65,4 +65,18 @@ class Event extends Model
     {
         return $this->hasMany(Queue::class);
     }
+
+    /**
+     * Get all possible event statuses.
+     */
+    public static function getStatuses(): array
+    {
+        return [
+            'pending'     => 'Pending',
+            'preparation' => 'Preparation',
+            'ongoing'     => 'Ongoing',
+            'completed'   => 'Completed',
+            'canceled'    => 'Canceled',
+        ];
+    }
 }

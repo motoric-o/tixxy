@@ -9,12 +9,17 @@ use App\Models\TicketType;
 use App\Models\User;
 use App\ViewModels\ManageEventViewModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventPanelController extends Controller
 {
     public function index($id)
     {
-        $event = Event::with('eventTicketTypes.ticketType')->where('id', $id)->first();
+        $event = Event::with('eventTicketTypes.ticketType')
+            ->when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
+            ->where('id', $id)
+            ->firstOrFail();
+
         $categories = Category::orderBy('name')->pluck('name', 'id');
         $ticketTypes = TicketType::orderBy('name')->get();
         $organizers = User::whereIn('role', ['organizer', 'admin'])->pluck('name', 'id');
@@ -39,7 +44,10 @@ class EventPanelController extends Controller
     }
 
     public function update($id, Request $request) {
-        $event = Event::where('id', $id)->first();
+        $event = Event::when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
+            ->where('id', $id)
+            ->firstOrFail();
+
         $event->update($request->all());
 
         if ($request->has('ticket_types')) {

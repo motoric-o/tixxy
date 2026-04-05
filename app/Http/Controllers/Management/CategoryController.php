@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -38,7 +38,7 @@ class CategoryController extends Controller
 
         Category::create(['name' => $request->name]);
 
-        return redirect('/admin/categories')->with('success', 'Category created successfully.');
+        return redirect('/manage/categories')->with('success', 'Category created successfully.');
     }
 
     public function edit($id)
@@ -59,7 +59,7 @@ class CategoryController extends Controller
 
         $category->update(['name' => $request->name]);
 
-        return redirect('/admin/categories')->with('success', 'Category updated successfully.');
+        return redirect('/manage/categories')->with('success', 'Category updated successfully.');
     }
 
     public function destroy($id)
@@ -67,6 +67,6 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->delete();
 
-        return redirect('/admin/categories')->with('success', 'Category deleted successfully.');
+        return redirect('/manage/categories')->with('success', 'Category deleted successfully.');
     }
 }

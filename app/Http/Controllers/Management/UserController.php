@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -55,7 +55,7 @@ class UserController extends Controller
         
         $user->update($data);
 
-        return redirect('/admin/users')->with('success', 'User updated successfully.');
+        return redirect('/manage/users')->with('success', 'User updated successfully.');
     }
 
     public function store(Request $request) {
@@ -75,13 +75,13 @@ class UserController extends Controller
             'role'=> $data['role'],
         ]);
 
-        return redirect('/admin/users')->with('success', 'User created successfully.');
+        return redirect('/manage/users')->with('success', 'User created successfully.');
     }
 
     public function destroy($id) {
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect('/admin/users')->with('success', 'User deleted successfully.');
+        return redirect('/manage/users')->with('success', 'User deleted successfully.');
     }
 }

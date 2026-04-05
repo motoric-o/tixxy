@@ -155,7 +155,8 @@ class OrganizerDashboardViewModel implements Arrayable
     private function ongoingEvents()
     {
         $ongoingEvents = Event::where('user_id', $this->userId)
-            ->where('status', 'ongoing')
+            ->where('start_time', '<=', now())
+            ->where('end_time', '>=', now())
             ->withCount([
                 'queues',
                 'queues as queues_waiting_count'  => fn ($q) => $q->where('status', 'waiting'),
@@ -194,7 +195,8 @@ class OrganizerDashboardViewModel implements Arrayable
     private function upcomingEvents()
     {
         return Event::where('user_id', $this->userId)
-            ->whereIn('status', ['preparation', 'pending'])
+            ->where('start_time', '>', now())
+            ->whereIn('status', ['preparation', 'pending', 'ongoing'])
             ->withCount([
                 'queues as queues_waiting_count' => fn ($q) => $q->where('status', 'waiting'),
             ])

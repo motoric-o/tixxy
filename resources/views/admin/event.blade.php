@@ -98,10 +98,9 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                         <select name="status" x-model="formData.status" @change="save()" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-purple-600 focus:border-purple-600 dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-colors duration-300">
-                            <option value="ongoing">Ongoing</option>
-                            <option value="completed">Completed</option>
-                            <option value="canceled">Canceled</option>
-                            <option value="pending">Pending</option>
+                            @foreach($statuses as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div>
@@ -304,7 +303,7 @@
                 this.saveTicketTypes();
             },
             async saveOrganizer() {
-                await fetch(`/events/manage/${eventId}`, {
+                await fetch(`/manage/events/${eventId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -316,7 +315,7 @@
             },
             async saveTicketTypes() {
                 const payload = this.formData.ticket_types.map(({ ticket_type_id, price, capacity }) => ({ ticket_type_id, price, capacity }));
-                await fetch(`/events/manage/${eventId}`, {
+                await fetch(`/manage/events/${eventId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -350,7 +349,7 @@
                 this.saving = true;
                 
                 try {
-                    const response = await fetch(`/events/manage/${eventId}`, {
+                    const response = await fetch(`/manage/events/${eventId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',

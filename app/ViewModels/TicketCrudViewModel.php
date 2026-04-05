@@ -26,9 +26,9 @@ class TicketCrudViewModel implements Arrayable
             'rows' => $this->tickets,
             'filters' => $this->filters(),
             'createUrl' => null, // Tickets are usually created via orders
-            'editUrl' => '/admin/tickets',
-            'backUrl' => '/admin/tickets',
-            'action' => $this->action === 'index' ? '/admin/tickets' : '/admin/tickets/' . ($this->tickets->id ?? ''),
+            'editUrl' => '/manage/tickets',
+            'backUrl' => '/manage/tickets',
+            'action' => $this->action === 'index' ? '/manage/tickets' : '/manage/tickets/' . ($this->tickets->id ?? ''),
             'method' => $this->action === 'edit' ? 'PUT' : 'POST',
             'item' => $this->tickets,
             'fields' => [
@@ -47,7 +47,7 @@ class TicketCrudViewModel implements Arrayable
             ['label' => 'Ticket ID',    'value' => '#' . $ticket->id],
             ['label' => 'QR Code Hash',  'value' => $ticket->qr_code_hash],
             ['label' => 'Status',       'value' => $ticket->is_scanned ? 'Scanned' : 'Active'],
-            ['label' => 'Order',        'value' => $order ? '#' . $order->id : 'N/A', 'url' => $order ? '/admin/orders/' . $order->id . '/edit' : null],
+            ['label' => 'Order',        'value' => $order ? '#' . $order->id : 'N/A', 'url' => $order ? '/manage/orders/' . $order->id . '/edit' : null],
             ['label' => 'Event',        'value' => $order->event->title ?? 'N/A'],
             ['label' => 'Customer',     'value' => $order->user->name ?? 'N/A'],
             ['label' => 'Customer Email', 'value' => $order->user->email ?? 'N/A'],

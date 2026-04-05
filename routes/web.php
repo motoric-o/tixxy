@@ -1,23 +1,17 @@
 <?php
 
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\EventController;
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Management\CategoryController;
+use App\Http\Controllers\Management\DashboardController;
+use App\Http\Controllers\Management\EventController;
+use App\Http\Controllers\Management\OrderController;
+use App\Http\Controllers\Management\UserController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\EventManagement\EventPanelController;
-use App\Http\Controllers\Admin\TicketTypeController;
-use App\Http\Controllers\Admin\TicketController as AdminTicketController;
+use App\Http\Controllers\Management\TicketTypeController;
+use App\Http\Controllers\Management\TicketController as ManagementTicketController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
-
-use App\Http\Controllers\Organizer\DashboardController as OrganizerDashboardController;
-use App\Http\Controllers\Organizer\EventController as OrganizerEventController;
-use App\Http\Controllers\Organizer\OrderController as OrganizerOrderController;
-use App\Http\Controllers\Organizer\UserController as OrganizerUserController;
-
 
 use App\Models\Event;
 
@@ -60,64 +54,61 @@ Route::middleware('auth')->group(function () {
 });
 
 /*
- * Admin Middleware
+ * Manage Middleware (Organizer + Admin)
  */
-Route::middleware(['auth', 'role:organizer,admin'])->group (function () {
-    Route::get('/organizer/dashboard', [OrganizerDashboardController::class, 'index'])->name('organizer.home');
-    Route::get('/organizer/events', [OrganizerEventController::class, 'index']);
+Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(function () {
+    // --- Dashboard ---
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('manage.home');
 
-    // --- Events CRUD ---
-    Route::get('/events/manage/{id}', [EventPanelController::class, 'index']);
-    Route::put('/events/manage/{id}', [EventPanelController::class, 'update']);
+    // --- Events CRUD (shared) ---
+    Route::get('/events', [EventController::class, 'index']);
+    Route::get('/events/create', [EventController::class, 'create']);
+    Route::post('/events/create', [EventController::class, 'store']);
+    Route::delete('/events/{id}', [EventController::class, 'destroy']);
 
-    Route::get('/admin/events', [EventController::class, 'index'])->name('organizer.home');
+    // --- Event Management Panel (edit + update) ---
+    Route::get('/events/{id}/edit', [EventPanelController::class, 'index']);
+    Route::put('/events/{id}', [EventPanelController::class, 'update']);
 
-    Route::get('/admin/events/create', [EventController::class, 'create']);
+    // --- Orders CRUD ---
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}/edit', [OrderController::class, 'edit']);
+    Route::put('/orders/{id}', [OrderController::class, 'update']);
 
-    Route::post('/admin/events/create', [EventController::class, 'store']);
-    Route::delete('/admin/events/{id}', [EventController::class, 'destroy']);
-
-    Route::get('/admin/events/{id}/edit', [EventController::class, 'edit']);
-    Route::put('/admin/events/{id}', [EventController::class, 'update']);
+    // --- Tickets CRUD ---
+    Route::get('/tickets', [ManagementTicketController::class, 'index']);
+    Route::get('/tickets/{id}/edit', [ManagementTicketController::class, 'edit']);
+    Route::put('/tickets/{id}', [ManagementTicketController::class, 'update']);
+    Route::delete('/tickets/{id}', [ManagementTicketController::class, 'destroy']);
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.home');
+/*
+ * Manage Middleware (Admin Only)
+ */
+Route::middleware(['auth', 'role:admin'])->prefix('manage')->group(function () {
+    // --- Categories CRUD ---
+    Route::get('/categories',            [CategoryController::class, 'index']);
+    Route::get('/categories/create',     [CategoryController::class, 'create']);
+    Route::post('/categories/create',    [CategoryController::class, 'store']);
+    Route::get('/categories/{id}/edit',  [CategoryController::class, 'edit']);
+    Route::put('/categories/{id}',       [CategoryController::class, 'update']);
+    Route::delete('/categories/{id}',    [CategoryController::class, 'destroy']);
 
-    // --- Admin Categories CRUD ---
-    Route::get('/admin/categories',            [CategoryController::class, 'index']);
-    Route::get('/admin/categories/create',     [CategoryController::class, 'create']);
-    Route::post('/admin/categories/create',    [CategoryController::class, 'store']);
-    Route::get('/admin/categories/{id}/edit',  [CategoryController::class, 'edit']);
-    Route::put('/admin/categories/{id}',       [CategoryController::class, 'update']);
-    Route::delete('/admin/categories/{id}',    [CategoryController::class, 'destroy']);
+    // --- Ticket Types CRUD ---
+    Route::get('/ticket-types',            [TicketTypeController::class, 'index']);
+    Route::get('/ticket-types/create',     [TicketTypeController::class, 'create']);
+    Route::post('/ticket-types/create',    [TicketTypeController::class, 'store']);
+    Route::get('/ticket-types/{id}/edit',  [TicketTypeController::class, 'edit']);
+    Route::put('/ticket-types/{id}',       [TicketTypeController::class, 'update']);
+    Route::delete('/ticket-types/{id}',    [TicketTypeController::class, 'destroy']);
 
-    // --- Admin Ticket Types CRUD ---
-    Route::get('/admin/ticket-types',            [TicketTypeController::class, 'index']);
-    Route::get('/admin/ticket-types/create',     [TicketTypeController::class, 'create']);
-    Route::post('/admin/ticket-types/create',    [TicketTypeController::class, 'store']);
-    Route::get('/admin/ticket-types/{id}/edit',  [TicketTypeController::class, 'edit']);
-    Route::put('/admin/ticket-types/{id}',       [TicketTypeController::class, 'update']);
-    Route::delete('/admin/ticket-types/{id}',    [TicketTypeController::class, 'destroy']);
-
-    // --- Admin Users CRUD ---
-    Route::get('/admin/users', [UserController::class, 'index']);
-    Route::get('/admin/users/create', [UserController::class, 'create']);
-    Route::post('/admin/users/create', [UserController::class, 'store']);
-    Route::delete('/admin/users/{id}', [UserController::class, 'destroy']);
-    Route::get('/admin/users/{id}/edit', [UserController::class, 'edit']);
-    Route::put('/admin/users/{id}', [UserController::class, 'update']);
-
-    // --- Admin Orders CRUD ---
-    Route::get('/admin/orders', [OrderController::class, 'index']);
-    Route::get('/admin/orders/{id}/edit', [OrderController::class, 'edit']);
-    Route::put('/admin/orders/{id}', [OrderController::class, 'update']);
-
-    // --- Admin Tickets CRUD ---
-    Route::get('/admin/tickets', [AdminTicketController::class, 'index']);
-    Route::get('/admin/tickets/{id}/edit', [AdminTicketController::class, 'edit']);
-    Route::put('/admin/tickets/{id}', [AdminTicketController::class, 'update']);
-    Route::delete('/admin/tickets/{id}', [AdminTicketController::class, 'destroy']);
+    // --- Users CRUD ---
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/create', [UserController::class, 'create']);
+    Route::post('/users/create', [UserController::class, 'store']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::get('/users/{id}/edit', [UserController::class, 'edit']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
 });
 
 require __DIR__ . '/auth.php';

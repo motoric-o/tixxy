@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use App\Models\TicketType;
@@ -32,7 +32,7 @@ class TicketTypeController extends Controller
             'name' => $request->name,
         ]);
 
-        return redirect('/admin/ticket-types')->with('success', 'Ticket Type created successfully.');
+        return redirect('/manage/ticket-types')->with('success', 'Ticket Type created successfully.');
     }
 
     public function edit($id) {
@@ -44,12 +44,12 @@ class TicketTypeController extends Controller
     public function update($id, Request $request) {
         $ticketType = TicketType::findOrFail($id);
         $ticketType->update($request->all());
-        return redirect('/admin/ticket-types')->with('success', 'Ticket Type updated successfully.');
+        return redirect('/manage/ticket-types')->with('success', 'Ticket Type updated successfully.');
     }
 
     public function destroy($id) {
         $ticketType = TicketType::findOrFail($id);
         $ticketType->delete();
-        return redirect('/admin/ticket-types')->with('success', 'Ticket Type deleted successfully.');
+        return redirect('/manage/ticket-types')->with('success', 'Ticket Type deleted successfully.');
     }
 }

@@ -24,10 +24,11 @@ class EventCrudViewModel implements Arrayable
             'columns'   => $this->columns(),
             'rows'      => $this->events,
             'filters'   => $this->filters(),
-            'createUrl' => '/admin/events/create',
-            'editUrl'   => '/admin/events',
-            'backUrl'   => '/admin/events',
-            'action'    => $this->action,
+            'createUrl' => '/manage/events/create',
+            'editUrl'   => '/manage/events',
+            'backUrl'   => '/manage/events',
+            'action'    => $this->action == 'create' ? '/manage/events/create' : ($this->action == 'edit' ? '/manage/events/' . $this->events->id : '/manage/events'),
+            'method'    => $this->action == 'edit' ? 'PUT' : 'POST',
             'item'      => $this->events,
             'fields'    => $this->fields(),
         ];
@@ -43,7 +44,7 @@ class EventCrudViewModel implements Arrayable
             ['name' => 'location',    'label' => 'Location',    'type' => 'text',            'required' => true],
             ['name' => 'description', 'label' => 'Description', 'type' => 'textarea'],
             ['name' => 'quota',       'label' => 'Quota',       'type' => 'number'],
-            ['name' => 'status',      'label' => 'Status',      'type' => 'select',          'options' => ['ongoing' => 'Ongoing', 'completed' => 'Completed', 'canceled' => 'Canceled', 'pending' => 'Pending', 'preparation' => 'Preparation'], 'required' => true],
+            ['name' => 'status',      'label' => 'Status',      'type' => 'select',          'options' => \App\Models\Event::getStatuses(), 'required' => true],
         ];
     }
 
@@ -52,13 +53,7 @@ class EventCrudViewModel implements Arrayable
         return [
             'status' => [
                 'label'   => 'Status',
-                'options' => [
-                    'ongoing'     => 'Ongoing',
-                    'completed'   => 'Completed',
-                    'canceled'    => 'Canceled',
-                    'pending'     => 'Pending',
-                    'preparation' => 'Preparation',
-                ],
+                'options' => \App\Models\Event::getStatuses(),
             ],
         ];
     }

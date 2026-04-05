@@ -51,4 +51,16 @@ class Order extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+
+    /**
+     * Get all possible order statuses.
+     */
+    public static function getStatuses(): array
+    {
+        return [
+            'pending'   => 'Pending',
+            'completed' => 'Completed',
+            'canceled'  => 'Canceled',
+        ];
+    }
 }

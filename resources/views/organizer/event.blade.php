@@ -250,7 +250,7 @@
                 this.saving = true;
                 
                 try {
-                    const response = await fetch(`/events/manage/${eventId}`, {
+                    const response = await fetch(`/manage/events/${eventId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',

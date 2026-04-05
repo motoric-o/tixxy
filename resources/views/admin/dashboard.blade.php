@@ -165,7 +165,7 @@
         </div>
 
         @forelse ($ongoingEvents as $event)
-        <a href="/events/manage/{{ $event->id }}" class="block rounded-2xl border border-green-500/20 bg-gradient-to-br from-green-500/5 to-transparent dark:bg-gray-700/40 p-5 shadow-sm hover:shadow-[0_0_18px_rgba(74,222,128,0.2)] transition-all duration-300 group/card">
+        <a href="/manage/events/{{ $event->id }}/edit" class="block rounded-2xl border border-green-500/20 bg-gradient-to-br from-green-500/5 to-transparent dark:bg-gray-700/40 p-5 shadow-sm hover:shadow-[0_0_18px_rgba(74,222,128,0.2)] transition-all duration-300 group/card">
 
             {{-- Header row --}}
             <div class="flex items-start justify-between gap-3 mb-3">
@@ -316,7 +316,7 @@
 
         <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/40 overflow-hidden shadow-sm divide-y divide-gray-100 dark:divide-gray-600/50">
             @forelse ($upcomingEvents as $event)
-            <a href="/events/manage/{{ $event->id }}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-600/20 transition-colors duration-200 border-b border-gray-100 dark:border-gray-600/50 last:border-0 grow">
+            <a href="/manage/events/{{ $event->id }}/edit" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-600/20 transition-colors duration-200 border-b border-gray-100 dark:border-gray-600/50 last:border-0 grow">
                 <div class="flex items-start justify-between gap-2">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-1.5 mb-0.5">

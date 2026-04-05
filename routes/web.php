@@ -10,6 +10,7 @@ use App\Http\Controllers\EventManagement\EventPanelController;
 use App\Http\Controllers\Admin\TicketTypeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PaymentController;
 
 use App\Models\Event;
 
@@ -23,14 +24,12 @@ Route::get('/', function () {
     $sportsCount = Event::where('category_id', 4)->count();
 
     return view('home', compact('musicCount', 'techCount', 'artCount', 'sportsCount'));
-});
+})->name('home');
 
 Route::get('/events', function () {
     return view('events');
 });
 
-// ticketing
-Route::get('/tickets', [TicketController::class, 'index']);
 
 Route::get('/register', function () {
     return view('auth.register');
@@ -47,6 +46,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // ticketing
+    Route::get('/tickets', [TicketController::class, 'index']);
+    Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
 });
 
 /*

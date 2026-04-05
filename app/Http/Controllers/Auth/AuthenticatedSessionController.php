@@ -34,7 +34,7 @@ class AuthenticatedSessionController extends Controller
         } elseif ($request->user()->role == 'organizer') {
             return redirect()->route('organizer.home');
         } else {
-            return view('home');
+            return redirect()->route('home');
         }
     }
 

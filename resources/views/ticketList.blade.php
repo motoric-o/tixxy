@@ -1,13 +1,13 @@
 @extends('layouts.default')
 
 @section('content')
-<div class="bg-gray-50 min-h-screen py-10">
+<div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10">
-            <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
                 My Tickets
             </h2>
-            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400">
                 View your purchased tickets and events.
             </p>
         </div>
@@ -19,18 +19,28 @@
                     $event = $ticket->order->event ?? null;
                 @endphp
 
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-200 flex flex-col h-full">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700 flex flex-col h-full">
                     <div class="p-6 flex-grow">
                         <div class="flex justify-between items-start mb-3">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Purchased
-                            </span>
+                            @if ($ticket->order->status == "completed")
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                                    Purchased
+                                </span>
+                            @elseif ($ticket->order->status == "pending")
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+                                    Pending
+                                </span>
+                            @elseif ($ticket->order->status == "canceled")
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                    Cancelled
+                                </span>
+                            @endif
                             <span class="text-sm text-gray-500">
-                                {{ \Carbon\Carbon::parse($event->start_time ?? now())->format('d M Y') }}
+                                {{ \Carbon\Carbon::parse($event->start_time ?? now())->format('d M Y')}}
                             </span>
                         </div>
 
-                        <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
                             {{ $event->title ?? 'Event Name Unavailable' }}
                         </h3>
 
@@ -51,7 +61,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 px-6 py-4 flex items-center justify-end border-t border-gray-100 mt-auto">
+                    <div class="bg-gray-50 px-6 py-4 flex items-center justify-end border-t border-gray-100 mt-auto dark:bg-gray-800 dark:border-gray-700">
                         <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                             View Ticket
                         </a>

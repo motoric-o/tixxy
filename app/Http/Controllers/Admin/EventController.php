@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\TicketType;
+use App\Models\User;
 use App\ViewModels\EventCrudViewModel;
 use App\ViewModels\ManageEventViewModel;
 use Illuminate\Http\Request;
@@ -46,8 +48,8 @@ class EventController extends Controller
     {
         $event = Event::with('eventTicketTypes.ticketType')->findOrFail($id);
         $categories = Category::orderBy('name')->pluck('name', 'id');
-        $ticketTypes = \App\Models\TicketType::orderBy('name')->get();
-        $organizers = \App\Models\User::whereIn('role', ['organizer', 'admin'])->pluck('name', 'id');
+        $ticketTypes = TicketType::orderBy('name')->get();
+        $organizers = User::whereIn('role', ['organizer', 'admin'])->pluck('name', 'id');
 
         $ticketTypesData = $ticketTypes->map(function ($t) {
             return ['id' => (string) $t->id, 'name' => $t->name];

@@ -35,31 +35,16 @@ class OrderController extends Controller
     }
 
     public function edit($id) {
-        $order = Order::find($id);
-
-        return view('admin.crud.form', [
-            'title' => 'Edit Order #' . $order->id,
-            'action' => '/admin/orders/' . $order->id,
-            'method' => 'PUT',
-            'backUrl' => '/admin/orders',
-            'item' => $order,
-            'fields' => [
-                [
-                    'name' => 'status', 
-                    'label' => 'Status', 
-                    'type' => 'select', 
-                    'options' => [
-                        'pending' => 'Pending', 
-                        'completed' => 'Completed', 
-                        'canceled' => 'Canceled'
-                    ], 
-                    'required' => true
-                ],
-            ],
-        ]);
+        $order = Order::with(['user', 'event', 'orderDetails.eventTicketType.ticketType', 'tickets'])->findOrFail($id);
+        $viewModel = new OrderCrudViewModel($order, 'edit');
+        return view('admin.crud.form', $viewModel->toArray());
     }
 
     public function update($id, Request $request) {
+        $request->validate([
+            'status' => 'required|in:pending,completed,canceled',
+        ]);
+
         $order = Order::find($id);
         $order->update($request->all());
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\EventManagement\EventPanelController;
 use App\Http\Controllers\Admin\TicketTypeController;
+use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
@@ -102,6 +103,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/orders', [OrderController::class, 'index']);
     Route::get('/admin/orders/{id}/edit', [OrderController::class, 'edit']);
     Route::put('/admin/orders/{id}', [OrderController::class, 'update']);
+
+    // --- Admin Tickets CRUD ---
+    Route::get('/admin/tickets', [AdminTicketController::class, 'index']);
+    Route::get('/admin/tickets/{id}/edit', [AdminTicketController::class, 'edit']);
+    Route::put('/admin/tickets/{id}', [AdminTicketController::class, 'update']);
+    Route::delete('/admin/tickets/{id}', [AdminTicketController::class, 'destroy']);
 });
 
 require __DIR__ . '/auth.php';

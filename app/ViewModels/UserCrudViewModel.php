@@ -19,7 +19,7 @@ class UserCrudViewModel implements Arrayable
     public function toArray(): array
     {
         return [
-            'title' => $this->action == 'index' ? ($this->action == 'create' ? 'Create User' : 'Users') : 'Edit User: ' . $this->users->name,
+            'title' => $this->action == 'index' ? 'Users' : ($this->action == 'create' ? 'Create User' : 'Edit User: ' . $this->users->name),
             'columns' => $this->columns(),
             'rows' => $this->users,
             'filters' => $this->filters(),
@@ -29,6 +29,17 @@ class UserCrudViewModel implements Arrayable
             'action' => $this->action,
             'item' => $this->users,
             'fields' => $this->fields(),
+            'detailFields' => $this->action === 'edit' ? $this->detailFields() : [],
+        ];
+    }
+
+    private function detailFields(): array
+    {
+        $user = $this->users;
+        return [
+            ['label' => 'User ID',           'value' => '#' . $user->id],
+            ['label' => 'Events Organized',   'value' => $user->events_count ?? $user->events()->count()],
+            ['label' => 'Orders Placed',      'value' => $user->orders_count ?? $user->orders()->count()],
         ];
     }
 
@@ -36,7 +47,7 @@ class UserCrudViewModel implements Arrayable
         return [
             ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'required' => true],
             ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true],
-            ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'user' => 'User'], 'required' => true],
+            ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'organizer' => 'Organizer', 'user' => 'User'], 'required' => true],
         ];
     }
 
@@ -47,6 +58,7 @@ class UserCrudViewModel implements Arrayable
                 'label' => 'Role',
                 'options' => [
                     'admin' => 'Admin',
+                    'organizer' => 'Organizer',
                     'user' => 'User'
                 ]
             ]

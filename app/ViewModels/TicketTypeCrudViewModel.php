@@ -28,6 +28,16 @@ class TicketTypeCrudViewModel implements Arrayable
             'action'    => $this->action,
             'item'      => $this->ticketTypes,
             'fields'    => $this->fields(),
+            'detailFields' => $this->action === 'edit' ? $this->detailFields() : [],
+        ];
+    }
+
+    private function detailFields(): array
+    {
+        $ticketType = $this->ticketTypes;
+        return [
+            ['label' => 'Ticket Type ID',  'value' => '#' . $ticketType->id],
+            ['label' => 'Used by Events',   'value' => $ticketType->event_ticket_types_count ?? $ticketType->eventTicketTypes()->count()],
         ];
     }
 

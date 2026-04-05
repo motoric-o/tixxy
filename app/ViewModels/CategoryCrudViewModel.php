@@ -28,6 +28,16 @@ class CategoryCrudViewModel implements Arrayable
             'action'    => $this->action,
             'item'      => $this->categories,
             'fields'    => $this->fields(),
+            'detailFields' => $this->action === 'edit' ? $this->detailFields() : [],
+        ];
+    }
+
+    private function detailFields(): array
+    {
+        $category = $this->categories;
+        return [
+            ['label' => 'Category ID',       'value' => '#' . $category->id],
+            ['label' => 'Associated Events',  'value' => $category->events_count ?? $category->events()->count()],
         ];
     }
 

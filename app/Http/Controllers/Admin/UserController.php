@@ -35,23 +35,17 @@ class UserController extends Controller
     }
 
     public function edit($id) {
-        $user = User::find($id);
-
-        return view('admin.crud.form', [
-            'title' => 'Edit User: ' . $user->name,
-            'action' => '/admin/users/' . $user->id,
-            'method' => 'PUT',
-            'backUrl' => '/admin/users',
-            'item' => $user,
-            'fields' => [
-                ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'required' => true],
-                ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true],
-                ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'organizer' => 'Organizer'], 'required' => true],
-            ],
-        ]);
+        $viewModel = new UserCrudViewModel(User::find($id), 'edit');
+        return view('admin.crud.form', $viewModel->toArray());
     }
 
     public function update($id, Request $request) {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'role' => 'required|in:admin,organizer',
+        ]);
+        
         $user = User::findOrFail($id);
         
         $data = $request->except('password');

@@ -40,7 +40,7 @@ class UserController extends Controller
             'fields' => [
                 ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'required' => true],
                 ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true],
-                ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'user' => 'User'], 'required' => true],
+                ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'organizer' => 'Organizer'], 'required' => true],
             ],
         ]);
     }
@@ -56,5 +56,32 @@ class UserController extends Controller
         $user->update($data);
 
         return redirect('/admin/users')->with('success', 'User updated successfully.');
+    }
+
+    public function store(Request $request) {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'role' => 'required|in:admin,organizer',
+        ]);
+        $data = $request->all();
+        $data['password'] = bcrypt($request->password);
+
+        User::create([
+            'name'=> $data['name'],
+            'email'=> $data['email'],
+            'password_hash'=> $data['password'],
+            'role'=> $data['role'],
+        ]);
+
+        return redirect('/admin/users')->with('success', 'User created successfully.');
+    }
+
+    public function destroy($id) {
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return redirect('/admin/users')->with('success', 'User deleted successfully.');
     }
 }

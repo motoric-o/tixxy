@@ -131,6 +131,8 @@ class DashboardViewModel implements Arrayable
     private function ongoingEvents()
     {
         $ongoingEvents = Event::where('status', 'ongoing')
+            ->where('start_time', '<=', now())
+            ->where('end_time', '>=', now())
             ->withCount([
                 'queues',
                 'queues as queues_waiting_count'  => fn ($q) => $q->where('status', 'waiting'),
@@ -168,7 +170,8 @@ class DashboardViewModel implements Arrayable
 
     private function upcomingEvents()
     {
-        return Event::whereIn('status', ['preparation', 'pending'])
+        return Event::whereIn('status', ['preparation', 'pending', 'ongoing'])
+            ->where('start_time', '>', now())
             ->withCount([
                 'queues as queues_waiting_count' => fn ($q) => $q->where('status', 'waiting'),
             ])

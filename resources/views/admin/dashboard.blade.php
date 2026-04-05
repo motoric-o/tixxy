@@ -165,7 +165,7 @@
         </div>
 
         @forelse ($ongoingEvents as $event)
-        <div class="rounded-2xl border border-green-500/20 bg-gradient-to-br from-green-500/5 to-transparent dark:bg-gray-700/40 p-5 shadow-sm hover:shadow-[0_0_18px_rgba(74,222,128,0.12)] transition-all duration-300">
+        <a href="/events/manage/{{ $event->id }}" class="block rounded-2xl border border-green-500/20 bg-gradient-to-br from-green-500/5 to-transparent dark:bg-gray-700/40 p-5 shadow-sm hover:shadow-[0_0_18px_rgba(74,222,128,0.2)] transition-all duration-300 group/card">
 
             {{-- Header row --}}
             <div class="flex items-start justify-between gap-3 mb-3">
@@ -291,7 +291,7 @@
                 </div>
             </div>
 
-        </div>
+        </a>
         @empty
         <div class="rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 p-8 text-center">
             <svg class="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,7 +316,7 @@
 
         <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/40 overflow-hidden shadow-sm divide-y divide-gray-100 dark:divide-gray-600/50">
             @forelse ($upcomingEvents as $event)
-            <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-600/20 transition-colors duration-200">
+            <a href="/events/manage/{{ $event->id }}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-600/20 transition-colors duration-200 border-b border-gray-100 dark:border-gray-600/50 last:border-0 grow">
                 <div class="flex items-start justify-between gap-2">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-1.5 mb-0.5">
@@ -349,7 +349,7 @@
                         @endif
                     </div>
                 </div>
-            </div>
+            </a>
             @empty
             <div class="p-8 text-center">
                 <p class="text-sm text-gray-400">No upcoming events</p>

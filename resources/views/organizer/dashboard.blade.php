@@ -1,4 +1,4 @@
-@extends('layouts.organizer')
+@extends('layouts.admin.default')
 
 @section('content')
 

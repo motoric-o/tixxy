@@ -1,4 +1,4 @@
-@extends('layouts.organizer')
+@extends('layouts.admin.default')
 
 @section('content')
 <div class="flex items-center justify-between mb-6 gap-4">

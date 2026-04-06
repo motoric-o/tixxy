@@ -31,6 +31,10 @@ Route::get('/events', function () {
     return view('events');
 });
 
+Route::get('/checkout', function () {
+    return view('checkout');
+});
+
 
 Route::get('/register', function () {
     return view('auth.register');

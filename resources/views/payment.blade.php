@@ -4,10 +4,10 @@
 <div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="mb-8">
-            <a href="/events" class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2 font-medium hover:underline">
+            <button onclick="window.history.back()" class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2 font-medium hover:underline mb-4">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Back to Events
-            </a>
+                Back to Details
+            </button>
             <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-4">Review Your Order</h1>
         </div>
         

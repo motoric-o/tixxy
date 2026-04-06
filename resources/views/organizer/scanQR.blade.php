@@ -11,7 +11,7 @@
 <div class="max-w-2xl mx-auto" x-data="qrScanner()">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         {{-- Area Preview Kamera --}}
-        <div class="relative bg-black aspect-square md:aspect-video flex items-center justify-center overflow-hidden border-b border-gray-200 dark:border-gray-700">
+        <div class="relative bg-black aspect-square md:aspect-video flex items-center justify-center overflow-auto border-b border-gray-200 dark:border-gray-700">
             <div id="reader" class="w-full h-full"></div>
             
             {{-- Overlay saat scanner tidak aktif --}}

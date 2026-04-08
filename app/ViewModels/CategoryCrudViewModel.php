@@ -18,14 +18,14 @@ class CategoryCrudViewModel implements Arrayable
     public function toArray(): array
     {
         return [
-            'title'     => $this->action == 'index' ? 'Categories' : ($this->action == 'create' ? 'Create Category' : 'Edit Category: ' . $this->categories->name),
+            'title'     => $this->action == 'index' ? 'Categories' : ($this->action == 'create' ? 'Create Category' : 'Edit Category: ' . ($this->categories?->name ?? 'Unknown')),
             'columns'   => $this->columns(),
             'rows'      => $this->categories,
             'filters'   => [],
             'createUrl' => '/manage/categories/create',
             'editUrl'   => '/manage/categories',
             'backUrl'   => '/manage/categories',
-            'action'    => $this->action == 'create' ? '/manage/categories/create' : ($this->action == 'edit' ? '/manage/categories/' . $this->categories->id : '/manage/categories'),
+            'action'    => $this->action == 'create' ? '/manage/categories/create' : ($this->action == 'edit' ? '/manage/categories/' . ($this->categories?->id ?? '') : '/manage/categories'),
             'method'    => $this->action == 'edit' ? 'PUT' : 'POST',
             'item'      => $this->categories,
             'fields'    => $this->fields(),
@@ -37,7 +37,7 @@ class CategoryCrudViewModel implements Arrayable
     {
         $category = $this->categories;
         return [
-            ['label' => 'Category ID',       'value' => '#' . $category->id],
+            ['label' => 'Category ID',       'value' => '#' . ($category?->id ?? '')],
             ['label' => 'Associated Events',  'value' => $category->events_count ?? $category->events()->count()],
         ];
     }

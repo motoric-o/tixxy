@@ -21,14 +21,14 @@ class TicketCrudViewModel implements Arrayable
         
         return [
             'title' => $isIndex ? 'Tickets' : 'Edit Ticket',
-            'subtitle' => $isIndex ? 'Manage all event tickets' : 'Edit Ticket #' . $this->tickets->id,
+            'subtitle' => $isIndex ? 'Manage all event tickets' : 'Edit Ticket #' . ($this->tickets?->id ?? ''),
             'columns' => $this->columns(),
             'rows' => $this->tickets,
             'filters' => $this->filters(),
             'createUrl' => null, // Tickets are usually created via orders
             'editUrl' => '/manage/tickets',
             'backUrl' => '/manage/tickets',
-            'action' => $this->action === 'index' ? '/manage/tickets' : '/manage/tickets/' . ($this->tickets->id ?? ''),
+            'action' => $this->action === 'index' ? '/manage/tickets' : '/manage/tickets/' . ($this->tickets?->id ?? ''),
             'method' => $this->action === 'edit' ? 'PUT' : 'POST',
             'item' => $this->tickets,
             'fields' => [
@@ -44,14 +44,14 @@ class TicketCrudViewModel implements Arrayable
         $order = $ticket->order;
 
         return [
-            ['label' => 'Ticket ID',    'value' => '#' . $ticket->id],
-            ['label' => 'QR Code Hash',  'value' => $ticket->qr_code_hash],
-            ['label' => 'Status',       'value' => $ticket->is_scanned ? 'Scanned' : 'Active'],
+            ['label' => 'Ticket ID',    'value' => '#' . ($ticket?->id ?? '')],
+            ['label' => 'QR Code Hash',  'value' => $ticket?->qr_code_hash ?? 'N/A'],
+            ['label' => 'Status',       'value' => $ticket?->is_scanned ? 'Scanned' : 'Active'],
             ['label' => 'Order',        'value' => $order ? '#' . $order->id : 'N/A', 'url' => $order ? '/manage/orders/' . $order->id . '/edit' : null],
-            ['label' => 'Event',        'value' => $order->event->title ?? 'N/A'],
-            ['label' => 'Customer',     'value' => $order->user->name ?? 'N/A'],
-            ['label' => 'Customer Email', 'value' => $order->user->email ?? 'N/A'],
-            ['label' => 'Generated At', 'value' => $ticket->created_at->format('d M Y H:i')],
+            ['label' => 'Event',        'value' => $order?->event?->title ?? 'N/A'],
+            ['label' => 'Customer',     'value' => $order?->user?->name ?? 'N/A'],
+            ['label' => 'Customer Email', 'value' => $order?->user?->email ?? 'N/A'],
+            ['label' => 'Generated At', 'value' => $ticket?->created_at ? $ticket->created_at->format('d M Y H:i') : 'N/A'],
         ];
     }
 
@@ -73,7 +73,7 @@ class TicketCrudViewModel implements Arrayable
         return [
             ['key' => 'id', 'label' => 'ID'],
             ['key' => 'qr_code_hash', 'label' => 'QR Hash'],
-            ['key' => 'is_scanned', 'label' => 'Status'], // Will be mapped in controller if needed or just display 0/1 for now
+            ['key' => 'is_scanned_label', 'label' => 'Status'],
             ['key' => 'order.event.title', 'label' => 'Event'],
             ['key' => 'order.user.name', 'label' => 'Customer'],
             ['key' => 'created_at', 'label' => 'Date'],

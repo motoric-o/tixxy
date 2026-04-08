@@ -3,6 +3,7 @@
 use App\Http\Controllers\Management\CategoryController;
 use App\Http\Controllers\Management\DashboardController;
 use App\Http\Controllers\Management\EventController;
+use App\Http\Controllers\Management\FinanceController;
 use App\Http\Controllers\Management\OrderController;
 use App\Http\Controllers\Management\UserController;
 use App\Http\Controllers\TicketController;
@@ -66,6 +67,9 @@ Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(fun
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('manage.home');
     Route::get('/scan', [QRController::class, 'index'])->name('manage.scan');
     Route::post('/tickets/scan', [QRController::class, 'update']);
+
+    // --- Financial ---
+    Route::get('/finances', [FinanceController::class, 'index'])->name('manage.finances');
 
     // --- Events CRUD (shared) ---
     Route::get('/events', [EventController::class, 'index']);

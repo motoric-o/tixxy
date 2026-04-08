@@ -14,7 +14,11 @@
             <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">Dashboard</span>
         </a>
 
-        {{-- 2. Core Business --}}
+        {{-- 1b. Financial --}}
+        <a class="p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-[#4a00e0] transition-colors duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] focus:outline-none border border-transparent hover:border-white/20 my-2 flex items-center gap-3 overflow-hidden" href="/manage/finances" title="Financial">
+            <svg class="w-7 h-7 drop-shadow-[0_0_5px_rgba(233,213,255,0.8)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">Financial</span>
+        </a>
         <a class="p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-[#4a00e0] transition-colors duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] focus:outline-none border border-transparent hover:border-white/20 my-2 flex items-center gap-3 overflow-hidden" href="/manage/events" title="Events">
             <svg class="w-7 h-7 drop-shadow-[0_0_5px_rgba(233,213,255,0.8)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
             <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">Events</span>

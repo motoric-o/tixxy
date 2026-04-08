@@ -30,7 +30,7 @@ class ManageEventViewModel implements Arrayable
     public function toArray(): array
     {
         return [
-            'title'                => $this->action == 'index' ? 'Manage Event: ' . $this->event->title : 'Edit Event: ' . $this->event->title,
+            'title'                => $this->action == 'index' ? 'Manage Event: ' . ($this->event?->title ?? 'Unknown') : 'Edit Event: ' . ($this->event?->title ?? 'Unknown'),
             'backUrl'              => '/manage/events',
             'action'               => $this->action,
             'item'                 => $this->event,

@@ -122,6 +122,7 @@ class EventSeeder extends Seeder
                 'end_time'    => $data['end_time'],
                 'status'      => $data['status'],
                 'quota'       => $data['quota'],
+                'banner_path' => 'events/banner.jpg',
                 'user_id'     => $organizers[$data['organizer']]->id,
             ]);
 

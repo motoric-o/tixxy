@@ -53,22 +53,22 @@ class OrderSeeder extends Seeder
                     'updated_at' => $createdAt,
                 ]);
 
-                OrderDetail::create([
-                    'order_id'             => $order->id,
-                    'event_ticket_type_id' => $ett->id,
-                    'quantity'             => $quantity,
-                    'created_at'           => $createdAt,
-                    'updated_at'           => $createdAt,
-                ]);
-
                 // Generate QR tickets for each ticket in this order
                 for ($t = 0; $t < $quantity; $t++) {
-                    Ticket::create([
+                    $ticket = Ticket::create([
                         'qr_code_hash' => Str::random(32),
                         'is_scanned'   => $localStatus === 'completed' && rand(0, 1),
                         'order_id'     => $order->id,
                         'created_at'   => $createdAt,
                         'updated_at'   => $createdAt,
+                    ]);
+
+                    OrderDetail::create([
+                        'order_id'             => $order->id,
+                        'ticket_id'            => $ticket->id,
+                        'event_ticket_type_id' => $ett->id,
+                        'created_at'           => $createdAt,
+                        'updated_at'           => $createdAt,
                     ]);
                 }
             }
@@ -97,21 +97,21 @@ class OrderSeeder extends Seeder
                     'updated_at' => $createdAt,
                 ]);
 
-                OrderDetail::create([
-                    'order_id'             => $order->id,
-                    'event_ticket_type_id' => $ett->id,
-                    'quantity'             => $quantity,
-                    'created_at'           => $createdAt,
-                    'updated_at'           => $createdAt,
-                ]);
-
                 for ($t = 0; $t < $quantity; $t++) {
-                    Ticket::create([
+                    $ticket = Ticket::create([
                         'qr_code_hash' => Str::random(32),
                         'is_scanned'   => rand(0, 1),
                         'order_id'     => $order->id,
                         'created_at'   => $createdAt,
                         'updated_at'   => $createdAt,
+                    ]);
+
+                    OrderDetail::create([
+                        'order_id'             => $order->id,
+                        'ticket_id'            => $ticket->id,
+                        'event_ticket_type_id' => $ett->id,
+                        'created_at'           => $createdAt,
+                        'updated_at'           => $createdAt,
                     ]);
                 }
             }

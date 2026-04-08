@@ -50,7 +50,7 @@ class UserController extends Controller
         
         $data = $request->except('password');
         if($request->filled('password')) {
-            $data['password'] = bcrypt($request->password);
+            $data['password_hash'] = bcrypt($request->password);
         }
         
         $user->update($data);

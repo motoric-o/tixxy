@@ -72,20 +72,11 @@ class Order extends Model
         parent::boot();
 
         static::updated(function ($order) {
-            // Generate tickets when the order is marked completed
+            // Mark tickets as ready or decrement quota when the order is marked completed
             if ($order->isDirty('status') && $order->status === 'completed') {
-                $order->loadMissing('orderDetails');
-                foreach ($order->orderDetails as $detail) {
-                    $existingTickets = \App\Models\Ticket::where('order_id', $order->id)->count();
-                    $amountToCreate = $detail->quantity - $existingTickets;
-                    for ($i = 0; $i < $amountToCreate; $i++) {
-                        \App\Models\Ticket::create([
-                            'order_id' => $order->id,
-                        ]);
-                        if ($order->event) {
-                            $order->event->decrement('quota');
-                        }
-                    }
+                if ($order->event) {
+                    $order->loadMissing('tickets');
+                    $order->event->decrement('quota', $order->tickets->count());
                 }
             }
         });

@@ -64,11 +64,18 @@ class CheckoutController extends Controller
         $order->save();
 
         if ($ticketType) {
-            \App\Models\OrderDetail::create([
-                'order_id' => $order->id,
-                'event_ticket_type_id' => $ticketType->id,
-                'quantity' => $request->qty,
-            ]);
+            for ($i = 0; $i < $request->qty; $i++) {
+                // Generate a ticket immediately since it's required for the OrderDetail primary key
+                $ticket = \App\Models\Ticket::create([
+                    'order_id' => $order->id,
+                ]);
+
+                \App\Models\OrderDetail::create([
+                    'order_id' => $order->id,
+                    'ticket_id' => $ticket->id,
+                    'event_ticket_type_id' => $ticketType->id,
+                ]);
+            }
         }
 
         return redirect()->route('payment.show', ['id' => $order->id]);

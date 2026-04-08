@@ -11,11 +11,27 @@ class CheckoutController extends Controller
     /**
      * Display the checkout page for a given event.
      */
-    public function index(Request $request): View
+    public function index(Request $request): View|\Illuminate\Http\RedirectResponse
     {
         $eventId = $request->input('event_id');
 
         $event = Event::with('category')->findOrFail($eventId);
+        
+        // Prevent going back to checkout if there is already an active unpaid order
+        $existingOrder = \App\Models\Order::where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->where('event_id', $eventId)
+            ->where('status', 'pending')
+            ->whereNull('payment_proof')
+            ->orderBy('id', 'desc')
+            ->first();
+            
+        if ($existingOrder) {
+            $expiry = $existingOrder->expired_at ?? $existingOrder->created_at->addHour();
+            if (now()->lessThan($expiry)) {
+                return redirect()->route('payment.show', $existingOrder->id)
+                    ->with('info', 'You already have an active order for this event. Please complete your payment.');
+            }
+        }
 
         return view('checkout', compact('event'));
     }

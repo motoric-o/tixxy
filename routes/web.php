@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Management\CategoryController;
+use App\Http\Controllers\Management\ScannerController;
+use App\Http\Controllers\Management\TicketController as ManagementTicketController;
 use App\Http\Controllers\Management\DashboardController;
 use App\Http\Controllers\Management\EventController;
 use App\Http\Controllers\Management\OrderController;
@@ -8,7 +10,6 @@ use App\Http\Controllers\Management\UserController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\EventManagement\EventPanelController;
 use App\Http\Controllers\Management\TicketTypeController;
-use App\Http\Controllers\Management\TicketController as ManagementTicketController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
@@ -59,6 +60,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(function () {
     // --- Dashboard ---
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('manage.home');
+
+    // --- Scanner ---
+    Route::get('/scanner', [ScannerController::class, 'index'])->name('manage.scanner');
+    Route::post('/scanner/validate', [ScannerController::class, 'validateHash'])->name('manage.scanner.validate');
 
     // --- Events CRUD (shared) ---
     Route::get('/events', [EventController::class, 'index']);

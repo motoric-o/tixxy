@@ -122,21 +122,40 @@
                             @csrf
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Proof of Payment</label>
-                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl relative hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                    <div class="space-y-1 text-center">
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl relative hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors overflow-hidden group">
+                                    <img id="image-preview" src="#" alt="Preview" class="hidden absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 opacity-50 group-hover:opacity-20" />
+                                    
+                                    <div id="upload-container" class="space-y-1 text-center relative z-10 p-4 transition-all duration-300">
                                         <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
                                         <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
                                             <label for="proof" class="relative cursor-pointer bg-transparent rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-within:outline-none">
-                                                <span>Upload a file</span>
-                                                <input id="proof" name="payment_proof" type="file" class="sr-only" required accept="image/*">
+                                                <span id="upload-label-text" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-md shadow-sm">Upload a file</span>
+                                                <input id="proof" name="payment_proof" type="file" class="sr-only" required accept="image/*" onchange="previewImage(event)">
                                             </label>
                                         </div>
-                                        <p class="text-xs text-gray-500">PNG, JPG, up to 2MB</p>
+                                        <p id="upload-hint" class="text-xs text-gray-500 bg-white/80 dark:bg-gray-800/80 px-2 py-1 rounded inline-block">PNG, JPG, up to 2MB</p>
                                     </div>
                                 </div>
                             </div>
+
+                            <script>
+                                function previewImage(event) {
+                                    var reader = new FileReader();
+                                    reader.onload = function() {
+                                        var output = document.getElementById('image-preview');
+                                        output.src = reader.result;
+                                        output.classList.remove('hidden');
+                                        document.getElementById('upload-label-text').innerText = 'Change Image';
+                                        document.getElementById('upload-hint').style.display = 'none';
+                                        document.getElementById('upload-container').classList.add('bg-white/80', 'dark:bg-gray-900/80', 'backdrop-blur-sm', 'rounded-xl', 'shadow-sm');
+                                    };
+                                    if(event.target.files[0]) {
+                                        reader.readAsDataURL(event.target.files[0]);
+                                    }
+                                }
+                            </script>
                             
                             <button type="submit" class="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-2xl shadow-lg hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white transition-all duration-300 transform hover:-translate-y-1">
                                 Submit Proof of Payment
@@ -178,4 +197,12 @@
 
     </div>
 </div>
+
+<script>
+    // Prevent the user from navigating back and forth with the browser Back button
+    history.pushState(null, null, window.location.href);
+    window.addEventListener('popstate', function () {
+        history.pushState(null, null, window.location.href);
+    });
+</script>
 @endsection

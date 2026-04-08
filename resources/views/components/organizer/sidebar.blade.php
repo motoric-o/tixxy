@@ -8,6 +8,10 @@
         <h1 x-show="sidebarOpen" x-transition class="dark:text-white text-2xl font-bold">Organizer</h1>
     </div>
     <div class="flex flex-col px-[8px] py-1 bg-gray-300 dark:bg-[#2b3544] rounded-xl transition-all duration-300">
+        <a class="p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 transition-colors duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] focus:outline-none border border-transparent hover:border-white/20 my-2 flex items-center gap-3 overflow-hidden shadow-lg" href="/manage/scanner" title="Ticket Scanner">
+            <svg class="w-7 h-7 drop-shadow-[0_0_5px_rgba(233,213,255,0.8)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m0 11v1m5-10v.5m0 9v.5M7 7v.5m0 9v.5M5 12h1m12 0h1M7 7l.354.354M7 17l.354-.354m10-10l-.354.354M17 17l-.354-.354"></path></svg>
+            <span x-show="sidebarOpen" x-transition class="whitespace-nowrap font-bold">Ticket Scanner</span>
+        </a>
         <a class="p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-[#4a00e0] transition-colors duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] focus:outline-none border border-transparent hover:border-white/20 my-2 flex items-center gap-3 overflow-hidden" href="/manage/dashboard" title="Dashboard">
             <svg class="w-7 h-7 drop-shadow-[0_0_5px_rgba(233,213,255,0.8)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
             <span x-show="sidebarOpen" x-transition class="whitespace-nowrap">Dashboard</span>

@@ -14,10 +14,13 @@ class Order extends Model
         'status',
         'user_id',
         'event_id',
+        'payment_proof',
+        'expired_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'expired_at' => 'datetime',
     ];
 
     /**
@@ -62,5 +65,29 @@ class Order extends Model
             'completed' => 'Completed',
             'canceled'  => 'Canceled',
         ];
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($order) {
+            // Generate tickets when the order is marked completed
+            if ($order->isDirty('status') && $order->status === 'completed') {
+                $order->loadMissing('orderDetails');
+                foreach ($order->orderDetails as $detail) {
+                    $existingTickets = \App\Models\Ticket::where('order_id', $order->id)->count();
+                    $amountToCreate = $detail->quantity - $existingTickets;
+                    for ($i = 0; $i < $amountToCreate; $i++) {
+                        \App\Models\Ticket::create([
+                            'order_id' => $order->id,
+                        ]);
+                        if ($order->event) {
+                            $order->event->decrement('quota');
+                        }
+                    }
+                }
+            }
+        });
     }
 }

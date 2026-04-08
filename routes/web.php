@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Management\CategoryController;
+use App\Http\Controllers\Management\ScannerController;
+use App\Http\Controllers\Management\TicketController as ManagementTicketController;
 use App\Http\Controllers\Management\DashboardController;
 use App\Http\Controllers\Management\EventController;
 use App\Http\Controllers\Management\FinanceController;
@@ -9,11 +11,13 @@ use App\Http\Controllers\Management\UserController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\EventManagement\EventPanelController;
 use App\Http\Controllers\Management\TicketTypeController;
-use App\Http\Controllers\Management\TicketController as ManagementTicketController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Management\QRController;
+
+use App\Http\Controllers\EventListController;
+use App\Http\Controllers\CheckoutController;
 
 use App\Models\Event;
 
@@ -29,22 +33,9 @@ Route::get('/', function () {
     return view('home', compact('musicCount', 'techCount', 'artCount', 'sportsCount'));
 })->name('home');
 
-Route::get('/events', function () {
-    return view('events');
-});
-
-Route::get('/checkout', function () {
-    return view('checkout');
-});
+Route::get('/events', [EventListController::class, 'index'])->name('events.index');
 
 
-Route::get('/register', function () {
-    return view('auth.register');
-});
-
-Route::get('/login', function () {
-    return view('auth.login');
-});
 
 /*
  * Auth Middleware
@@ -54,9 +45,15 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // checkout & payment flow
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/{id}', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/{id}', [PaymentController::class, 'store'])->name('payment.store');
+
     // ticketing
     Route::get('/tickets', [TicketController::class, 'index']);
-    Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::get('/tickets/{id}', [TicketController::class, 'show'])->name('tickets.show');
 });
 
 /*
@@ -70,6 +67,10 @@ Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(fun
 
     // --- Financial ---
     Route::get('/finances', [FinanceController::class, 'index'])->name('manage.finances');
+
+    // --- Scanner ---
+    Route::get('/scanner', [ScannerController::class, 'index'])->name('manage.scanner');
+    Route::post('/scanner/validate', [ScannerController::class, 'validateHash'])->name('manage.scanner.validate');
 
     // --- Events CRUD (shared) ---
     Route::get('/events', [EventController::class, 'index']);

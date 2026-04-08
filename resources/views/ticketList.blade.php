@@ -62,7 +62,7 @@
                     </div>
 
                     <div class="bg-gray-50 px-6 py-4 flex items-center justify-end border-t border-gray-100 mt-auto dark:bg-gray-800 dark:border-gray-700">
-                        <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <a href="{{ route('tickets.show', $ticket->id) }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                             View Ticket
                         </a>
                     </div>

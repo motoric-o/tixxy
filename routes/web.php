@@ -13,6 +13,7 @@ use App\Http\Controllers\Management\TicketController as ManagementTicketControll
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Management\QRController;
 
 use App\Models\Event;
 
@@ -64,6 +65,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(function () {
     // --- Dashboard ---
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('manage.home');
+    Route::get('/scan', [QRController::class, 'index'])->name('manage.scan');
+    Route::post('/tickets/scan', [QRController::class, 'update']);
 
     // --- Financial ---
     Route::get('/finances', [FinanceController::class, 'index'])->name('manage.finances');

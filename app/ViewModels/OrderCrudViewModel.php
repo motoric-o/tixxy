@@ -20,7 +20,7 @@ class OrderCrudViewModel implements Arrayable
     {
         return [
             'title' => $this->action == 'index' ? 'Orders' : 'Edit Order',
-            'subtitle' => $this->action == 'index' ? 'Overview' : 'Edit Order #' . $this->orders->id . " - " . $this->orders->event->title,
+            'subtitle' => $this->action == 'index' ? 'Overview' : 'Edit Order #' . ($this->orders?->id ?? '') . " - " . ($this->orders?->event?->title ?? 'Unknown Event'),
             'columns' => $this->columns(),
             'rows' => $this->orders,
             'filters' => $this->filters(),
@@ -28,7 +28,7 @@ class OrderCrudViewModel implements Arrayable
             'editUrl' => '/manage/orders',
             'backUrl' => '/manage/orders',
             'canDelete' => false,
-            'action' => $this->action == 'create' ? '/manage/orders/create' : ($this->action == 'edit' ? '/manage/orders/' . $this->orders->id : '/manage/orders'),
+            'action' => $this->action == 'create' ? '/manage/orders/create' : ($this->action == 'edit' ? '/manage/orders/' . ($this->orders?->id ?? '') : '/manage/orders'),
             'method' => $this->action == 'edit' ? 'PUT' : 'POST',
             'item' => $this->orders,
             'fields' => [
@@ -53,8 +53,8 @@ class OrderCrudViewModel implements Arrayable
         if ($order->relationLoaded('orderDetails') && $order->orderDetails->count() > 0) {
             $items = $order->orderDetails->map(function ($detail) {
                 return [
-                    'Ticket Type' => $detail->eventTicketType->ticketType->name ?? 'N/A',
-                    'Price'       => 'Rp ' . number_format($detail->eventTicketType->price ?? 0, 0, ',', '.'),
+                    'Ticket Type' => $detail->eventTicketType?->ticketType?->name ?? 'N/A',
+                    'Price'       => 'Rp ' . number_format($detail->eventTicketType?->price ?? 0, 0, ',', '.'),
                     'Qty'         => $detail->quantity,
                 ];
             })->toArray();

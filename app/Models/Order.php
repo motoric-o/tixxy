@@ -14,10 +14,13 @@ class Order extends Model
         'status',
         'user_id',
         'event_id',
+        'payment_proof',
+        'expired_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'expired_at' => 'datetime',
     ];
 
     /**

@@ -44,7 +44,9 @@ Route::middleware('auth')->group(function () {
 
     // checkout & payment flow
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/{id}', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/{id}', [PaymentController::class, 'store'])->name('payment.store');
 
     // ticketing
     Route::get('/tickets', [TicketController::class, 'index']);

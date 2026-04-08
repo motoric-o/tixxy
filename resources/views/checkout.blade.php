@@ -88,8 +88,9 @@
 
                     <!-- Right: Form Wizard -->
                     <div class="p-8">
-                        <form id="checkout-form" action="/payment/{{ $event->id }}" method="GET" class="relative">
-                            <!-- We use GET here so it redirects smoothly to payment.blade.php as requested, without needing POST routes -->
+                        <form id="checkout-form" action="{{ route('checkout.store', $event->id) }}" method="POST" class="relative">
+                            @csrf
+                            <!-- We POST to CheckoutController to create the order, which then redirects to payment -->
 
                             <!-- STEP 1: TICKETS -->
                             <div id="step-1-content" class="transition-opacity duration-300 w-full opacity-100">
@@ -131,14 +132,14 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full
                                             Name</label>
-                                        <input type="text" id="name-input" required placeholder="John Doe"
+                                        <input type="text" name="name" id="name-input" required placeholder="John Doe"
                                             class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email
                                             Address</label>
-                                        <input type="email" id="email-input" required placeholder="john@example.com"
+                                        <input type="email" name="email" id="email-input" required placeholder="john@example.com"
                                             class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                                         <p class="text-xs text-gray-500 mt-2">We'll send your tickets to this email.</p>
                                     </div>
@@ -146,7 +147,7 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone
                                             Number</label>
-                                        <input type="tel" id="phone-input" required placeholder="+1 (555) 000-0000"
+                                        <input type="tel" name="phone" id="phone-input" required placeholder="+1 (555) 000-0000"
                                             class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                                     </div>
 

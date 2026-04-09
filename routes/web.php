@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EventManagement\OrderApprovalController;
 use App\Http\Controllers\Management\CategoryController;
 use App\Http\Controllers\Management\ScannerController;
 use App\Http\Controllers\Management\TicketController as ManagementTicketController;
@@ -86,7 +87,11 @@ Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(fun
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}/edit', [OrderController::class, 'edit']);
     Route::put('/orders/{id}', [OrderController::class, 'update']);
-    Route::get('/orders/{id}/approve', [OrderController::class, 'aprrove']);
+
+    // --- Order Approval ---
+    Route::get('/orders/{id}/approve', [OrderApprovalController::class, 'approve']);
+    Route::post('/orders/{id}/approve', [OrderApprovalController::class, 'handleApprove']);
+    Route::post('/orders/{id}/decline', [OrderApprovalController::class, 'handleDecline']);
 
     // --- Tickets CRUD ---
     Route::get('/tickets', [ManagementTicketController::class, 'index']);

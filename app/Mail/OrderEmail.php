@@ -2,9 +2,7 @@
 
 namespace App\Mail;
 
-namespace App\Mail;
-
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Order;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -13,7 +11,7 @@ class OrderEmail extends Mailable
 {
     private $order;
 
-    public function __construct(Builder $order) {
+    public function __construct(Order $order) {
         $this->order = $order;
     }
 

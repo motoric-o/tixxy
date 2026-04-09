@@ -10,7 +10,7 @@ class EmailController extends Controller
 {
     public function sendOrderEmail(string $id) : void
     {
-        $order = Order::with('orderDetails', 'orderDetails.tickets', 'orderDetails.eventTicketType', 'event', 'user')->where('id', $id)->get();
+        $order = Order::with('orderDetails.ticket', 'orderDetails.eventTicketType.ticketType', 'event', 'user')->findOrFail($id);
         Mail::to($order->user->email)->send(new OrderEmail($order));
     }
 }

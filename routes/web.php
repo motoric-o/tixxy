@@ -86,6 +86,7 @@ Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(fun
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}/edit', [OrderController::class, 'edit']);
     Route::put('/orders/{id}', [OrderController::class, 'update']);
+    Route::get('/orders/{id}/approve', [OrderController::class, 'aprrove']);
 
     // --- Tickets CRUD ---
     Route::get('/tickets', [ManagementTicketController::class, 'index']);

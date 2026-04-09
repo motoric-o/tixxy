@@ -44,7 +44,6 @@ class EventCrudViewModel implements Arrayable
             ['name' => 'location',    'label' => 'Location',    'type' => 'text',            'required' => true],
             ['name' => 'description', 'label' => 'Description', 'type' => 'textarea'],
             ['name' => 'quota',       'label' => 'Quota',       'type' => 'number'],
-            ['name' => 'status',      'label' => 'Status',      'type' => 'select',          'options' => \App\Models\Event::getStatuses(), 'required' => true],
         ];
     }
 

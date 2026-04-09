@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\EventManagement;
 
 use App\Http\Controllers\Controller;
-// use App\Http\Controllers\EmailController;
+use App\Http\Controllers\EmailController;
 use App\Models\Order;
 
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +32,7 @@ class OrderApprovalController extends Controller
         $order->update(['status' => 'completed']);
 
         // Send order confirmation email
-        // app(EmailController::class)->sendOrderEmail($id);
+        app(EmailController::class)->sendOrderEmail($id);
 
         return redirect('/manage/orders')->with('success', 'Order #' . str_pad($id, 6, '0', STR_PAD_LEFT) . ' has been approved and confirmation email sent.');
     }

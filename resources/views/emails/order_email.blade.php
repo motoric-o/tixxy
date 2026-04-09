@@ -563,7 +563,7 @@
                                                             <!-- Ticket number badge -->
                                                             <span
                                                                 style="display: inline-block; font-size: 11px; font-weight: 700; color: #6366f1; background-color: #eef2ff; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                                Ticket #{{ str_pad($detail->ticket->id, 6, '0', STR_PAD_LEFT) }}
+                                                                Ticket #{{ $index + 1 }}
                                                             </span>
                                                         </td>
                                                     </tr>
@@ -572,8 +572,8 @@
                                                             style="padding: 8px; background-color: #ffffff; border: 2px solid #e5e7eb; border-radius: 12px;">
                                                             <!-- QR Code Image via free API -->
                                                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ urlencode($detail->ticket->qr_code_hash) }}&margin=4"
-                                                                alt="QR Code for Ticket #{{ str_pad($detail->ticket->id, 6, '0', STR_PAD_LEFT) }}"
-                                                                width="180" height="180"
+                                                                alt="QR Code for Ticket #{{ $index + 1 }}" width="180"
+                                                                height="180"
                                                                 style="display: block; width: 180px; height: 180px;">
                                                         </td>
                                                     </tr>

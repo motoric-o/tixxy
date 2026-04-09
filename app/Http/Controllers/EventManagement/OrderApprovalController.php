@@ -20,7 +20,7 @@ class OrderApprovalController extends Controller
             })
             ->findOrFail($id);
 
-        return view('admin.orders.approve', compact('order'));
+        return view('admin.approve', compact('order'));
     }
 
     public function handleApprove($id)

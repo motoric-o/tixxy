@@ -19,8 +19,17 @@ use App\Http\Controllers\Management\QRController;
 
 use App\Http\Controllers\EventListController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\EmailController;
 
 use App\Models\Event;
+
+/*
+ * Test Routes
+ */
+Route::get('/test-email', function () {
+    app(EmailController::class)->sendOrderEmail('1');
+    return 'Order email sent for order #1!';
+});
 
 /*
  * No Role
@@ -105,20 +114,20 @@ Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(fun
  */
 Route::middleware(['auth', 'role:admin'])->prefix('manage')->group(function () {
     // --- Categories CRUD ---
-    Route::get('/categories',            [CategoryController::class, 'index']);
-    Route::get('/categories/create',     [CategoryController::class, 'create']);
-    Route::post('/categories/create',    [CategoryController::class, 'store']);
-    Route::get('/categories/{id}/edit',  [CategoryController::class, 'edit']);
-    Route::put('/categories/{id}',       [CategoryController::class, 'update']);
-    Route::delete('/categories/{id}',    [CategoryController::class, 'destroy']);
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories/create', [CategoryController::class, 'create']);
+    Route::post('/categories/create', [CategoryController::class, 'store']);
+    Route::get('/categories/{id}/edit', [CategoryController::class, 'edit']);
+    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
     // --- Ticket Types CRUD ---
-    Route::get('/ticket-types',            [TicketTypeController::class, 'index']);
-    Route::get('/ticket-types/create',     [TicketTypeController::class, 'create']);
-    Route::post('/ticket-types/create',    [TicketTypeController::class, 'store']);
-    Route::get('/ticket-types/{id}/edit',  [TicketTypeController::class, 'edit']);
-    Route::put('/ticket-types/{id}',       [TicketTypeController::class, 'update']);
-    Route::delete('/ticket-types/{id}',    [TicketTypeController::class, 'destroy']);
+    Route::get('/ticket-types', [TicketTypeController::class, 'index']);
+    Route::get('/ticket-types/create', [TicketTypeController::class, 'create']);
+    Route::post('/ticket-types/create', [TicketTypeController::class, 'store']);
+    Route::get('/ticket-types/{id}/edit', [TicketTypeController::class, 'edit']);
+    Route::put('/ticket-types/{id}', [TicketTypeController::class, 'update']);
+    Route::delete('/ticket-types/{id}', [TicketTypeController::class, 'destroy']);
 
     // --- Users CRUD ---
     Route::get('/users', [UserController::class, 'index']);

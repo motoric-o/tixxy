@@ -61,6 +61,9 @@ Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(fun
     // --- Dashboard ---
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('manage.home');
 
+    // --- Financial ---
+    Route::get('/financial', [\App\Http\Controllers\Management\FinancialController::class, 'index'])->name('manage.financial');
+
     // --- Scanner ---
     Route::get('/scanner', [ScannerController::class, 'index'])->name('manage.scanner');
     Route::post('/scanner/validate', [ScannerController::class, 'validateHash'])->name('manage.scanner.validate');

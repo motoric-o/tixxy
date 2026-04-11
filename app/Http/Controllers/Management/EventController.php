@@ -18,7 +18,7 @@ class EventController extends Controller
     {
         $search = request('search');
         $status = request('status');
-        $rows = Event::with('category')
+        $rows = Event::with(['category', 'organizer'])
             ->when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
@@ -62,23 +62,11 @@ class EventController extends Controller
         ]);
 
 
-        $data['status'] = 'preparation';
+        $data['status'] = 'pending';
         $data['user_id'] = Auth::user()->role === 'admin' ? $request->user_id ?? Auth::id() : Auth::id();
 
         Event::create($data);
-
-        // Event::create([
-        //     'title'       => $request->title,
-        //     'description' => $request->description,
-        //     'category_id' => $request->category_id,
-        //     'location'    => $request->location,
-        //     'start_time'  => $request->start_time,
-        //     'end_time'    => $request->end_time,
-        //     'status'      => 'preparation',
-        //     'quota'       => $request->quota,
-        //     'user_id'     => Auth::user()->role === 'admin' ? $request->user_id ?? Auth::id() : Auth::id(),
-        // ]);
-
+        
         return redirect('/manage/events')->with('success', 'Event created successfully.');
     }
 
@@ -86,6 +74,11 @@ class EventController extends Controller
     {
         $event = Event::when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
             ->findOrFail($id);
+
+        if ($event->status === 'ongoing' || $event->orders()->exists()) {
+            $reason = $event->status === 'ongoing' ? 'it is currently ongoing' : 'it has associated orders';
+            return redirect('/manage/events')->with('error', "Event cannot be deleted because {$reason}.");
+        }
 
         $event->delete();
 

@@ -97,6 +97,10 @@ class TicketController extends Controller
             })
             ->findOrFail($id);
             
+        if ($ticket->is_scanned) {
+            return redirect('/manage/tickets')->with('error', 'Ticket cannot be deleted because it has already been scanned.');
+        }
+
         $ticket->delete();
 
         return redirect('/manage/tickets')->with('success', 'Ticket deleted successfully.');

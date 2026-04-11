@@ -161,6 +161,9 @@ class OrganizerDashboardViewModel implements Arrayable
                 'queues',
                 'queues as queues_waiting_count'  => fn ($q) => $q->where('status', 'waiting'),
                 'queues as queues_completed_count' => fn ($q) => $q->where('status', 'completed'),
+                'orders as orders_completed_count' => fn ($q) => $q->where('status', 'completed'),
+                'orders as orders_pending_count'   => fn ($q) => $q->where('status', 'pending'),
+                'orders as orders_canceled_count'  => fn ($q) => $q->where('status', 'canceled'),
             ])
             ->with(['eventTicketTypes'])
             ->orderBy('start_time')
@@ -168,7 +171,8 @@ class OrganizerDashboardViewModel implements Arrayable
 
         foreach ($ongoingEvents as $event) {
             $totalCapacity = $event->quota;
-            $totalSold     = DB::table('order_details')
+            
+            $totalSold = DB::table('order_details')
                 ->join('event_ticket_types', 'order_details.event_ticket_type_id', '=', 'event_ticket_types.id')
                 ->where('event_ticket_types.event_id', $event->id)
                 ->count();
@@ -179,14 +183,9 @@ class OrganizerDashboardViewModel implements Arrayable
                 ? min(100, round(($totalSold / $totalCapacity) * 100))
                 : 0;
 
-            $statusCounts = Order::where('event_id', $event->id)
-                ->select('status', DB::raw('COUNT(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status');
-
-            $event->orders_completed = (int) ($statusCounts['completed'] ?? 0);
-            $event->orders_pending   = (int) ($statusCounts['pending']   ?? 0);
-            $event->orders_canceled  = (int) ($statusCounts['canceled']  ?? 0);
+            $event->orders_completed = (int) $event->orders_completed_count;
+            $event->orders_pending   = (int) $event->orders_pending_count;
+            $event->orders_canceled  = (int) $event->orders_canceled_count;
         }
 
         return $ongoingEvents;

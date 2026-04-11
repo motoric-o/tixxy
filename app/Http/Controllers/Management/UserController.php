@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Management;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\ViewModels\UserCrudViewModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -51,6 +52,11 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
 
+        // Self-Demotion Guard
+        if (Auth::id() === $user->id && $user->role === 'admin' && $request->role !== 'admin') {
+            return redirect()->back()->with('error', 'You cannot demote your own role from the admin panel.');
+        }
+
         $data = $request->except('password');
         if ($request->filled('password')) {
             $data['password_hash'] = bcrypt($request->password);
@@ -85,7 +91,16 @@ class UserController extends Controller
 
     public function destroy($id)
     {
+        if (Auth::id() == $id) {
+            return redirect('/manage/users')->with('error', 'You cannot delete your own account.');
+        }
+
         $user = User::findOrFail($id);
+
+        if ($user->events()->exists() || $user->orders()->exists()) {
+            return redirect('/manage/users')->with('error', 'User cannot be deleted because they have associated events or orders.');
+        }
+
         $user->delete();
 
         return redirect('/manage/users')->with('success', 'User deleted successfully.');

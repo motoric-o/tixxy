@@ -49,6 +49,11 @@ class TicketTypeController extends Controller
 
     public function destroy($id) {
         $ticketType = TicketType::findOrFail($id);
+
+        if ($ticketType->eventTicketTypes()->exists()) {
+            return redirect('/manage/ticket-types')->with('error', 'Ticket Type cannot be deleted because it has event ticket types.');
+        }
+
         $ticketType->delete();
         return redirect('/manage/ticket-types')->with('success', 'Ticket Type deleted successfully.');
     }

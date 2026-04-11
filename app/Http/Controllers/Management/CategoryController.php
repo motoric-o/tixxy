@@ -15,6 +15,7 @@ class CategoryController extends Controller
         $rows = Category::when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
+            ->withCount('events')
             ->latest()
             ->paginate(10);
 
@@ -65,6 +66,11 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         $category = Category::findOrFail($id);
+
+        if ($category->events()->exists()) {
+            return redirect('/manage/categories')->with('error', 'Category cannot be deleted because it has associated events.');
+        }
+
         $category->delete();
 
         return redirect('/manage/categories')->with('success', 'Category deleted successfully.');

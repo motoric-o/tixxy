@@ -24,7 +24,7 @@ class OrderCrudViewModel implements Arrayable
             'columns' => $this->columns(),
             'rows' => $this->orders,
             'filters' => $this->filters(),
-            'createUrl' => '/manage/orders/create',
+            'createUrl' => null,
             'editUrl' => '/manage/orders',
             'backUrl' => '/manage/orders',
             'canDelete' => false,

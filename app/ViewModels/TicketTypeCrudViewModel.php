@@ -46,7 +46,7 @@ class TicketTypeCrudViewModel implements Arrayable
     private function fields(): array
     {
         return [
-            ['name' => 'name', 'label' => 'Ticket Type Name',  'type' => 'text', 'required' => true],
+            ['name' => 'name', 'label' => 'Ticket Type Name',  'type' => 'text', 'required' => true, 'wide' => true],
         ];
     }
 

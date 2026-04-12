@@ -25,7 +25,7 @@ class TicketCrudViewModel implements Arrayable
             'columns' => $this->columns(),
             'rows' => $this->tickets,
             'filters' => $this->filters(),
-            'createUrl' => null, // Tickets are usually created via orders
+            'createUrl' => null,
             'editUrl' => '/manage/tickets',
             'backUrl' => '/manage/tickets',
             'action' => $this->action === 'index' ? '/manage/tickets' : '/manage/tickets/' . ($this->tickets?->id ?? ''),

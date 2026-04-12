@@ -61,7 +61,15 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'role' => 'required|in:admin,organizer',
+            'password' => 'nullable|string|min:8',
+            'password_confirmation' => 'nullable|string|min:8',
+            'date_of_birth' => 'nullable|date',
+            'profile_picture_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($request->password != $request->password_confirmation) {
+            return redirect()->back()->with('error', 'Passwords do not match.');
+        }
 
         $user = User::findOrFail($id);
 

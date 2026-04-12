@@ -15,14 +15,14 @@
                                     <label
                                         class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ $filterParams['label'] ?? ucfirst($filterKey) }}</label>
                                     <input type="date" name="{{ $filterKey }}" value="{{ request($filterKey) }}"
-                                        class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-300">
+                                        class="h-[36px] w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors duration-300">
                                 </div>
                             @else
                                 <div class="flex-grow min-w-[150px] relative">
                                     <label
                                         class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ $filterParams['label'] ?? ucfirst($filterKey) }}</label>
                                     <select name="{{ $filterKey }}"
-                                        class="appearance-none w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block pl-3 pr-10 py-2 transition-colors duration-300 cursor-pointer hover:bg-gray-50/80 dark:hover:bg-gray-700/80">
+                                        class="h-[36px] appearance-none w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block pl-3 pr-10 py-2 transition-colors duration-300 cursor-pointer hover:bg-gray-50/80 dark:hover:bg-gray-700/80">
                                         <option value="">All {{ $filterParams['label'] ?? ucfirst($filterKey) }}
                                         </option>
                                         @foreach ($filterParams['options'] as $value => $label)
@@ -46,7 +46,7 @@
                     <div class="flex-grow min-w-[200px] relative">
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Search</label>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search..."
-                            class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full pl-10 py-2 transition-colors duration-300">
+                            class="h-[36px] bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full pl-10 py-2 transition-colors duration-300">
                         <div
                             class="absolute inset-y-0 left-0 top-5 flex items-center pl-3 pointer-events-none text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,12 +66,12 @@
 
                     <div class="flex items-center gap-2">
                         <button type="submit"
-                            class="px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-sm whitespace-nowrap">
+                            class="h-[36px] px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-sm whitespace-nowrap">
                             Apply Filters
                         </button>
                         @if (request()->hasAny(array_merge(['search'], array_keys($filters ?? []))))
                             <a href="{{ url()->current() }}"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition duration-200 shadow-sm whitespace-nowrap"
+                                class="h-[36px] flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition duration-200 shadow-sm whitespace-nowrap"
                                 title="Clear Filters">
                                 Clear
                             </a>
@@ -82,15 +82,17 @@
 
 
         </div>
-        <div class="flex items-end justify-end w-full">
-            <a href="{{ $createUrl }}"
-                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] transition-all duration-300 shadow-md hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] whitespace-nowrap ml-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Create {{ Str::singular($title) }}
-            </a>
-        </div>
+        @if ($createUrl)
+            <div class="flex items-end justify-end w-full">
+                <a href="{{ $createUrl }}"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] transition-all duration-300 shadow-md hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] whitespace-nowrap ml-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Create {{ Str::singular($title) }}
+                </a>
+            </div>
+        @endif
     </div>
 
     <!-- Table -->

@@ -69,7 +69,7 @@ class CategoryCrudViewModel implements Arrayable
     private function fields(): array
     {
         return [
-            ['name' => 'name', 'label' => 'Category Name', 'type' => 'text', 'placeholder' => 'e.g. Music, Sports, Tech', 'required' => true],
+            ['name' => 'name', 'label' => 'Category Name', 'type' => 'text', 'placeholder' => 'e.g. Music, Sports, Tech', 'required' => true, 'wide' => true],
         ];
     }
 }

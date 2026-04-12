@@ -39,8 +39,19 @@ class TicketController extends Controller
             $query->where('is_scanned', $request->get('is_scanned'));
         }
 
-        $tickets = $query->latest()->paginate(10);
-        
+        $dateFrom = request('date_from');
+        $dateTo = request('date_to');
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        $sort = request('sort', 'id');
+        $direction = request('direction', 'desc');
+
+        $tickets = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
         // Map values for columns that need it
         $tickets->getCollection()->transform(function ($ticket) {
             $ticket->is_scanned_label = $ticket->is_scanned ? 'Scanned' : 'Active';
@@ -97,6 +108,10 @@ class TicketController extends Controller
             })
             ->findOrFail($id);
             
+        if ($ticket->is_scanned) {
+            return redirect('/manage/tickets')->with('error', 'Ticket cannot be deleted because it has already been scanned.');
+        }
+
         $ticket->delete();
 
         return redirect('/manage/tickets')->with('success', 'Ticket deleted successfully.');

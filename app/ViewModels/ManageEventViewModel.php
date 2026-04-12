@@ -3,6 +3,7 @@
 namespace App\ViewModels;
 
 use Illuminate\Contracts\Support\Arrayable;
+use App\Models\Event;
 
 class ManageEventViewModel implements Arrayable
 {
@@ -13,6 +14,7 @@ class ManageEventViewModel implements Arrayable
     private $organizers;
     private $ticketTypesData;
     private $eventTicketTypesData;
+    private $orders;
     private $statuses;
 
     public function __construct($event, $action = 'index', $categories = [], $ticketTypes = [], $organizers = [], $ticketTypesData = [], $eventTicketTypesData = [])
@@ -24,7 +26,7 @@ class ManageEventViewModel implements Arrayable
         $this->organizers          = $organizers;
         $this->ticketTypesData     = $ticketTypesData;
         $this->eventTicketTypesData = $eventTicketTypesData;
-        $this->statuses             = \App\Models\Event::getStatuses();
+        $this->statuses             = Event::getStatuses();
     }
 
     public function toArray(): array

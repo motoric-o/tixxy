@@ -21,7 +21,7 @@ class CategoryCrudViewModel implements Arrayable
             'title'     => $this->action == 'index' ? 'Categories' : ($this->action == 'create' ? 'Create Category' : 'Edit Category: ' . ($this->categories?->name ?? 'Unknown')),
             'columns'   => $this->columns(),
             'rows'      => $this->categories,
-            'filters'   => [],
+            'filters'   => $this->filters(),
             'createUrl' => '/manage/categories/create',
             'editUrl'   => '/manage/categories',
             'backUrl'   => '/manage/categories',
@@ -47,14 +47,29 @@ class CategoryCrudViewModel implements Arrayable
         return [
             ['key' => 'id', 'label' => 'ID'],
             ['key' => 'name', 'label' => 'Name'],
+            ['key' => 'events_count', 'label' => 'Events', 'sortable' => true],
             ['key' => 'created_at', 'label' => 'Created At'],
+        ];
+    }
+
+    private function filters(): array
+    {
+        return [
+            'date_from' => [
+                'label' => 'Created Date (From)',
+                'type'  => 'date',
+            ],
+            'date_to' => [
+                'label' => 'Created Date (To)',
+                'type'  => 'date',
+            ]
         ];
     }
 
     private function fields(): array
     {
         return [
-            ['name' => 'name', 'label' => 'Category Name', 'type' => 'text', 'placeholder' => 'e.g. Music, Sports, Tech', 'required' => true],
+            ['name' => 'name', 'label' => 'Category Name', 'type' => 'text', 'placeholder' => 'e.g. Music, Sports, Tech', 'required' => true, 'wide' => true],
         ];
     }
 }

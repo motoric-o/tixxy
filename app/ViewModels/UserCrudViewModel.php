@@ -47,10 +47,13 @@ class UserCrudViewModel implements Arrayable
     private function fields(): array
     {
         return [
-            ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'required' => true],
+            ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'required' => true, 'wide' => true],
             ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true],
-            ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['organizer' => 'Organizer', 'user' => 'User'], 'required' => true],
-            ['name' => 'password', 'label' => 'Password', 'type' => 'password', 'required' => true],
+            ['name' => 'date_of_birth', 'label' => 'Date of Birth', 'type' => 'date'],
+            ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['organizer' => 'Organizer', 'user' => 'User'], 'required' => true, 'wide' => true],
+            ['name' => 'password', 'label' => 'Password', 'type' => 'password', 'required' => $this->action === 'create'],
+            ['name' => 'password_confirmation', 'label' => 'Password Confirmation', 'type' => 'password', 'required' => $this->action === 'create'],
+            ['name' => 'profile_picture_path', 'label' => 'Profile Picture', 'type' => 'file'],
         ];
     }
 
@@ -60,9 +63,18 @@ class UserCrudViewModel implements Arrayable
             'role' => [
                 'label' => 'Role',
                 'options' => [
+                    'admin' => 'Admin',
                     'organizer' => 'Organizer',
                     'user' => 'User'
                 ]
+            ],
+            'date_from' => [
+                'label' => 'Joined Date (From)',
+                'type'  => 'date',
+            ],
+            'date_to' => [
+                'label' => 'Joined Date (To)',
+                'type'  => 'date',
             ]
         ];
     }

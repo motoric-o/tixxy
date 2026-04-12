@@ -51,13 +51,14 @@ class OrderCrudViewModel implements Arrayable
 
         // Order Items (from orderDetails relationship)
         if ($order->relationLoaded('orderDetails') && $order->orderDetails->count() > 0) {
-            $items = $order->orderDetails->map(function ($detail) {
+            $items = $order->orderDetails->groupBy('event_ticket_type_id')->map(function ($group) {
+                $first = $group->first();
                 return [
-                    'Ticket Type' => $detail->eventTicketType?->ticketType?->name ?? 'N/A',
-                    'Price'       => 'Rp ' . number_format($detail->eventTicketType?->price ?? 0, 0, ',', '.'),
-                    'Qty'         => $detail->quantity,
+                    'Ticket Type' => $first->eventTicketType?->ticketType?->name ?? 'N/A',
+                    'Price'       => 'Rp ' . number_format($first->eventTicketType?->price ?? 0, 0, ',', '.'),
+                    'Qty'         => $group->count(),
                 ];
-            })->toArray();
+            })->values()->toArray();
 
             $details[] = [
                 'label' => 'Order Items',

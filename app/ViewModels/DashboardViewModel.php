@@ -143,11 +143,11 @@ class DashboardViewModel implements Arrayable
             ->get();
 
         foreach ($ongoingEvents as $event) {
-            $totalCapacity = $event->eventTicketTypes->sum('capacity');
+            $totalCapacity = $event->quota;
             $totalSold     = DB::table('order_details')
                 ->join('event_ticket_types', 'order_details.event_ticket_type_id', '=', 'event_ticket_types.id')
                 ->where('event_ticket_types.event_id', $event->id)
-                ->sum('order_details.quantity');
+                ->count();
 
             $event->total_capacity = $totalCapacity ?: 0;
             $event->total_sold     = $totalSold ?: 0;

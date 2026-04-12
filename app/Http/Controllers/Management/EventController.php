@@ -23,10 +23,10 @@ class EventController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                      ->orWhere('location', 'like', "%{$search}%")
-                      ->orWhereHas('category', function ($sub) use ($search) {
-                          $sub->where('name', 'like', "%{$search}%");
-                      });
+                        ->orWhere('location', 'like', "%{$search}%")
+                        ->orWhereHas('category', function ($sub) use ($search) {
+                            $sub->where('name', 'like', "%{$search}%");
+                        });
                 });
             })
             ->when($status, function ($query, $status) {
@@ -41,7 +41,8 @@ class EventController extends Controller
         return view('admin.crud.index', $viewModel->toArray());
     }
 
-    public function create() {
+    public function create()
+    {
         $categories = Category::orderBy('name')->pluck('name', 'id');
         $viewModel  = new EventCrudViewModel(null, 'create', $categories);
 
@@ -50,7 +51,7 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'title'       => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'start_time'  => 'required|date_format:Y-m-d\TH:i|after_or_equal:today',
@@ -60,17 +61,23 @@ class EventController extends Controller
             'quota'       => 'required|integer|min:1',
         ]);
 
-        Event::create([
-            'title'       => $request->title,
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-            'location'    => $request->location,
-            'start_time'  => $request->start_time,
-            'end_time'    => $request->end_time,
-            'status'      => 'preparation',
-            'quota'       => $request->quota,
-            'user_id'     => Auth::user()->role === 'admin' ? $request->user_id ?? Auth::id() : Auth::id(),
-        ]);
+
+        $data['status'] = 'preparation';
+        $data['user_id'] = Auth::user()->role === 'admin' ? $request->user_id ?? Auth::id() : Auth::id();
+
+        Event::create($data);
+
+        // Event::create([
+        //     'title'       => $request->title,
+        //     'description' => $request->description,
+        //     'category_id' => $request->category_id,
+        //     'location'    => $request->location,
+        //     'start_time'  => $request->start_time,
+        //     'end_time'    => $request->end_time,
+        //     'status'      => 'preparation',
+        //     'quota'       => $request->quota,
+        //     'user_id'     => Auth::user()->role === 'admin' ? $request->user_id ?? Auth::id() : Auth::id(),
+        // ]);
 
         return redirect('/manage/events')->with('success', 'Event created successfully.');
     }
@@ -79,7 +86,7 @@ class EventController extends Controller
     {
         $event = Event::when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
             ->findOrFail($id);
-        
+
         $event->delete();
 
         return redirect('/manage/events')->with('success', 'Event deleted successfully.');

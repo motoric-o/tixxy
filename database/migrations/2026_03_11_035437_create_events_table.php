@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->text('description');
             $table->string('title');
+            $table->text('description');
             $table->string('location');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
+            $table->string('banner_path');
             $table->enum('status', ['preparation','ongoing', 'completed', 'canceled', 'pending'])->default('preparation');
             $table->integer('quota')->default(20);
             $table->unsignedBigInteger('category_id')->nullable();

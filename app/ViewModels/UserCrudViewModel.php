@@ -44,11 +44,13 @@ class UserCrudViewModel implements Arrayable
         ];
     }
 
-    private function fields() : array {
+    private function fields(): array
+    {
         return [
             ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'required' => true],
             ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true],
-            ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'organizer' => 'Organizer', 'user' => 'User'], 'required' => true],
+            ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['organizer' => 'Organizer', 'user' => 'User'], 'required' => true],
+            ['name' => 'password', 'label' => 'Password', 'type' => 'password', 'required' => true],
         ];
     }
 
@@ -58,7 +60,6 @@ class UserCrudViewModel implements Arrayable
             'role' => [
                 'label' => 'Role',
                 'options' => [
-                    'admin' => 'Admin',
                     'organizer' => 'Organizer',
                     'user' => 'User'
                 ]

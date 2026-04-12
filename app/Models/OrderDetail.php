@@ -14,7 +14,7 @@ class OrderDetail extends Model
      *
      * @var array<string>
      */
-    protected $primaryKey = ['order_id', 'event_ticket_type_id'];
+    protected $primaryKey = ['order_id', 'ticket_id'];
 
     /**
      * Disable auto-incrementing since the PK is composite.
@@ -23,8 +23,8 @@ class OrderDetail extends Model
 
     protected $fillable = [
         'order_id',
+        'ticket_id',
         'event_ticket_type_id',
-        'quantity',
     ];
 
     /**
@@ -33,6 +33,14 @@ class OrderDetail extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    /**
+     * The ticket associated with this detail line.
+     */
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
     }
 
     /**

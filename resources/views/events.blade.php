@@ -30,8 +30,7 @@
                         <div class="hidden md:block w-px h-8 bg-white/20 mx-2"></div>
                         <select name="category" class="w-full md:w-auto bg-transparent border-none text-gray-200 focus:ring-0 py-3 px-4 rounded-xl [&>option]:text-gray-900">
                             <option value="">All Categories</option>
-                            @php $cachedCategories = \App\Models\Category::all(); @endphp
-                            @foreach($cachedCategories as $cat)
+                            @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                             @endforeach
                         </select>
@@ -62,25 +61,7 @@
             </div>
         </div>
 
-        @php
-            // Build the query gracefully from request inputs
-            $query = \App\Models\Event::with('category');
-            
-            if (request('search')) {
-                $query->where(function($q) {
-                    // Using ilike for postgresql case-insensitive matching
-                    $q->where('title', 'ilike', '%' . request('search') . '%')
-                      ->orWhere('description', 'ilike', '%' . request('search') . '%')
-                      ->orWhere('location', 'ilike', '%' . request('search') . '%');
-                });
-            }
-            if (request('category')) {
-                $query->where('category_id', request('category'));
-            }
-            
-            // Execute paginated search and preserve URL query string parameters across pages
-            $events = $query->orderBy('start_time', 'asc')->paginate(6)->withQueryString();
-        @endphp
+        {{-- $events and $categories are now passed from EventListController --}}
 
         <!-- AJAX Wrapper -->
         <div id="events-grid-wrapper">

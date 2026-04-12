@@ -14,10 +14,13 @@ class Order extends Model
         'status',
         'user_id',
         'event_id',
+        'payment_proof',
+        'expired_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'expired_at' => 'datetime',
     ];
 
     /**
@@ -62,5 +65,20 @@ class Order extends Model
             'completed' => 'Completed',
             'canceled'  => 'Canceled',
         ];
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($order) {
+            // Mark tickets as ready or decrement quota when the order is marked completed
+            if ($order->isDirty('status') && $order->status === 'completed') {
+                if ($order->event) {
+                    $order->loadMissing('tickets');
+                    $order->event->decrement('quota', $order->tickets->count());
+                }
+            }
+        });
     }
 }

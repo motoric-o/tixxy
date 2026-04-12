@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->decimal('amount', 10, 2);
             $table->enum('status', ['pending', 'completed', 'canceled'])->default('pending');
+            $table->string('payment_proof')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null')->onUpdate('cascade');
             $table->foreignId('event_id')->nullable()->constrained()->onDelete('set null')->onUpdate('cascade');
             $table->timestamps();

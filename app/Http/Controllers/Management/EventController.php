@@ -18,6 +18,12 @@ class EventController extends Controller
     {
         $search = request('search');
         $status = request('status');
+        $dateFrom = request('date_from');
+        $dateTo = request('date_to');
+        
+        $sort = request('sort', 'start_time');
+        $direction = request('direction', 'asc');
+
         $rows = Event::with(['category', 'organizer'])
             ->when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
             ->when($search, function ($query, $search) {
@@ -32,8 +38,15 @@ class EventController extends Controller
             ->when($status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->orderBy('start_time', 'asc')
-            ->paginate(10);
+            ->when($dateFrom, function ($query, $dateFrom) {
+                $query->whereDate('start_time', '>=', $dateFrom);
+            })
+            ->when($dateTo, function ($query, $dateTo) {
+                $query->whereDate('start_time', '<=', $dateTo);
+            })
+            ->orderBy($sort, $direction)
+            ->paginate(10)
+            ->withQueryString();
 
         $categories = Category::orderBy('name')->pluck('name', 'id');
         $viewModel  = new EventCrudViewModel($rows, 'index', $categories);

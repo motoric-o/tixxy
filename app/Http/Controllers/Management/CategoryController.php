@@ -12,12 +12,31 @@ class CategoryController extends Controller
     public function index()
     {
         $search = request('search');
+        $dateFrom = request('date_from');
+        $dateTo = request('date_to');
+        
+        $sort = request('sort', 'id');
+        $direction = request('direction', 'desc');
+
         $rows = Category::when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
-            ->withCount('events')
-            ->latest()
-            ->paginate(10);
+            ->when($dateFrom, function ($query, $dateFrom) {
+                $query->whereDate('created_at', '>=', $dateFrom);
+            })
+            ->when($dateTo, function ($query, $dateTo) {
+                $query->whereDate('created_at', '<=', $dateTo);
+            })
+            ->withCount('events');
+            
+        // Handle sorting for aggregated column
+        if ($sort === 'events_count') {
+             $rows = $rows->orderBy('events_count', $direction);
+        } else {
+             $rows = $rows->orderBy($sort, $direction);
+        }
+
+        $rows = $rows->paginate(10)->withQueryString();
 
         $viewModel = new CategoryCrudViewModel($rows);
 

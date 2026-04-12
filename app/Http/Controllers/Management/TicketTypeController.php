@@ -11,9 +11,30 @@ class TicketTypeController extends Controller
 {
     public function index() {
         $search = request('search');
+        $dateFrom = request('date_from');
+        $dateTo = request('date_to');
+        
+        $sort = request('sort', 'id');
+        $direction = request('direction', 'desc');
+
         $rows = TicketType::when($search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%");
-        })->latest()->paginate(10);
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->when($dateFrom, function ($query, $dateFrom) {
+                $query->whereDate('created_at', '>=', $dateFrom);
+            })
+            ->when($dateTo, function ($query, $dateTo) {
+                $query->whereDate('created_at', '<=', $dateTo);
+            })
+            ->withCount('eventTicketTypes');
+
+        if ($sort === 'event_ticket_types_count') {
+             $rows = $rows->orderBy('event_ticket_types_count', $direction);
+        } else {
+             $rows = $rows->orderBy($sort, $direction);
+        }
+
+        $rows = $rows->paginate(10)->withQueryString();
         $ticketTypesVM = new TicketTypeCrudViewModel($rows, 'index');
         return view('admin.crud.index', $ticketTypesVM->toArray());
     }

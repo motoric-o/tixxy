@@ -60,9 +60,18 @@ class UserCrudViewModel implements Arrayable
             'role' => [
                 'label' => 'Role',
                 'options' => [
+                    'admin' => 'Admin',
                     'organizer' => 'Organizer',
                     'user' => 'User'
                 ]
+            ],
+            'date_from' => [
+                'label' => 'Joined Date (From)',
+                'type'  => 'date',
+            ],
+            'date_to' => [
+                'label' => 'Joined Date (To)',
+                'type'  => 'date',
             ]
         ];
     }

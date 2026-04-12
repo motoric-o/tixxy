@@ -54,6 +54,14 @@ class EventCrudViewModel implements Arrayable
                 'label'   => 'Status',
                 'options' => \App\Models\Event::getStatuses(),
             ],
+            'date_from' => [
+                'label' => 'Start Date (From)',
+                'type'  => 'date',
+            ],
+            'date_to' => [
+                'label' => 'Start Date (To)',
+                'type'  => 'date',
+            ]
         ];
     }
 
@@ -62,8 +70,8 @@ class EventCrudViewModel implements Arrayable
         return [
             ['key' => 'id', 'label' => 'ID'],
             ['key' => 'title', 'label' => 'Title'],
-            ['key' => 'category.name', 'label' => 'Category'],
-            ['key' => 'description', 'label' => 'Description'],
+            ['key' => 'category.name', 'label' => 'Category', 'sortable' => false],
+            ['key' => 'description', 'label' => 'Description', 'sortable' => false],
             ['key' => 'location', 'label' => 'Location'],
             ['key' => 'start_time', 'label' => 'Start Time'],
             ['key' => 'end_time', 'label' => 'End Time'],

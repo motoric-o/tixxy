@@ -14,6 +14,12 @@ class UserController extends Controller
     {
         $search = request('search');
         $role = request('role');
+        $dateFrom = request('date_from');
+        $dateTo = request('date_to');
+        
+        $sort = request('sort', 'id');
+        $direction = request('direction', 'desc');
+
         $rows = User::when($search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%");
@@ -21,8 +27,15 @@ class UserController extends Controller
             ->when($role, function ($query, $role) {
                 $query->where('role', $role);
             })
-            ->latest()
-            ->paginate(10);
+            ->when($dateFrom, function ($query, $dateFrom) {
+                $query->whereDate('created_at', '>=', $dateFrom);
+            })
+            ->when($dateTo, function ($query, $dateTo) {
+                $query->whereDate('created_at', '<=', $dateTo);
+            })
+            ->orderBy($sort, $direction)
+            ->paginate(10)
+            ->withQueryString();
 
         $viewModel = new UserCrudViewModel($rows);
 

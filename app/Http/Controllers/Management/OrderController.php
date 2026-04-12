@@ -15,7 +15,13 @@ class OrderController extends Controller
     {
         $search = request('search');
         $status = request('status');
-        $rows = Order::with(['user', 'event'])
+        $dateFrom = request('date_from');
+        $dateTo = request('date_to');
+        
+        $sort = request('sort', 'id');
+        $direction = request('direction', 'desc');
+
+        $query = Order::with(['user', 'event'])
             ->when(Auth::user()->role === 'organizer', function($q) {
                 $q->whereHas('event', fn($sub) => $sub->where('user_id', Auth::id()));
             })
@@ -33,8 +39,17 @@ class OrderController extends Controller
             ->when($status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->latest()
-            ->paginate(10);
+            ->when($dateFrom, function ($query, $dateFrom) {
+                $query->whereDate('created_at', '>=', $dateFrom);
+            })
+            ->when($dateTo, function ($query, $dateTo) {
+                $query->whereDate('created_at', '<=', $dateTo);
+            });
+
+        // Ignore relationship sorting for now, just fallback to order columns
+        $rows = $query->orderBy($sort, $direction)
+            ->paginate(10)
+            ->withQueryString();
 
         $viewModel = new OrderCrudViewModel($rows);
 

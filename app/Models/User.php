@@ -6,6 +6,10 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Carbon;
+use App\Mail\VerifyEmail;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -73,5 +77,19 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getAuthPasswordName(): string
     {
         return 'password_hash';
+    }
+
+    /**
+     * Send the email verification notification using a custom mailable.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            Carbon::now()->addMinutes(60),
+            ['id' => $this->getKey(), 'hash' => sha1($this->getEmailForVerification())]
+        );
+
+        Mail::to($this->getEmailForVerification())->send(new VerifyEmail($this, $verificationUrl));
     }
 }

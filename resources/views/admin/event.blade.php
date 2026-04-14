@@ -6,40 +6,72 @@
         @csrf
         @method('PUT')
 
-        <div class="mb-6 flex flex-row justify-between items-center">
-            <div class="flex flex-row items-center gap-5">
+        <div
+            class="mb-8 flex flex-row justify-between items-center sticky top-4 z-20 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-5 rounded-2xl border border-white/20 dark:border-gray-800/50 shadow-xl shadow-purple-500/5 ring-1 ring-black/5 dark:ring-white/5">
+            <div class="flex flex-row items-center gap-6">
                 <a href="{{ $backUrl }}"
-                    class="p-2 text-[#e9d5ff] hover:text-white rounded-lg bg-[#4a00e0] transition-colors duration-300 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] border border-transparent hover:border-white/20"
+                    class="group p-2.5 text-purple-100 hover:text-white rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 hover:-translate-y-0.5 active:scale-95 border border-white/10"
                     title="Back">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    <svg class="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                             d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
                 </a>
                 <div class="flex flex-col">
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Event: {{ $item->title }}</h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Overview as of {{ now()->format('l, d F Y') }}
-                    </p>
+                    <h2 class="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                        Edit Event: <span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-500 dark:from-purple-400 dark:to-indigo-300">{{ $item->title }}</span>
+                    </h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            Overview as of {{ now()->format('l, d F Y') }}
+                        </p>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-col items-end gap-1">
-                <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Assigned
-                    Organizer</label>
-                <select name="user_id"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-colors duration-300 min-w-[180px]">
-                    <option value="">Unassigned</option>
-                    @foreach ($organizers as $orgId => $orgName)
-                        <option value="{{ $orgId }}" @if (old('user_id', $item->user_id) == $orgId) selected @endif>
-                            {{ $orgName }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('user_id')
-                    <span class="text-xs text-red-500">{{ $message }}</span>
-                @enderror
+            <div class="flex flex-row items-center gap-6">
+                <div class="flex flex-col items-end gap-1.5">
+                    <label
+                        class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Assigned
+                        Organizer</label>
+                    <div class="relative group">
+                        <select name="user_id"
+                            class="appearance-none bg-gray-50/50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 block w-full pl-4 pr-10 py-2 dark:bg-gray-800/50 dark:border-gray-700 dark:text-white transition-all duration-300 cursor-pointer hover:border-purple-400/50 min-w-[200px]">
+                            <option value="">Unassigned</option>
+                            @foreach ($organizers as $orgId => $orgName)
+                                <option value="{{ $orgId }}" @if (old('user_id', $item->user_id) == $orgId) selected @endif>
+                                    {{ $orgName }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 group-hover:text-purple-500 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                    @error('user_id')
+                        <span class="text-xs text-red-500">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="h-10 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
+
+                <button type="submit"
+                    class="h-12 w-54 group inline-flex items-center gap-2.5 px-7 py-3 text-sm font-bold text-white rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-[length:200%_auto] hover:bg-[position:right_center] shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all duration-500 hover:-translate-y-0.5 active:scale-95">
+                    <svg class="w-4.5 h-4.5 transition-transform duration-500 group-hover:rotate-12" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Save Changes</span>
+                </button>
             </div>
         </div>
+
 
         @if (session('success'))
             <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative shadow-sm">
@@ -65,14 +97,6 @@
                     <div
                         class="flex flex-row items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-t-xl">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Event Details</h3>
-                        <button type="submit"
-                            class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] shadow-md hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all duration-300">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
-                                </path>
-                            </svg>
-                            Save Changes
-                        </button>
                     </div>
                     <div class="p-6">
                         <div class="space-y-4">
@@ -145,7 +169,8 @@
                                     class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-purple-600 focus:border-purple-600 dark:focus:ring-purple-500 dark:focus:border-purple-500">
                                     @foreach ($statuses as $value => $label)
                                         <option value="{{ $value }}" @if (old('status', $item->status) == $value) selected @endif>
-                                            {{ $label }}</option>
+                                            {{ $label }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -169,14 +194,6 @@
                             <button type="button" id="addTicketBtn"
                                 class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
                                 + Add Ticket Type
-                            </button>
-                            <button type="submit"
-                                class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white rounded-lg bg-gradient-to-r from-[#4a00e0] via-[#8e2de2] to-[#4a00e0] bg-[length:200%_auto] hover:bg-[position:right_center] shadow-sm transition-all duration-300">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                Save Tickets
                             </button>
                         </div>
                     </div>
@@ -361,7 +378,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             let ticketIndex =
-                    {{ collect(old('ticket_types', $eventTicketTypesData))->count() ? max(array_keys(old('ticket_types', is_array($eventTicketTypesData) ? $eventTicketTypesData : $eventTicketTypesData->toArray()))) + 1 : 0 }};
+                                                                                                                                    {{ collect(old('ticket_types', $eventTicketTypesData))->count() ? max(array_keys(old('ticket_types', is_array($eventTicketTypesData) ? $eventTicketTypesData : $eventTicketTypesData->toArray()))) + 1 : 0 }};
             const container = document.getElementById('ticketContainer');
             const template = document.getElementById('ticketTemplate').innerHTML;
 

@@ -15,7 +15,7 @@ class CheckoutController extends Controller
     {
         $eventId = $request->input('event_id');
 
-        $event = Event::with('category')->findOrFail($eventId);
+        $event = Event::with(['category', 'eventTicketTypes.ticketType'])->findOrFail($eventId);
         
         // Prevent going back to checkout if there is already an active unpaid order
         $existingOrder = \App\Models\Order::where('user_id', \Illuminate\Support\Facades\Auth::id())
@@ -33,6 +33,11 @@ class CheckoutController extends Controller
             }
         }
 
+        if (\Carbon\Carbon::parse($event->start_time)->isPast()) {
+            return redirect()->route('events.index')
+                ->with('error', 'Booking for this event has already closed.');
+        }
+
         return view('checkout', compact('event'));
     }
     /**
@@ -41,17 +46,29 @@ class CheckoutController extends Controller
     public function store(Request $request, $id)
     {
         $request->validate([
-            'qty' => 'required|integer|min:1|max:5',
+            'tickets' => 'required|array|min:1',
+            'tickets.*.event_ticket_type_id' => 'required|exists:event_ticket_types,id',
+            'tickets.*.qty' => 'required|integer|min:1',
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
         ]);
 
+        $totalQty = collect($request->tickets)->sum('qty');
+        if ($totalQty > 10) {
+            return back()->withErrors(['tickets' => 'You can only purchase a maximum of 10 tickets in a single order.'])->withInput();
+        }
+
         $event = Event::with('eventTicketTypes')->findOrFail($id);
         
-        // Use the first available ticket type for pricing (for simplicity)
-        $ticketType = $event->eventTicketTypes->first();
-        $amount = $ticketType ? ($ticketType->price * $request->qty) : 0;
+        $amount = 0;
+        foreach ($request->tickets as $ticketInput) {
+            $ticketType = $event->eventTicketTypes->firstWhere('id', $ticketInput['event_ticket_type_id']);
+            if (!$ticketType) {
+                return back()->withErrors(['tickets' => 'Invalid ticket type selected for this event.'])->withInput();
+            }
+            $amount += $ticketType->price * $ticketInput['qty'];
+        }
 
         // Create the pending order
         $order = \App\Models\Order::create([
@@ -63,8 +80,9 @@ class CheckoutController extends Controller
         $order->expired_at = now()->addHour();
         $order->save();
 
-        if ($ticketType) {
-            for ($i = 0; $i < $request->qty; $i++) {
+        foreach ($request->tickets as $ticketInput) {
+            $ticketType = $event->eventTicketTypes->firstWhere('id', $ticketInput['event_ticket_type_id']);
+            for ($i = 0; $i < $ticketInput['qty']; $i++) {
                 // Generate a ticket immediately since it's required for the OrderDetail primary key
                 $ticket = \App\Models\Ticket::create([
                     'order_id' => $order->id,

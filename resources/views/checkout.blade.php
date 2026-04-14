@@ -97,18 +97,42 @@
                                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Step 1: Select Tickets</h3>
 
                                 <div class="space-y-6">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">How
-                                            many tickets do you need?</label>
-                                        <select name="qty" id="qty-select"
-                                            class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-lg">
-                                            <option value="1">1 Ticket</option>
-                                            <option value="2">2 Tickets</option>
-                                            <option value="3">3 Tickets</option>
-                                            <option value="4">4 Tickets</option>
-                                            <option value="5">5 Tickets</option>
-                                        </select>
+                                    <!-- Dynamic Ticket Types Wrapper -->
+                                    <div id="ticket-selection-wrapper" class="space-y-4">
+                                        <!-- Initial Row -->
+                                        <div class="flex flex-col sm:flex-row gap-4 ticket-row items-end">
+                                            <div class="flex-grow w-full">
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ticket Type</label>
+                                                <select name="tickets[0][event_ticket_type_id]" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-base ticket-type-select">
+                                                    @foreach($event->eventTicketTypes as $tt)
+                                                        @if($tt->ticketType)
+                                                        <option value="{{ $tt->id }}">{{ $tt->ticketType->name }} - Rp {{ number_format($tt->price, 0, ',', '.') }}</option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="w-full sm:w-32 shrink-0">
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount</label>
+                                                <input type="number" name="tickets[0][qty]" value="1" min="1" max="10" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-base ticket-qty-input" required onchange="checkMaxTickets(this)" oninput="checkMaxTickets(this)">
+                                            </div>
+                                            <div class="shrink-0">
+                                                <button type="button" onclick="removeTicketRow(this)" class="p-4 text-red-500 hover:text-red-700 transition self-end bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40" style="display:none;" title="Remove this ticket type">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    <div class="mt-4 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                        <button type="button" onclick="addTicketRow()" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                                            <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mr-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                            </div>
+                                            Add Another Type
+                                        </button>
+                                        <div class="text-sm text-gray-600 dark:text-gray-400 font-semibold px-4 py-2 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">Total: <span id="total-tickets-count" class="text-indigo-600 dark:text-indigo-400 font-bold">1</span> / 10 limit</div>
+                                    </div>
+
 
 
                                     <div class="pt-8 border-t border-gray-100 dark:border-gray-700">
@@ -217,6 +241,64 @@
             }
         }
 
+        let ticketRowIndex = 1;
+
+        function checkMaxTickets(input) {
+            let total = 0;
+            document.querySelectorAll('.ticket-qty-input').forEach(el => {
+                let val = parseInt(el.value);
+                if (val < 1 || isNaN(val)) {
+                    val = 1; // force minimum 1 if edited to something else
+                    el.value = 1; 
+                }
+                total += val;
+            });
+            document.getElementById('total-tickets-count').innerText = total;
+
+            if (total > 10) {
+                alert('You can only purchase a maximum of 10 tickets total.');
+                input.value = Math.max(1, parseInt(input.value) - (total - 10));
+                checkMaxTickets(input); // Recalculate correctly
+            }
+        }
+
+        function addTicketRow() {
+            let total = 0;
+            document.querySelectorAll('.ticket-qty-input').forEach(el => {
+                total += parseInt(el.value) || 0;
+            });
+
+            if (total >= 10) {
+                alert('Cannot add more rows. You have reached the maximum of 10 tickets.');
+                return;
+            }
+
+            const wrapper = document.getElementById('ticket-selection-wrapper');
+            const firstRow = wrapper.querySelector('.ticket-row');
+            const newRow = firstRow.cloneNode(true);
+
+            // Update names to use new index
+            const select = newRow.querySelector('.ticket-type-select');
+            select.name = `tickets[${ticketRowIndex}][event_ticket_type_id]`;
+            
+            const input = newRow.querySelector('.ticket-qty-input');
+            input.name = `tickets[${ticketRowIndex}][qty]`;
+            input.value = "1";
+
+            // Show remove button
+            const removeBtn = newRow.querySelector('button');
+            removeBtn.style.display = 'block';
+
+            wrapper.appendChild(newRow);
+            ticketRowIndex++;
+            checkMaxTickets(input);
+        }
+
+        function removeTicketRow(btn) {
+            btn.closest('.ticket-row').remove();
+            checkMaxTickets(document.querySelector('.ticket-qty-input'));
+        }
+
         function validateAndSubmit() {
             const form = document.getElementById('checkout-form');
             const name = document.getElementById('name-input').value;
@@ -225,6 +307,20 @@
 
             if (!name || !email || !phone) {
                 alert("Please fill in all required fields!");
+                return;
+            }
+
+            let total = 0;
+            document.querySelectorAll('.ticket-qty-input').forEach(el => {
+                total += parseInt(el.value) || 0;
+            });
+
+            if (total === 0) {
+                alert("You must purchase at least 1 ticket!");
+                return;
+            }
+            if (total > 10) {
+                alert("Maximum 10 tickets per order.");
                 return;
             }
 

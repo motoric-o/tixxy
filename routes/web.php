@@ -69,7 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 /*
  * Manage Middleware (Organizer + Admin)
  */
-Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(function () {
+Route::middleware(['auth', 'verified', 'role:organizer,admin'])->prefix('manage')->group(function () {
     Route::get('/manage-event-orders/{id}', [OrderController::class, 'eventOrders'])->name('manage.orders.event');
 
     // --- Dashboard ---
@@ -115,7 +115,7 @@ Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(fun
 /*
  * Manage Middleware (Admin Only)
  */
-Route::middleware(['auth', 'role:admin'])->prefix('manage')->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('manage')->group(function () {
     // --- Categories CRUD ---
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/categories/create', [CategoryController::class, 'create']);

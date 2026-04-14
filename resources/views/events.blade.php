@@ -87,7 +87,10 @@
                         </span>
                     </div>
                     <div class="absolute top-4 right-4">
-                        @if($event->status == 'ongoing' || $event->status == 'preparation')
+                        @php
+                            $isPastDue = \Carbon\Carbon::parse($event->start_time)->isPast();
+                        @endphp
+                        @if(!$isPastDue && ($event->status == 'ongoing' || $event->status == 'preparation'))
                         <span class="flex items-center gap-1 px-3 py-1 bg-green-500/90 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             Booking Open
@@ -95,7 +98,7 @@
                         @else
                         <span class="flex items-center gap-1 px-3 py-1 bg-gray-600/90 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                            {{ ucfirst($event->status) }}
+                            {{ $isPastDue ? 'Ended' : ucfirst($event->status) }}
                         </span>
                         @endif
                     </div>
@@ -133,7 +136,7 @@
                             <span class="text-xs text-gray-500 dark:text-gray-400">Tickets Available</span>
                             <span class="text-lg font-extrabold text-gray-900 dark:text-white">{{ $event->quota }} left</span>
                         </div>
-                        @if($event->status == 'ongoing' || $event->status == 'preparation')    
+                        @if(!$isPastDue && ($event->status == 'ongoing' || $event->status == 'preparation'))    
                         <a href="/checkout?event_id={{ $event->id }}" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white transition-colors duration-300">
                             Get Tickets
                         </a>

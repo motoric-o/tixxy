@@ -18,7 +18,13 @@ class EventController extends Controller
     {
         $search = request('search');
         $status = request('status');
-        $rows = Event::with('category')
+        $dateFrom = request('date_from');
+        $dateTo = request('date_to');
+        
+        $sort = request('sort', 'start_time');
+        $direction = request('direction', 'asc');
+
+        $rows = Event::with(['category', 'organizer'])
             ->when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
@@ -32,8 +38,15 @@ class EventController extends Controller
             ->when($status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->orderBy('start_time', 'asc')
-            ->paginate(10);
+            ->when($dateFrom, function ($query, $dateFrom) {
+                $query->whereDate('start_time', '>=', $dateFrom);
+            })
+            ->when($dateTo, function ($query, $dateTo) {
+                $query->whereDate('start_time', '<=', $dateTo);
+            })
+            ->orderBy($sort, $direction)
+            ->paginate(10)
+            ->withQueryString();
 
         $categories = Category::orderBy('name')->pluck('name', 'id');
         $viewModel  = new EventCrudViewModel($rows, 'index', $categories);
@@ -62,23 +75,11 @@ class EventController extends Controller
         ]);
 
 
-        $data['status'] = 'preparation';
+        $data['status'] = 'pending';
         $data['user_id'] = Auth::user()->role === 'admin' ? $request->user_id ?? Auth::id() : Auth::id();
 
         Event::create($data);
-
-        // Event::create([
-        //     'title'       => $request->title,
-        //     'description' => $request->description,
-        //     'category_id' => $request->category_id,
-        //     'location'    => $request->location,
-        //     'start_time'  => $request->start_time,
-        //     'end_time'    => $request->end_time,
-        //     'status'      => 'preparation',
-        //     'quota'       => $request->quota,
-        //     'user_id'     => Auth::user()->role === 'admin' ? $request->user_id ?? Auth::id() : Auth::id(),
-        // ]);
-
+        
         return redirect('/manage/events')->with('success', 'Event created successfully.');
     }
 
@@ -86,6 +87,11 @@ class EventController extends Controller
     {
         $event = Event::when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
             ->findOrFail($id);
+
+        if ($event->status === 'ongoing' || $event->orders()->exists()) {
+            $reason = $event->status === 'ongoing' ? 'it is currently ongoing' : 'it has associated orders';
+            return redirect('/manage/events')->with('error', "Event cannot be deleted because {$reason}.");
+        }
 
         $event->delete();
 

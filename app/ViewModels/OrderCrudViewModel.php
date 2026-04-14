@@ -24,7 +24,7 @@ class OrderCrudViewModel implements Arrayable
             'columns' => $this->columns(),
             'rows' => $this->orders,
             'filters' => $this->filters(),
-            'createUrl' => '/manage/orders/create',
+            'createUrl' => null,
             'editUrl' => '/manage/orders',
             'backUrl' => '/manage/orders',
             'canDelete' => false,
@@ -94,6 +94,14 @@ class OrderCrudViewModel implements Arrayable
             'status' => [
                 'label' => 'Status',
                 'options' => \App\Models\Order::getStatuses()
+            ],
+            'date_from' => [
+                'label' => 'Order Date (From)',
+                'type'  => 'date',
+            ],
+            'date_to' => [
+                'label' => 'Order Date (To)',
+                'type'  => 'date',
             ]
         ];
     }
@@ -104,8 +112,8 @@ class OrderCrudViewModel implements Arrayable
             ['key' => 'id', 'label' => 'ID'],
             ['key' => 'amount', 'label' => 'Amount'],
             ['key' => 'status', 'label' => 'Status'],
-            ['key' => 'user.name', 'label' => 'User'],
-            ['key' => 'event.title', 'label' => 'Event'],
+            ['key' => 'user.name', 'label' => 'User', 'sortable' => false],
+            ['key' => 'event.title', 'label' => 'Event', 'sortable' => false],
             ['key' => 'created_at', 'label' => 'Ordered At'],
         ];
     }

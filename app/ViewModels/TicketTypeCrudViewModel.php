@@ -22,6 +22,7 @@ class TicketTypeCrudViewModel implements Arrayable
             'title'     => $this->action == 'index' ? 'Ticket Types' : ($this->action == 'create' ? 'Create Ticket Type' : 'Edit Ticket Type: ' . $this->ticketTypes->name),
             'columns'   => $this->columns(),
             'rows'      => $this->ticketTypes,
+            'filters'   => $this->filters(),
             'createUrl' => '/manage/ticket-types/create',
             'editUrl'   => '/manage/ticket-types',
             'backUrl'   => '/manage/ticket-types',
@@ -45,7 +46,21 @@ class TicketTypeCrudViewModel implements Arrayable
     private function fields(): array
     {
         return [
-            ['name' => 'name', 'label' => 'Ticket Type Name',  'type' => 'text', 'required' => true],
+            ['name' => 'name', 'label' => 'Ticket Type Name',  'type' => 'text', 'required' => true, 'wide' => true],
+        ];
+    }
+
+    private function filters(): array
+    {
+        return [
+            'date_from' => [
+                'label' => 'Created Date (From)',
+                'type'  => 'date',
+            ],
+            'date_to' => [
+                'label' => 'Created Date (To)',
+                'type'  => 'date',
+            ]
         ];
     }
 
@@ -54,6 +69,7 @@ class TicketTypeCrudViewModel implements Arrayable
         return [
             ['key' => 'id', 'label' => 'ID'],
             ['key' => 'name', 'label' => 'Name'],
+            ['key' => 'event_ticket_types_count', 'label' => 'Events', 'sortable' => true],
         ];
     }
 }

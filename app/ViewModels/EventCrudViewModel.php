@@ -3,6 +3,7 @@
 namespace App\ViewModels;
 
 use Illuminate\Contracts\Support\Arrayable;
+use App\Models\User;
 
 class EventCrudViewModel implements Arrayable
 {
@@ -37,13 +38,14 @@ class EventCrudViewModel implements Arrayable
     private function fields(): array
     {
         return [
-            ['name' => 'title',       'label' => 'Event Name',  'type' => 'text',           'required' => true],
+            ['name' => 'title',       'label' => 'Event Name',  'type' => 'text',           'required' => true, 'wide' => true],
             ['name' => 'category_id', 'label' => 'Category',    'type' => 'select',          'options' => $this->categories, 'required' => true],
+            ['name' => 'quota',       'label' => 'Quota',       'type' => 'number'],
             ['name' => 'start_time',  'label' => 'Start Time',  'type' => 'datetime-local',  'required' => true],
             ['name' => 'end_time',    'label' => 'End Time',    'type' => 'datetime-local',  'required' => true],
-            ['name' => 'location',    'label' => 'Location',    'type' => 'text',            'required' => true],
+            ['name' => 'location',    'label' => 'Location',    'type' => 'text',            'required' => true, 'wide' => true],
             ['name' => 'description', 'label' => 'Description', 'type' => 'textarea'],
-            ['name' => 'quota',       'label' => 'Quota',       'type' => 'number'],
+            ['name' => 'user_id', 'label' => 'Organizer', 'type' => 'select', 'options' => User::where('role', 'organizer')->get()->pluck('name', 'id')],
         ];
     }
 
@@ -54,6 +56,14 @@ class EventCrudViewModel implements Arrayable
                 'label'   => 'Status',
                 'options' => \App\Models\Event::getStatuses(),
             ],
+            'date_from' => [
+                'label' => 'Start Date (From)',
+                'type'  => 'date',
+            ],
+            'date_to' => [
+                'label' => 'Start Date (To)',
+                'type'  => 'date',
+            ]
         ];
     }
 
@@ -62,8 +72,8 @@ class EventCrudViewModel implements Arrayable
         return [
             ['key' => 'id', 'label' => 'ID'],
             ['key' => 'title', 'label' => 'Title'],
-            ['key' => 'category.name', 'label' => 'Category'],
-            ['key' => 'description', 'label' => 'Description'],
+            ['key' => 'category.name', 'label' => 'Category', 'sortable' => false],
+            ['key' => 'description', 'label' => 'Description', 'sortable' => false],
             ['key' => 'location', 'label' => 'Location'],
             ['key' => 'start_time', 'label' => 'Start Time'],
             ['key' => 'end_time', 'label' => 'End Time'],

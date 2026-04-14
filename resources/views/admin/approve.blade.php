@@ -7,13 +7,13 @@
 @endphp
 
 <!-- Back Link -->
-<a href="/manage/orders"
+<a href="{{ route('manage.orders.event', $order->event_id) }}"
     class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2 font-medium hover:underline mb-8">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
         </path>
     </svg>
-    Back to Orders
+    Back to Event Orders
 </a>
 
 <!-- Page Header -->

@@ -70,6 +70,8 @@ Route::middleware('auth')->group(function () {
  * Manage Middleware (Organizer + Admin)
  */
 Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(function () {
+    Route::get('/manage-event-orders/{id}', [OrderController::class, 'eventOrders'])->name('manage.orders.event');
+
     // --- Dashboard ---
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('manage.home');
     Route::get('/scan', [QRController::class, 'index'])->name('manage.scan');
@@ -91,6 +93,7 @@ Route::middleware(['auth', 'role:organizer,admin'])->prefix('manage')->group(fun
     // --- Event Management Panel (edit + update) ---
     Route::get('/events/{id}/edit', [EventPanelController::class, 'index']);
     Route::put('/events/{id}', [EventPanelController::class, 'update']);
+
 
     // --- Orders CRUD ---
     Route::get('/orders', [OrderController::class, 'index']);

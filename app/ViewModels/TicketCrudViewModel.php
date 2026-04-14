@@ -25,7 +25,7 @@ class TicketCrudViewModel implements Arrayable
             'columns' => $this->columns(),
             'rows' => $this->tickets,
             'filters' => $this->filters(),
-            'createUrl' => null, // Tickets are usually created via orders
+            'createUrl' => null,
             'editUrl' => '/manage/tickets',
             'backUrl' => '/manage/tickets',
             'action' => $this->action === 'index' ? '/manage/tickets' : '/manage/tickets/' . ($this->tickets?->id ?? ''),
@@ -64,6 +64,14 @@ class TicketCrudViewModel implements Arrayable
                     '0' => 'Active',
                     '1' => 'Scanned'
                 ]
+            ],
+            'date_from' => [
+                'label' => 'Generated Date (From)',
+                'type'  => 'date',
+            ],
+            'date_to' => [
+                'label' => 'Generated Date (To)',
+                'type'  => 'date',
             ]
         ];
     }
@@ -73,9 +81,9 @@ class TicketCrudViewModel implements Arrayable
         return [
             ['key' => 'id', 'label' => 'ID'],
             ['key' => 'qr_code_hash', 'label' => 'QR Hash'],
-            ['key' => 'is_scanned_label', 'label' => 'Status'],
-            ['key' => 'order.event.title', 'label' => 'Event'],
-            ['key' => 'order.user.name', 'label' => 'Customer'],
+            ['key' => 'is_scanned_label', 'label' => 'Status', 'sortable' => false],
+            ['key' => 'order.event.title', 'label' => 'Event', 'sortable' => false],
+            ['key' => 'order.user.name', 'label' => 'Customer', 'sortable' => false],
             ['key' => 'created_at', 'label' => 'Date'],
         ];
     }

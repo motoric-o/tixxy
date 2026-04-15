@@ -97,4 +97,20 @@ class EventController extends Controller
 
         return redirect('/manage/events')->with('success', 'Event deleted successfully.');
     }
+
+    public function compare()
+    {
+        $events = Event::where('status', 'completed')
+            ->when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
+            ->with(['category'])
+            ->withSum(['orders' => fn($q) => $q->where('status', 'completed')], 'amount')
+            ->withCount([
+                'tickets as total_sold',
+                'tickets as total_scanned' => fn($q) => $q->where('is_scanned', true)
+            ])
+            ->latest()
+            ->get();
+
+        return view('admin.compare', compact('events'));
+    }
 }

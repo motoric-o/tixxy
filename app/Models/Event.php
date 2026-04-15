@@ -59,6 +59,18 @@ class Event extends Model
     }
 
     /**
+     * Mendapatkan semua tiket melalui relasi Order.
+     */
+    public function tickets()
+    {
+        // Relasi: Event has many Tickets through Orders
+        return $this->hasManyThrough(
+            Ticket::class, 
+            Order::class
+        );
+    }
+
+    /**
      * Queues for this event.
      */
     public function queues()

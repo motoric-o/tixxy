@@ -19,6 +19,7 @@ class Event extends Model
         'quota',
         'category_id',
         'user_id',
+        'banner_path',
     ];
 
     protected $casts = [

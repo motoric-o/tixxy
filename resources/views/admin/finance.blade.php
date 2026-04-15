@@ -26,7 +26,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
 
     {{-- Total Revenue --}}
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-700/10 border border-emerald-500/20 dark:border-emerald-500/10 p-5 shadow-sm dark:bg-gray-800 group hover:shadow-[0_0_20px_rgba(52,211,153,0.2)] transition-all duration-300">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-700/10 border border-emerald-500/20 dark:border-emerald-500/10 p-5 shadow-sm dark:bg-gray-800">
         <div class="flex items-start justify-between mb-3">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-widest text-emerald-400">Total Revenue</p>
@@ -44,11 +44,11 @@
         <p class="text-xs text-gray-500 dark:text-gray-400">
             From <span class="text-emerald-400 font-semibold">{{ number_format($totalOrdersCompleted) }}</span> completed orders
         </p>
-        <div class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+        <div class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-emerald-500/10"></div>
     </div>
 
     {{-- Revenue This Month + Growth --}}
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-700/10 border border-blue-500/20 dark:border-blue-500/10 p-5 shadow-sm dark:bg-gray-800 group hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-700/10 border border-blue-500/20 dark:border-blue-500/10 p-5 shadow-sm dark:bg-gray-800">
         <div class="flex items-start justify-between mb-3">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-widest text-blue-400">This Month</p>
@@ -73,11 +73,11 @@
             @endif
             <span class="text-xs text-gray-400">vs last month</span>
         </div>
-        <div class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 transition-all duration-500"></div>
+        <div class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-blue-500/10"></div>
     </div>
 
     {{-- Pending Orders Value --}}
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/10 border border-amber-500/20 dark:border-amber-500/10 p-5 shadow-sm dark:bg-gray-800 group hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-all duration-300">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/10 border border-amber-500/20 dark:border-amber-500/10 p-5 shadow-sm dark:bg-gray-800">
         <div class="flex items-start justify-between mb-3">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-widest text-amber-400">Pending Orders</p>
@@ -95,11 +95,11 @@
         <p class="text-xs text-gray-500 dark:text-gray-400">
             <span class="text-amber-400 font-semibold">{{ number_format($totalOrdersPending) }}</span> orders awaiting payment
         </p>
-        <div class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-amber-500/10 group-hover:bg-amber-500/20 transition-all duration-500"></div>
+        <div class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-amber-500/10"></div>
     </div>
 
     {{-- Average Order Value --}}
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-700/10 border border-purple-500/20 dark:border-purple-500/10 p-5 shadow-sm dark:bg-gray-800 group hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] transition-all duration-300">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-700/10 border border-purple-500/20 dark:border-purple-500/10 p-5 shadow-sm dark:bg-gray-800">
         <div class="flex items-start justify-between mb-3">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-widest text-purple-400">Avg. Order Value</p>
@@ -118,7 +118,7 @@
             <span class="text-purple-400 font-semibold">{{ number_format($totalTicketsScanned) }}</span>
             / {{ number_format($totalTicketsSold) }} tickets scanned
         </p>
-        <div class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-purple-500/10 group-hover:bg-purple-500/20 transition-all duration-500"></div>
+        <div class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-purple-500/10"></div>
     </div>
 
 </div>{{-- end row 1 --}}
@@ -224,7 +224,7 @@
         @if($topEvents->count() > 0)
         <div class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
             @foreach ($topEvents as $index => $event)
-            <div class="flex items-center gap-3 py-3 px-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+            <div class="flex items-center gap-3 py-3 px-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
                 {{-- Rank --}}
                 <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0
                     {{ $index === 0 ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white' :

@@ -19,7 +19,7 @@
 
         {{-- Total Revenue --}}
         <div
-            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-700/10 border border-emerald-500/20 dark:border-emerald-500/10 p-5 shadow-sm dark:bg-gray-700/40 group hover:shadow-[0_0_20px_rgba(52,211,153,0.2)] transition-all duration-300">
+            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-700/10 border border-emerald-500/20 dark:border-emerald-500/10 p-5 shadow-sm dark:bg-gray-700/40">
             <div class="flex items-start justify-between mb-3">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-widest text-emerald-400">Total Revenue</p>
@@ -39,13 +39,13 @@
                 completed orders
             </p>
             <div
-                class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-all duration-500">
+                class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-emerald-500/10">
             </div>
         </div>
 
         {{-- Revenue This Month --}}
         <div
-            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-700/10 border border-blue-500/20 dark:border-blue-500/10 p-5 shadow-sm dark:bg-gray-700/40 group hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300">
+            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-700/10 border border-blue-500/20 dark:border-blue-500/10 p-5 shadow-sm dark:bg-gray-700/40">
             <div class="flex items-start justify-between mb-3">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-widest text-blue-400">Revenue This Month</p>
@@ -64,13 +64,13 @@
                 {{ now()->format('F Y') }}
             </p>
             <div
-                class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 transition-all duration-500">
+                class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-blue-500/10">
             </div>
         </div>
 
         {{-- Pending Orders Value --}}
         <div
-            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/10 border border-amber-500/20 dark:border-amber-500/10 p-5 shadow-sm dark:bg-gray-700/40 group hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-all duration-300">
+            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/10 border border-amber-500/20 dark:border-amber-500/10 p-5 shadow-sm dark:bg-gray-700/40">
             <div class="flex items-start justify-between mb-3">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-widest text-amber-400">Pending Orders</p>
@@ -90,13 +90,13 @@
                 payment
             </p>
             <div
-                class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-amber-500/10 group-hover:bg-amber-500/20 transition-all duration-500">
+                class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-amber-500/10">
             </div>
         </div>
 
         {{-- Average Order Value --}}
         <div
-            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-700/10 border border-purple-500/20 dark:border-purple-500/10 p-5 shadow-sm dark:bg-gray-700/40 group hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] transition-all duration-300">
+            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-700/10 border border-purple-500/20 dark:border-purple-500/10 p-5 shadow-sm dark:bg-gray-700/40">
             <div class="flex items-start justify-between mb-3">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-widest text-purple-400">Avg. Order Value</p>
@@ -116,7 +116,7 @@
                 / {{ number_format($totalTicketsSold) }} tickets scanned
             </p>
             <div
-                class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-purple-500/10 group-hover:bg-purple-500/20 transition-all duration-500">
+                class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-purple-500/10">
             </div>
         </div>
 

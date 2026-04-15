@@ -30,7 +30,7 @@ class OrderApprovalController extends Controller
             ->findOrFail($id);
 
         if (empty($order->payment_proof)) {
-            return redirect()->route('manage.orders.event', $order->event_id)->with('error', 'Cannot approve order without payment proof.');
+            return redirect()->to(route('manage.events.edit', $order->event_id) . '#orders')->with('error', 'Cannot approve order without payment proof.');
         }
 
         $order->update(['status' => 'completed']);
@@ -38,7 +38,7 @@ class OrderApprovalController extends Controller
         // Send order confirmation email
         app(EmailController::class)->sendOrderEmail($id);
 
-        return redirect()->route('manage.orders.event', $order->event_id)->with('success', 'Order #' . str_pad($id, 6, '0', STR_PAD_LEFT) . ' has been approved and confirmation email sent.');
+        return redirect()->to(route('manage.events.edit', $order->event_id) . '#orders')->with('success', 'Order #' . str_pad($id, 6, '0', STR_PAD_LEFT) . ' has been approved and confirmation email sent.');
     }
 
     public function handleDecline($id)
@@ -58,6 +58,6 @@ class OrderApprovalController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()->route('manage.orders.event', $order->event_id)->with('success', 'Order #' . str_pad($id, 6, '0', STR_PAD_LEFT) . ' has been declined and payment proof removed.');
+        return redirect()->to(route('manage.events.edit', $order->event_id) . '#orders')->with('success', 'Order #' . str_pad($id, 6, '0', STR_PAD_LEFT) . ' has been declined and payment proof removed.');
     }
 }

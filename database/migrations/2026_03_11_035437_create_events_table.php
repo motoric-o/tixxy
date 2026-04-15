@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('location');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
-            $table->string('banner_path');
+            $table->string('banner_path')->nullable();
             $table->enum('status', ['preparation','ongoing', 'completed', 'canceled', 'pending'])->default('preparation');
             $table->integer('quota')->default(20);
             $table->unsignedBigInteger('category_id')->nullable();

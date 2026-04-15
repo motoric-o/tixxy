@@ -16,7 +16,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Management\QRController;
-use App\Http\Controllers\Management\EventPerformanceController;
+
 
 use App\Http\Controllers\EventListController;
 use App\Http\Controllers\CheckoutController;
@@ -72,7 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
  * Manage Middleware (Organizer + Admin)
  */
 Route::middleware(['auth', 'verified', 'role:organizer,admin'])->prefix('manage')->group(function () {
-    Route::get('/manage-event-orders/{id}', [OrderController::class, 'eventOrders'])->name('manage.orders.event');
+
 
     // --- Dashboard ---
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('manage.home');
@@ -93,11 +93,11 @@ Route::middleware(['auth', 'verified', 'role:organizer,admin'])->prefix('manage'
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
 
     // --- Event Management Panel (edit + update) ---
-    Route::get('/events/{id}/edit', [EventPanelController::class, 'index']);
+    Route::get('/events/{id}/edit', [EventPanelController::class, 'index'])->name('manage.events.edit');
     Route::put('/events/{id}', [EventPanelController::class, 'update']);
 
     // --- Event Performance Analytics ---
-    Route::get('/events/{id}/performance/data', [EventPerformanceController::class, 'data'])->name('manage.events.performance.data');
+    Route::get('/events/{id}/performance/data', [EventPanelController::class, 'performanceData'])->name('manage.events.performance.data');
 
 
     // --- Orders CRUD ---

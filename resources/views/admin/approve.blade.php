@@ -7,8 +7,8 @@
 @endphp
 
 <!-- Back Link -->
-<a href="{{ route('manage.orders.event', $order->event_id) }}"
-    class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2 font-medium hover:underline mb-8">
+<a href="{{ route('manage.events.edit', $order->event_id) }}#orders"
+    class="group inline-flex items-center gap-2.5 text-sm font-semibold text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 transition-all duration-300">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
         </path>

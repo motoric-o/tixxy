@@ -45,6 +45,7 @@ class EventCrudViewModel implements Arrayable
             ['name' => 'end_time',    'label' => 'End Time',    'type' => 'datetime-local',  'required' => true],
             ['name' => 'location',    'label' => 'Location',    'type' => 'text',            'required' => true, 'wide' => true],
             ['name' => 'description', 'label' => 'Description', 'type' => 'textarea'],
+            ['name' => 'banner_path', 'label' => 'Event Banner',  'type' => 'file', 'wide' => true],
             ['name' => 'user_id', 'label' => 'Organizer', 'type' => 'select', 'options' => User::where('role', 'organizer')->get()->pluck('name', 'id')],
         ];
     }

@@ -56,6 +56,8 @@ class EventController extends Controller
 
     public function create()
     {
+        if (Auth::user()->role === 'organizer') abort(403, 'Unauthorized action.');
+        
         $categories = Category::orderBy('name')->pluck('name', 'id');
         $viewModel  = new EventCrudViewModel(null, 'create', $categories);
 
@@ -64,6 +66,8 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        if (Auth::user()->role === 'organizer') abort(403, 'Unauthorized action.');
+
         $data = $request->validate([
             'title'       => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -72,11 +76,16 @@ class EventController extends Controller
             'location'    => 'required|string|max:255',
             'description' => 'nullable|string',
             'quota'       => 'required|integer|min:1',
+            'banner_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
 
         $data['status'] = 'pending';
         $data['user_id'] = Auth::user()->role === 'admin' ? $request->user_id ?? Auth::id() : Auth::id();
+
+        if ($request->hasFile('banner_path')) {
+            $data['banner_path'] = $request->file('banner_path')->store('events/banners', 'public');
+        }
 
         Event::create($data);
         
@@ -85,6 +94,8 @@ class EventController extends Controller
 
     public function destroy($id)
     {
+        if (Auth::user()->role === 'organizer') abort(403, 'Unauthorized action.');
+
         $event = Event::when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
             ->findOrFail($id);
 

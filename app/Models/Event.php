@@ -79,4 +79,18 @@ class Event extends Model
             'canceled'    => 'Canceled',
         ];
     }
+
+    /**
+     * Get real-time available quota by subtracting reserved tickets in active pending orders.
+     */
+    public function getAvailableQuotaAttribute()
+    {
+        $reservedTickets = \App\Models\Ticket::whereHas('order', function ($q) {
+            $q->where('status', 'pending')
+              ->where('event_id', $this->id)
+              ->where('expired_at', '>', now());
+        })->count();
+
+        return max(0, $this->quota - $reservedTickets);
+    }
 }

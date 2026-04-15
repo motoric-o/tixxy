@@ -134,7 +134,7 @@
                     <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700/50 flex items-center justify-between">
                         <div class="flex flex-col">
                             <span class="text-xs text-gray-500 dark:text-gray-400">Tickets Available</span>
-                            <span class="text-lg font-extrabold text-gray-900 dark:text-white">{{ $event->quota }} left</span>
+                            <span class="text-lg font-extrabold text-gray-900 dark:text-white">{{ $event->available_quota }} left</span>
                         </div>
                         @if(!$isPastDue && ($event->status == 'ongoing' || $event->status == 'preparation'))    
                         <a href="/checkout?event_id={{ $event->id }}" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white transition-colors duration-300">

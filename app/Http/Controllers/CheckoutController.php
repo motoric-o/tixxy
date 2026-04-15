@@ -60,6 +60,10 @@ class CheckoutController extends Controller
         }
 
         $event = Event::with('eventTicketTypes')->findOrFail($id);
+
+        if ($totalQty > $event->available_quota) {
+            return back()->withErrors(['tickets' => "You requested $totalQty tickets, but only {$event->available_quota} are currently available."])->withInput();
+        }
         
         $amount = 0;
         foreach ($request->tickets as $ticketInput) {

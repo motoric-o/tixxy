@@ -124,17 +124,30 @@
                     </div>
 
                     <!-- Right: QR Code -->
-                    <div class="flex flex-col items-center justify-center">
-                        <div class="bg-white p-6 rounded-2xl shadow-inner border-2 border-gray-100 dark:border-gray-600">
-                            <div id="qr-code-container"></div>
+                    @if($order->status === 'completed')
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="bg-white p-6 rounded-2xl shadow-inner border-2 border-gray-100 dark:border-gray-600">
+                                <div id="qr-code-container"></div>
+                            </div>
+                            <p class="mt-4 text-xs text-gray-400 dark:text-gray-500 text-center font-mono tracking-wider select-all">
+                                {{ $ticket->qr_code_hash }}
+                            </p>
+                            <p class="mt-2 text-xs text-gray-400 dark:text-gray-500 text-center">
+                                Scan this code at the event entrance
+                            </p>
                         </div>
-                        <p class="mt-4 text-xs text-gray-400 dark:text-gray-500 text-center font-mono tracking-wider select-all">
-                            {{ $ticket->qr_code_hash }}
-                        </p>
-                        <p class="mt-2 text-xs text-gray-400 dark:text-gray-500 text-center">
-                            Scan this code at the event entrance
-                        </p>
-                    </div>
+                    @else
+                        <div class="flex flex-col items-center justify-center text-center p-8 bg-gray-50 dark:bg-gray-700/30 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-600">
+                            <div class="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mb-4 text-gray-400 dark:text-gray-400">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Ticket Locked</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Your QR code will be generated and displayed once the payment process is fully completed.</p>
+                            @if($order->status === 'pending')
+                                <a href="{{ route('payment.show', $order->id) }}" class="mt-6 inline-flex px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors">Complete Payment</a>
+                            @endif
+                        </div>
+                    @endif
 
                 </div>
             </div>
@@ -158,6 +171,7 @@
 </div>
 
 <!-- QR Code Generation (lightweight, no PHP package needed) -->
+@if($order->status === 'completed')
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -166,18 +180,21 @@
         qr.make();
 
         const container = document.getElementById('qr-code-container');
-        container.innerHTML = qr.createSvgTag({
-            cellSize: 5,
-            margin: 0,
-            scalable: true
-        });
+        if (container) {
+            container.innerHTML = qr.createSvgTag({
+                cellSize: 5,
+                margin: 0,
+                scalable: true
+            });
 
-        // Style the generated SVG
-        const svg = container.querySelector('svg');
-        if (svg) {
-            svg.style.width = '200px';
-            svg.style.height = '200px';
+            // Style the generated SVG
+            const svg = container.querySelector('svg');
+            if (svg) {
+                svg.style.width = '200px';
+                svg.style.height = '200px';
+            }
         }
     });
 </script>
+@endif
 @endsection

@@ -36,17 +36,26 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Cek apakah ini pendaftar pertama
+        $role = User::count() === 0 ? 'admin' : 'user';
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'date_of_birth' => $request->date_of_birth,
             'password_hash' => Hash::make($request->password),
+            'role' => $role,
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect()->route('verification.notice');
+        // redirect after registration to the appropriate user page
+        if ($user->role === 'admin') {
+            return redirect()->route('manage.home');
+        }
+
+        return redirect(url('/'));
     }
 }

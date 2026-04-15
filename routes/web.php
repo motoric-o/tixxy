@@ -87,7 +87,7 @@ Route::middleware(['auth', 'verified', 'role:organizer,admin'])->prefix('manage'
     Route::post('/scanner/validate', [ScannerController::class, 'validateHash'])->name('manage.scanner.validate');
 
     // --- Events CRUD (shared) ---
-    Route::get('/events', [EventController::class, 'index']);
+    Route::get('/events', [EventController::class, 'index'])->name('manage.events');
     Route::get('/events/create', [EventController::class, 'create']);
     Route::post('/events/create', [EventController::class, 'store']);
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
@@ -115,6 +115,9 @@ Route::middleware(['auth', 'verified', 'role:organizer,admin'])->prefix('manage'
     Route::get('/tickets/{id}/edit', [ManagementTicketController::class, 'edit']);
     Route::put('/tickets/{id}', [ManagementTicketController::class, 'update']);
     Route::delete('/tickets/{id}', [ManagementTicketController::class, 'destroy']);
+
+    // --- Events comparison ----
+    Route::get('/events/compare', [EventController::class, 'compare'])->name('manage.events.compare');
 });
 
 /*

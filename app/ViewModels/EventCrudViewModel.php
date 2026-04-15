@@ -26,6 +26,7 @@ class EventCrudViewModel implements Arrayable
             'rows'      => $this->events,
             'filters'   => $this->filters(),
             'createUrl' => '/manage/events/create',
+            'compareUrl' => '/manage/events/compare',
             'editUrl'   => '/manage/events',
             'backUrl'   => '/manage/events',
             'action'    => $this->action == 'create' ? '/manage/events/create' : ($this->action == 'edit' ? '/manage/events/' . $this->events->id : '/manage/events'),

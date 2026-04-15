@@ -16,7 +16,8 @@ class EventListController extends Controller
     {
         $categories = Category::all();
 
-        $query = Event::with('category');
+        // Only show events that have not passed their start time by more than 1 week
+        $query = Event::with('category')->where('start_time', '>=', now()->subDays(7));
 
         if ($request->filled('search')) {
             $search = $request->input('search');

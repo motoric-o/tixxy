@@ -59,9 +59,7 @@
     </div>
 </div>
 
-<!-- Sound Effects -->
-<audio id="success-sound" src="https://assets.mixkit.co/active_storage/sfx/1071/1071-preview.mp3"></audio>
-<audio id="error-sound" src="https://assets.mixkit.co/active_storage/sfx/2648/2648-preview.mp3"></audio>
+
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
@@ -73,8 +71,7 @@
         const ticketInfo = document.getElementById('ticket-info');
         const statusText = document.getElementById('status-text');
         
-        const successSound = document.getElementById('success-sound');
-        const errorSound = document.getElementById('error-sound');
+
 
         let isScanning = true;
 
@@ -142,7 +139,6 @@
             ticketInfo.classList.add('hidden');
 
             if (data.status === 'success') {
-                successSound.play();
                 resultCard.classList.add('border-green-500', 'bg-green-50/10');
                 resultIcon.classList.add('bg-green-100', 'text-green-600', 'dark:bg-green-900/50');
                 resultIcon.innerHTML = '<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>';
@@ -157,7 +153,6 @@
                 document.getElementById('timestamp').innerText = "Validated at " + new Date().toLocaleTimeString();
             } 
             else if (data.status === 'warning') {
-                errorSound.play(); // Warning sound would be better but error works
                 resultCard.classList.add('border-amber-500', 'bg-amber-50/10');
                 resultIcon.classList.add('bg-amber-100', 'text-amber-600', 'dark:bg-amber-900/50');
                 resultIcon.innerHTML = '<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>';
@@ -166,7 +161,6 @@
                 resultMessage.innerText = data.message;
             }
             else {
-                errorSound.play();
                 resultCard.classList.add('border-red-500', 'bg-red-50/10');
                 resultIcon.classList.add('bg-red-100', 'text-red-600', 'dark:bg-red-900/50');
                 resultIcon.innerHTML = '<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>';

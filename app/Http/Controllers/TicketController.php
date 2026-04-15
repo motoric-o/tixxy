@@ -13,9 +13,13 @@ class TicketController extends Controller
     {
         $userId = Auth::user()->id;
 
-        $tickets = Ticket::with('order.event')->whereHas('order', function ($query) use ($userId) {
-                    $query->where('user_id', $userId);
-                    })->get();
+        $tickets = Ticket::with('order.event')
+            ->select('tickets.*')
+            ->join('orders', 'tickets.order_id', '=', 'orders.id')
+            ->where('orders.user_id', $userId)
+            ->orderByRaw("CASE WHEN orders.status = 'pending' THEN 0 ELSE 1 END")
+            ->orderBy('tickets.id', 'desc')
+            ->get();
         
         return view('ticketList', compact('tickets'));
     }

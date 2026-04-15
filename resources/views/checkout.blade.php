@@ -4,7 +4,7 @@
     {{-- $event is now passed from CheckoutController --}}
 
     <div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-12">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <a href="/events"
@@ -46,10 +46,10 @@
 
             <div
                 class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2">
+                <div class="grid grid-cols-1 md:grid-cols-12">
                     <!-- Left: Event Summary Mini -->
                     <div
-                        class="bg-indigo-50 dark:bg-gray-800/50 p-8 border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-700">
+                        class="col-span-1 md:col-span-4 bg-indigo-50 dark:bg-gray-800/50 p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-700">
                         <span
                             class="px-3 py-1 bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
                             {{ $event->category->name ?? 'Event' }}
@@ -87,7 +87,7 @@
                     </div>
 
                     <!-- Right: Form Wizard -->
-                    <div class="p-8">
+                    <div class="col-span-1 md:col-span-8 p-6 md:p-8">
                         <form id="checkout-form" action="{{ route('checkout.store', $event->id) }}" method="POST" class="relative">
                             @csrf
                             <!-- We POST to CheckoutController to create the order, which then redirects to payment -->
@@ -157,6 +157,7 @@
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full
                                             Name</label>
                                         <input type="text" name="name" id="name-input" required placeholder="John Doe"
+                                            value="{{ auth()->user()->name ?? '' }}"
                                             class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                                     </div>
 
@@ -164,6 +165,7 @@
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email
                                             Address</label>
                                         <input type="email" name="email" id="email-input" required placeholder="john@example.com"
+                                            value="{{ auth()->user()->email ?? '' }}"
                                             class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                                         <p class="text-xs text-gray-500 mt-2">We'll send your tickets to this email.</p>
                                     </div>
@@ -172,6 +174,7 @@
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone
                                             Number</label>
                                         <input type="tel" name="phone" id="phone-input" required placeholder="+1 (555) 000-0000"
+                                            value="{{ auth()->user()->phone ?? '' }}"
                                             class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                                     </div>
 

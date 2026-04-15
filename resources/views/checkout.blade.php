@@ -17,18 +17,6 @@
                     </a>
                     <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2">Complete Your Booking</h1>
                     <p class="text-gray-500 dark:text-gray-400 mt-2">Follow the steps to secure your tickets.</p>
-                    <form action="{{ route('queue.cancel', $event->id) }}" method="POST" class="inline mt-3"
-                        onsubmit="return confirm('Cancel your booking? You will lose your queue position and your spot will be given to the next person in line.');">
-                        @csrf
-                        <button type="submit"
-                            class="inline-flex items-center gap-1.5 text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                            Cancel Booking
-                        </button>
-                    </form>
                 </div>
 
                 <!-- Unified Stepper UI -->
@@ -61,7 +49,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-12">
                     <!-- Left: Event Summary Mini -->
                     <div
-                        class="col-span-1 md:col-span-4 bg-indigo-50 dark:bg-gray-800/50 p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-700">
+                        class="col-span-1 md:col-span-4 bg-indigo-50 dark:bg-gray-800/50 p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-700 flex flex-col">
                         <span
                             class="px-3 py-1 bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
                             {{ $event->category->name ?? 'Event' }}
@@ -96,6 +84,20 @@
                                 <span>{{ $event->location }}</span>
                             </div>
                         </div>
+
+                        <!-- Cancel Booking -->
+                        <form action="{{ route('queue.cancel', $event->id) }}" method="POST" class="mt-auto pt-6"
+                            onsubmit="return confirm('Cancel your booking? You will lose your queue position and your spot will be given to the next person in line.');">
+                            @csrf
+                            <button type="submit"
+                                class="w-full py-3.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold rounded-2xl border border-red-200 dark:border-red-800/50 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all duration-300 flex justify-center items-center gap-2 px-6">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                <span>Cancel Booking</span>
+                            </button>
+                        </form>
                     </div>
 
                     <!-- Right: Form Wizard -->

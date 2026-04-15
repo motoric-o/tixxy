@@ -13,11 +13,23 @@
 {{-- ═══════════════════════════════════════════════════════════════
      Page Header
 ═══════════════════════════════════════════════════════════════ --}}
-<div class="mb-6">
-    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Financial Overview</h2>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-        Your events' financial analytics — {{ now()->format('l, d F Y') }}
-    </p>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Financial Overview</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Your events' financial analytics — {{ now()->format('l, d F Y') }}
+        </p>
+    </div>
+    <div class="flex gap-3">
+        <a href="/manage/finances/export/csv" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-emerald-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            Export CSV
+        </a>
+        <a href="/manage/finances/export/pdf" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 border border-transparent rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/20 active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            Export PDF
+        </a>
+    </div>
 </div>
 
 {{-- ═══════════════════════════════════════════════════════════════

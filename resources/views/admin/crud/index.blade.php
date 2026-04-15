@@ -15,8 +15,8 @@
         <div class="flex items-center gap-3">
             @if (isset($compareUrl))
                 <a href="{{ $compareUrl }}"
-                    class="inline-flex items-center gap-2.5 px-6 py-3 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 transition-all duration-300 shadow-sm hover:shadow-md active:scale-95 whitespace-nowrap">
-                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="inline-flex items-center gap-2.5 px-6 py-3 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-500/30 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/40 hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-all duration-300 shadow-sm hover:shadow-indigo-500/10 active:scale-95 whitespace-nowrap group/compare">
+                    <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-400 transition-transform duration-300 group-hover/compare:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                         </path>

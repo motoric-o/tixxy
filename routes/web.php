@@ -81,6 +81,8 @@ Route::middleware(['auth', 'verified', 'role:organizer,admin'])->prefix('manage'
 
     // --- Financial ---
     Route::get('/finances', [FinanceController::class, 'index'])->name('manage.finances');
+    Route::get('/finances/export/pdf', [FinanceController::class, 'exportPdf']);
+    Route::get('/finances/export/csv', [FinanceController::class, 'exportCsv']);
 
     // --- Scanner ---
     Route::get('/scanner', [ScannerController::class, 'index'])->name('manage.scanner');
@@ -98,7 +100,8 @@ Route::middleware(['auth', 'verified', 'role:organizer,admin'])->prefix('manage'
 
     // --- Event Performance Analytics ---
     Route::get('/events/{id}/performance/data', [EventPanelController::class, 'performanceData'])->name('manage.events.performance.data');
-
+    Route::get('/events/{id}/export/pdf', [EventPanelController::class, 'exportPdf']);
+    Route::get('/events/{id}/export/csv', [EventPanelController::class, 'exportCsv']);
 
     // --- Orders CRUD ---
     Route::get('/orders', [OrderController::class, 'index']);

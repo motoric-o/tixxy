@@ -123,6 +123,78 @@ class EventPanelController extends Controller
         return response()->json($viewModel->toArray());
     }
 
+    public function exportPdf(Request $request, $id)
+    {
+        $event = Event::when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $eventsList = Event::orderBy('start_time', 'desc')->get(['id', 'title', 'status']);
+        $perfViewModel = new \App\ViewModels\EventPerformanceViewModel($eventsList, $id, 'all');
+        $performanceData = $perfViewModel->toArray();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.event-performance-pdf', [
+            'event' => $event,
+            'performanceData' => $performanceData
+        ]);
+
+        return $pdf->stream('event-performance-'.$event->id.'.pdf');
+    }
+
+    public function exportCsv(Request $request, $id)
+    {
+        $event = Event::when(Auth::user()->role === 'organizer', fn($q) => $q->where('user_id', Auth::id()))
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $eventsList = collect(); // not strictly needed for the calculations, but required by constructor
+        $perfViewModel = new \App\ViewModels\EventPerformanceViewModel($eventsList, $id, 'all');
+        $perfData = $perfViewModel->toArray();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=event_performance_{$event->id}.csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use($perfData) {
+            $file = fopen('php://output', 'w');
+            
+            fputcsv($file, ['Metric', 'Value']);
+            fputcsv($file, ['Total Tickets Sold', $perfData['totalTicketsSold'] ?? 0]);
+            fputcsv($file, ['Total Capacity', $perfData['totalCapacity'] ?? 0]);
+            fputcsv($file, ['Total Gross Revenue', $perfData['totalRevenue'] ?? 0]);
+            fputcsv($file, ['Completed Orders', $perfData['totalOrdersCompleted'] ?? 0]);
+            fputcsv($file, ['Pending Orders', $perfData['totalOrdersPending'] ?? 0]);
+            fputcsv($file, ['Canceled Orders', $perfData['totalOrdersCanceled'] ?? 0]);
+            fputcsv($file, ['Sell-through Rate (%)', $perfData['sellThroughRate'] ?? 0]);
+            fputcsv($file, ['Average Order Value', $perfData['avgOrderValue'] ?? 0]);
+            fputcsv($file, ['Conversion Rate (%)', $perfData['conversionRate'] ?? 0]);
+            fputcsv($file, ['Attendance Rate (%)', $perfData['attendanceRate'] ?? 0]);
+            fputcsv($file, []);
+
+            fputcsv($file, ['Tier Name', 'Price', 'Capacity', 'Sold', 'Revenue', 'Fill Rate (%)']);
+            if (isset($perfData['tierBreakdown'])) {
+                foreach ($perfData['tierBreakdown'] as $tier) {
+                    fputcsv($file, [
+                        $tier['name'],
+                        $tier['price'],
+                        $tier['capacity'],
+                        $tier['sold'],
+                        $tier['revenue'],
+                        $tier['fill']
+                    ]);
+                }
+            }
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function update(Request $request, $id) {
         if (Auth::user()->role === 'organizer') abort(403, 'Unauthorized action.');
 

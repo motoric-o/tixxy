@@ -473,6 +473,23 @@
 
         {{-- Analytics Tab --}}
         <div x-show="activeTab === 'analytics'" x-transition.opacity.duration.300ms class="mt-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Performance Analytics</h3>
+                    <p class="text-sm text-gray-500 mt-1">Detailed breakdown of financial and sales metrics</p>
+                </div>
+                <div class="flex gap-3">
+                    <a href="/manage/events/{{ $item->id }}/export/csv" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-purple-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Export CSV
+                    </a>
+                    <a href="/manage/events/{{ $item->id }}/export/pdf" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-purple-600 border border-transparent rounded-xl hover:bg-purple-700 dark:hover:bg-purple-500 transition-colors shadow-lg shadow-purple-500/20 active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Export PDF
+                    </a>
+                </div>
+            </div>
+            
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
 
                 {{-- Total Gross Revenue --}}
@@ -613,27 +630,52 @@
             </div>{{-- end row 1 --}}
 
             {{-- ═══════════════════════════════════════════════════════════════
-    ROW 2 – Sales Velocity + Attendance Mix
+    ROW 2 – Sales Velocity + Revenue Trend
     ═══════════════════════════════════════════════════════════════ --}}
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
 
-                {{-- Sales Velocity Line Chart (2/3) --}}
+                {{-- Sales Velocity Line Chart (1/2) --}}
                 <div
-                    class="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm backdrop-blur-sm">
+                    class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm backdrop-blur-sm">
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Sales Velocity</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Tickets sold over selected timeframe</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Tickets sold over time</p>
                         </div>
                         <span id="velocity-total-badge"
                             class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 font-medium border border-indigo-500/20">
-                            {{ number_format($performanceData['totalTicketsSold'] ?? 0) }} total tickets
+                            {{ number_format($performanceData['totalTicketsSold'] ?? 0) }} tickets
                         </span>
                     </div>
                     <div class="relative h-56">
                         <canvas id="velocityChart"></canvas>
                     </div>
                 </div>
+
+                {{-- Revenue Trend Line Chart (1/2) --}}
+                <div
+                    class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm backdrop-blur-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Revenue Trend</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Revenue generated over time</p>
+                        </div>
+                        <span
+                            class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-medium border border-emerald-500/20">
+                            Rp {{ number_format($performanceData['totalRevenue'] ?? 0, 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="relative h-56">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- ═══════════════════════════════════════════════════════════════
+    ROW 2.5 – Attendance Mix
+    ═══════════════════════════════════════════════════════════════ --}}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
 
                 {{-- Attendance Doughnut (1/3) --}}
                 <div
@@ -1019,7 +1061,7 @@
                 const fmtRp = v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v);
                 const fmtNum = v => new Intl.NumberFormat('id-ID').format(v);
 
-                let velocityChart, attendanceChart;
+                let velocityChart, attendanceChart, revenueChart;
 
                 function buildVelocityChart(labels, data) {
                     const ctx = document.getElementById('velocityChart');
@@ -1088,6 +1130,74 @@
                     });
                 }
 
+                function buildRevenueChart(labels, data) {
+                    const ctx = document.getElementById('revenueChart');
+                    if (!ctx) return;
+                    const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
+                    grad.addColorStop(0, 'rgba(52, 211, 153, 0.35)');
+                    grad.addColorStop(1, 'rgba(52, 211, 153, 0)');
+
+                    revenueChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Revenue',
+                                data: data,
+                                fill: true,
+                                backgroundColor: grad,
+                                borderColor: 'rgba(52,211,153,0.9)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(52,211,153,1)',
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                tension: 0.4,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    ...tooltipOpts(),
+                                    callbacks: {
+                                        label: c => fmtRp(c.raw)
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: {
+                                        color: gridColor()
+                                    },
+                                    ticks: {
+                                        color: labelColor(),
+                                        font: {
+                                            size: 11
+                                        }
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        color: gridColor()
+                                    },
+                                    ticks: {
+                                        color: labelColor(),
+                                        font: {
+                                            size: 11
+                                        },
+                                        callback: v => window.innerWidth > 768 ? fmtRp(v) : v
+                                    },
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+
                 function buildAttendanceChart(scanned, noshow) {
                     const ctx = document.getElementById('attendanceChart');
                     if (!ctx) return;
@@ -1122,6 +1232,7 @@
                 // We inject the actual labels array directly from Blade
                 const chartLabels = {!! json_encode($performanceData['chartLabels'] ?? []) !!};
                 const chartVelocity = {!! json_encode($performanceData['chartVelocity'] ?? []) !!};
+                const chartRevenueVelocity = {!! json_encode($performanceData['chartRevenueVelocity'] ?? []) !!};
                 const scannedCount = {{ $performanceData['totalTicketsScanned'] ?? 0 }};
                 const noshowCount =
                     {{ ($performanceData['totalTicketsSold'] ?? 0) - ($performanceData['totalTicketsScanned'] ?? 0) }};
@@ -1132,6 +1243,7 @@
                 function initCharts() {
                     if (chartRendered) return;
                     buildVelocityChart(chartLabels, chartVelocity);
+                    buildRevenueChart(chartLabels, chartRevenueVelocity);
                     buildAttendanceChart(scannedCount, noshowCount);
                     chartRendered = true;
                 }

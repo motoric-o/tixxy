@@ -42,6 +42,7 @@ class EventPerformanceViewModel implements Arrayable
             'tierBreakdown'       => $this->tierBreakdown(),
             'chartLabels'         => $this->velocityChartData()['labels'],
             'chartVelocity'       => $this->velocityChartData()['data'],
+            'chartRevenueVelocity'=> $this->revenueVelocityChartData()['data'],
         ];
     }
 
@@ -206,5 +207,53 @@ class EventPerformanceViewModel implements Arrayable
               ->where('status', 'completed')
               ->whereBetween('created_at', [$start, $end]);
         })->count();
+    }
+
+    private function revenueVelocityChartData()
+    {
+        $labels = [];
+        $data = [];
+
+        if ($this->range == '24h') {
+            // Every 3 hours over the last 24h
+            for ($i = 21; $i >= 0; $i -= 3) {
+                $start = now()->subHours($i + 3);
+                $end   = now()->subHours($i);
+                $labels[] = $end->format('H:00');
+                $data[] = $this->calculateRevenueInDateRange($start, $end);
+            }
+        } elseif ($this->range == '7d') {
+            // Last 7 days
+            for ($i = 6; $i >= 0; $i--) {
+                $date = now()->subDays($i);
+                $labels[] = $date->format('D'); // Mon, Tue
+                $data[] = $this->calculateRevenueInDateRange($date->copy()->startOfDay(), $date->copy()->endOfDay());
+            }
+        } elseif ($this->range == '30d') {
+            // By week for the last 30 days, or just roughly every 7 days (4 points)
+            for ($i = 3; $i >= 0; $i--) {
+                $start = now()->subDays(($i * 7) + 7);
+                $end   = now()->subDays($i * 7);
+                $labels[] = 'Week ' . (4 - $i);
+                $data[] = $this->calculateRevenueInDateRange($start, $end);
+            }
+        } else {
+            // all time - by month for the last 6 months
+            for ($i = 5; $i >= 0; $i--) {
+                $date = now()->startOfMonth()->subMonths($i);
+                $labels[] = $date->format('M');
+                $data[] = $this->calculateRevenueInDateRange($date->copy()->startOfMonth(), $date->copy()->endOfMonth());
+            }
+        }
+
+        return ['labels' => $labels, 'data' => $data];
+    }
+
+    private function calculateRevenueInDateRange($start, $end)
+    {
+        return Order::where('event_id', $this->selectedEventId)
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$start, $end])
+            ->sum('amount');
     }
 }

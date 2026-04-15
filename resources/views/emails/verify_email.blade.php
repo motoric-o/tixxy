@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Verifikasi Email — Tixxy</title>
+    <title>Email Verification — Tixxy</title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -159,13 +159,13 @@
                                     <td align="center" style="padding-top: 20px;">
                                         <h1
                                             style="margin: 0; font-size: 22px; font-weight: 700; color: #ffffff; line-height: 1.3;">
-                                            Verifikasi Alamat Email Anda ✉️</h1>
+                                            Verify Your Email Address ✉️</h1>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td align="center" style="padding-top: 8px;">
                                         <p style="margin: 0; font-size: 14px; color: #c7d2fe; line-height: 1.5;">
-                                            Satu langkah lagi untuk mengaktifkan akun Tixxy Anda.</p>
+                                            One more step to activate your Tixxy account.</p>
                                     </td>
                                 </tr>
                             </table>
@@ -200,7 +200,7 @@
                                                             </td>
                                                             <td
                                                                 style="vertical-align: middle; padding-left: 6px; font-size: 13px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; line-height: 1;">
-                                                                Halo, {{ $user->name }}
+                                                                Hello, {{ $user->name }}
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -209,10 +209,10 @@
                                             <tr>
                                                 <td style="padding-top: 16px;">
                                                     <p style="margin: 0 0 12px 0; font-size: 14px; color: #4b5563; line-height: 1.6;">
-                                                        Terima kasih telah mendaftar di Tixxy! Silakan klik tombol di bawah ini untuk memverifikasi alamat email Anda dan mengaktifkan akun Anda.
+                                                        Thank you for signing up at Tixxy! Please click the button below to verify your email address and activate your account.
                                                     </p>
                                                     <p style="margin: 0; font-size: 14px; color: #4b5563; line-height: 1.6;">
-                                                        Jika Anda tidak membuat akun ini, Anda tidak perlu melakukan tindakan apapun.
+                                                        If you did not create this account, no further action is required.
                                                     </p>
                                                 </td>
                                             </tr>
@@ -238,14 +238,14 @@
                                                      fillcolor="#4f46e5">
                                             <w:anchorlock/>
                                             <center style="color:#ffffff;font-family:sans-serif;font-size:15px;font-weight:bold;">
-                                                Verifikasi Email Saya
+                                                Verify My Email
                                             </center>
                                         </v:roundrect>
                                         <![endif]-->
                                         <!--[if !mso]><!-->
                                         <a href="{{ $verificationUrl }}"
                                             style="display: inline-block; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #4338ca 100%); color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 14px 48px; border-radius: 10px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4); letter-spacing: 0.3px;">
-                                            Verifikasi Email Saya
+                                            Verify My Email
                                         </a>
                                         <!--<![endif]-->
                                     </td>
@@ -270,11 +270,11 @@
                                                 <td style="padding-left: 10px; vertical-align: top;">
                                                     <p
                                                         style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #6b7280;">
-                                                        Tidak bisa klik tombol di atas?
+                                                        Can't click the button above?
                                                     </p>
                                                     <p
                                                         style="margin: 0; font-size: 12px; color: #9ca3af; line-height: 1.5;">
-                                                        Salin dan tempelkan URL berikut ke browser Anda:
+                                                        Copy and paste the following URL into your browser:
                                                     </p>
                                                     <p
                                                         style="margin: 8px 0 0 0; font-size: 11px; color: #4f46e5; word-break: break-all; line-height: 1.5;">
@@ -305,11 +305,11 @@
                                                 <td style="padding-left: 10px; vertical-align: top;">
                                                     <p
                                                         style="margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #92400e;">
-                                                        Penting
+                                                        Important
                                                     </p>
                                                     <p
                                                         style="margin: 0; font-size: 12px; color: #a16207; line-height: 1.5;">
-                                                        Tautan verifikasi ini akan kedaluwarsa dalam 60 menit. Jika tautan sudah kedaluwarsa, Anda dapat meminta tautan verifikasi baru dari halaman login.
+                                                        This verification link will expire in 60 minutes. If the link has expired, you can request a new verification link from the login page.
                                                     </p>
                                                 </td>
                                             </tr>

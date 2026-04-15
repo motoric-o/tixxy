@@ -137,9 +137,12 @@
                             <span class="text-lg font-extrabold text-gray-900 dark:text-white">{{ $event->available_quota }} left</span>
                         </div>
                         @if(!$isPastDue && ($event->status == 'ongoing' || $event->status == 'preparation'))    
-                        <a href="/checkout?event_id={{ $event->id }}" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white transition-colors duration-300">
-                            Get Tickets
-                        </a>
+                        <form action="{{ route('queue.join', $event->id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white transition-colors duration-300">
+                                Get Tickets
+                            </button>
+                        </form>
                         @else
                         <button disabled class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-gray-400 bg-gray-100 dark:bg-gray-700/50 dark:text-gray-500 rounded-xl cursor-not-allowed">
                             Unavailable

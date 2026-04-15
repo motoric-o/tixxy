@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Event;
 use App\Models\Queue;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class QueueSeeder extends Seeder
@@ -11,25 +12,52 @@ class QueueSeeder extends Seeder
     public function run(): void
     {
         $events = Event::whereIn('status', ['ongoing', 'preparation', 'pending'])->get();
+        $users = User::where('role', 'user')->pluck('id')->toArray();
+
+        if (empty($users)) {
+            return;
+        }
 
         foreach ($events as $event) {
-            $waitingCount    = rand(5, 30);
-            $completedCount  = rand(10, 50);
-            $canceledCount   = rand(2, 10);
+            $shuffled = collect($users)->shuffle()->values();
 
-            // Waiting entries
-            for ($i = 0; $i < $waitingCount; $i++) {
-                Queue::create(['event_id' => $event->id, 'status' => 'waiting']);
+            $queuedCount    = min(rand(3, 6), count($shuffled));
+            $waitlistedCount = min(rand(2, 4), count($shuffled) - $queuedCount);
+            $purchasedCount = min(rand(3, 8), count($shuffled) - $queuedCount - $waitlistedCount);
+            $canceledCount  = min(rand(1, 3), count($shuffled) - $queuedCount - $waitlistedCount - $purchasedCount);
+
+            $index = 0;
+
+            for ($i = 0; $i < $queuedCount && $index < count($shuffled); $i++, $index++) {
+                Queue::create([
+                    'event_id' => $event->id,
+                    'user_id'  => $shuffled[$index],
+                    'status'   => Queue::STATUS_QUEUED,
+                ]);
             }
 
-            // Completed entries
-            for ($i = 0; $i < $completedCount; $i++) {
-                Queue::create(['event_id' => $event->id, 'status' => 'completed']);
+            for ($i = 0; $i < $waitlistedCount && $index < count($shuffled); $i++, $index++) {
+                Queue::create([
+                    'event_id' => $event->id,
+                    'user_id'  => $shuffled[$index],
+                    'status'   => Queue::STATUS_WAITLISTED,
+                ]);
             }
 
-            // Canceled entries
-            for ($i = 0; $i < $canceledCount; $i++) {
-                Queue::create(['event_id' => $event->id, 'status' => 'canceled']);
+            for ($i = 0; $i < $purchasedCount && $index < count($shuffled); $i++, $index++) {
+                Queue::create([
+                    'event_id' => $event->id,
+                    'user_id'  => $shuffled[$index],
+                    'status'   => Queue::STATUS_PURCHASED,
+                ]);
+            }
+
+            for ($i = 0; $i < $canceledCount && $index < count($shuffled); $i++, $index++) {
+                Queue::create([
+                    'event_id' => $event->id,
+                    'user_id'  => $shuffled[$index],
+                    'status'   => Queue::STATUS_CANCELED,
+                ]);
             }
         }
     }

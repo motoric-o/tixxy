@@ -20,6 +20,7 @@ use App\Http\Controllers\Management\QRController;
 use App\Http\Controllers\EventListController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\QueueController;
 
 use App\Models\Event;
 
@@ -55,11 +56,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // checkout & payment flow
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-    Route::post('/checkout/{id}', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
-    Route::post('/payment/{id}', [PaymentController::class, 'store'])->name('payment.store');
+    // queue system
+    Route::post('/queue/join/{event_id}', [QueueController::class, 'join'])->name('queue.join');
+    Route::get('/queue/{event_id}', [QueueController::class, 'waitingRoom'])->name('queue.waiting');
+    Route::get('/api/queue/status/{event_id}', [QueueController::class, 'status'])->name('queue.status');
+    Route::get('/queue/claim/{event_id}', [QueueController::class, 'claim'])->name('queue.claim');
+    Route::post('/queue/cancel/{event_id}', [QueueController::class, 'cancel'])->name('queue.cancel');
+
+    // checkout & payment flow (protected by queue access)
+    Route::middleware(['queue.access'])->group(function () {
+        Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+        Route::post('/checkout/{id}', [CheckoutController::class, 'store'])->name('checkout.store');
+        Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
+        Route::post('/payment/{id}', [PaymentController::class, 'store'])->name('payment.store');
+    });
 
     // ticketing
     Route::get('/tickets', [TicketController::class, 'index']);

@@ -293,11 +293,17 @@
                                                             <td style="padding: 6px 0 6px 8px; vertical-align: top;">
                                                                 <p
                                                                     style="margin: 0; font-size: 13px; color: #4b5563; line-height: 1.4;">
+                                                                    @if(\Carbon\Carbon::parse($order->event->start_time)->isSameDay(\Carbon\Carbon::parse($order->event->end_time)))
                                                                     <strong
                                                                         style="color: #1f2937;">{{ \Carbon\Carbon::parse($order->event->start_time)->format('l, d M Y') }}</strong><br>
                                                                     {{ \Carbon\Carbon::parse($order->event->start_time)->format('h:i A') }}
                                                                     —
                                                                     {{ \Carbon\Carbon::parse($order->event->end_time)->format('h:i A') }}
+                                                                    @else
+                                                                    <strong
+                                                                        style="color: #1f2937;">{{ \Carbon\Carbon::parse($order->event->start_time)->format('l, d M Y — h:i A') }}</strong><br>
+                                                                    to <strong style="color: #1f2937;">{{ \Carbon\Carbon::parse($order->event->end_time)->format('l, d M Y — h:i A') }}</strong>
+                                                                    @endif
                                                                 </p>
                                                             </td>
                                                         </tr>

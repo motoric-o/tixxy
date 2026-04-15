@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Queue;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
@@ -18,7 +21,7 @@ class CheckoutController extends Controller
         $event = Event::with(['category', 'eventTicketTypes.ticketType'])->findOrFail($eventId);
         
         // Prevent going back to checkout if there is already an active unpaid order
-        $existingOrder = \App\Models\Order::where('user_id', \Illuminate\Support\Facades\Auth::id())
+        $existingOrder = \App\Models\Order::where('user_id', Auth::id())
             ->where('event_id', $eventId)
             ->where('status', 'pending')
             ->whereNull('payment_proof')
@@ -38,10 +41,18 @@ class CheckoutController extends Controller
                 ->with('error', 'Booking for this event has already closed.');
         }
 
-        return view('checkout', compact('event'));
+        // Fetch queue entry for the countdown timer display
+        $queueEntry = Queue::where('user_id', Auth::id())
+            ->where('event_id', $eventId)
+            ->where('status', Queue::STATUS_ACTIVE)
+            ->first();
+
+        return view('checkout', compact('event', 'queueEntry'));
     }
+
     /**
      * Process checkout form and create the Order.
+     * Uses DB transaction with locking to prevent race conditions.
      */
     public function store(Request $request, $id)
     {
@@ -59,47 +70,70 @@ class CheckoutController extends Controller
             return back()->withErrors(['tickets' => 'You can only purchase a maximum of 10 tickets in a single order.'])->withInput();
         }
 
-        $event = Event::with('eventTicketTypes')->findOrFail($id);
+        return DB::transaction(function () use ($request, $id, $totalQty) {
+            // Lock the event row to prevent overselling
+            $event = Event::lockForUpdate()->with('eventTicketTypes')->findOrFail($id);
 
-        if ($totalQty > $event->available_quota) {
-            return back()->withErrors(['tickets' => "You requested $totalQty tickets, but only {$event->available_quota} are currently available."])->withInput();
-        }
-        
-        $amount = 0;
-        foreach ($request->tickets as $ticketInput) {
-            $ticketType = $event->eventTicketTypes->firstWhere('id', $ticketInput['event_ticket_type_id']);
-            if (!$ticketType) {
-                return back()->withErrors(['tickets' => 'Invalid ticket type selected for this event.'])->withInput();
+            // Check available quota (uses the merged available_quota accessor logic)
+            if ($totalQty > $event->available_quota) {
+                return back()->withErrors(['tickets' => "You requested $totalQty tickets, but only {$event->available_quota} are currently available."])->withInput();
             }
-            $amount += $ticketType->price * $ticketInput['qty'];
-        }
 
-        // Create the pending order
-        $order = \App\Models\Order::create([
-            'amount' => $amount,
-            'status' => 'pending',
-            'user_id' => \Illuminate\Support\Facades\Auth::id(),
-            'event_id' => $event->id,
-        ]);
-        $order->expired_at = now()->addHour();
-        $order->save();
+            // Update queue status to 'processing' to protect from expiry during payment creation
+            $queueEntry = Queue::where('user_id', Auth::id())
+                ->where('event_id', $event->id)
+                ->where('status', Queue::STATUS_ACTIVE)
+                ->first();
 
-        foreach ($request->tickets as $ticketInput) {
-            $ticketType = $event->eventTicketTypes->firstWhere('id', $ticketInput['event_ticket_type_id']);
-            for ($i = 0; $i < $ticketInput['qty']; $i++) {
-                // Generate a ticket immediately since it's required for the OrderDetail primary key
-                $ticket = \App\Models\Ticket::create([
-                    'order_id' => $order->id,
-                ]);
-
-                \App\Models\OrderDetail::create([
-                    'order_id' => $order->id,
-                    'ticket_id' => $ticket->id,
-                    'event_ticket_type_id' => $ticketType->id,
-                ]);
+            if ($queueEntry) {
+                $queueEntry->update(['status' => Queue::STATUS_PROCESSING]);
             }
-        }
 
-        return redirect()->route('payment.show', ['id' => $order->id]);
+            $amount = 0;
+            foreach ($request->tickets as $ticketInput) {
+                $ticketType = $event->eventTicketTypes->firstWhere('id', $ticketInput['event_ticket_type_id']);
+                if (!$ticketType) {
+                    // Rollback the processing status if validation fails
+                    if ($queueEntry) {
+                        $queueEntry->update(['status' => Queue::STATUS_ACTIVE]);
+                    }
+                    return back()->withErrors(['tickets' => 'Invalid ticket type selected for this event.'])->withInput();
+                }
+                $amount += $ticketType->price * $ticketInput['qty'];
+            }
+
+            // Create the pending order
+            $order = \App\Models\Order::create([
+                'amount' => $amount,
+                'status' => 'pending',
+                'user_id' => Auth::id(),
+                'event_id' => $event->id,
+            ]);
+            $order->expired_at = now()->addHour();
+            $order->save();
+
+            foreach ($request->tickets as $ticketInput) {
+                $ticketType = $event->eventTicketTypes->firstWhere('id', $ticketInput['event_ticket_type_id']);
+                for ($i = 0; $i < $ticketInput['qty']; $i++) {
+                    // Generate a ticket immediately since it's required for the OrderDetail primary key
+                    $ticket = \App\Models\Ticket::create([
+                        'order_id' => $order->id,
+                    ]);
+
+                    \App\Models\OrderDetail::create([
+                        'order_id' => $order->id,
+                        'ticket_id' => $ticket->id,
+                        'event_ticket_type_id' => $ticketType->id,
+                    ]);
+                }
+            }
+
+            // Mark queue entry as purchased — their spot is now converted to a real order
+            if ($queueEntry) {
+                $queueEntry->update(['status' => Queue::STATUS_PURCHASED]);
+            }
+
+            return redirect()->route('payment.show', ['id' => $order->id]);
+        });
     }
 }

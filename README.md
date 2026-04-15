@@ -1,59 +1,128 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
+<h1 align="center">Tixxy</h1>
+
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+    Aplikasi pemesanan tiket berbasis web yang dibangun dengan Laravel.
 </p>
 
-## About Laravel
+## Deskripsi Singkat
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Tixxy adalah aplikasi pemesanan tiket event yang mengintegrasikan pengelolaan acara dan sistem ticketing dalam satu platform. Projek ini dibuat sebagai pemenuhan tugas untuk mata kuliah Pemrograman Web Lanjut.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Latar Belakang
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Projek ini dikembangkan oleh tim dari program studi Teknik Informatika, Universitas Kristen Maranatha.
 
-## Learning Laravel
+Tim:
+* **Christian Anthony Hermawan - 2472008 (Ketua Tim)**
+* **Jonathan Valent W. - 2472010**
+* **Rico Dharmawan - 2472041**
+* **Jayden Marvel Ethanael - 2472048**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Fitur Utama
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🔐 Authentication & Authorization
+* **Register & Login**: Akses pendaftaran dan masuk akun yang aman.
+* **Role Management**: Dukungan peran pengguna yang mencakup Admin, Organizer, dan User.
+* **Password Hashing**: Proteksi keamanan kata sandi pengguna.
+* **Middleware Route**: Pembatasan akses halaman berdasarkan autentikasi dan peran.
 
-## Laravel Sponsors
+### 📅 Manajemen Event
+* **CRUD Event**: Fitur lengkap untuk menambah, membaca, mengubah, dan menghapus acara.
+* **Upload Banner**: Pengunggahan visual promosi untuk halaman detail acara.
+* **Kategori Event**: Pengelompokan acara untuk mempermudah pencarian.
+* **Jadwal & Lokasi**: Informasi terperinci mengenai waktu dan tempat pelaksanaan.
+* **Kuota Tiket**: Penentuan batas maksimal peserta pada setiap acara.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 🎟️ Sistem Ticketing
+* **Pemilihan Jenis Tiket**: Dukungan untuk berbagai kategori tiket seperti VIP, Regular, dll.
+* **Manajemen Stok Otomatis**: Pemotongan ketersediaan tiket secara *real-time* saat transaksi berlangsung.
+* **Generate E-ticket (QR Code)**: Pembuatan tiket elektronik dengan kode unik.
+* **Validasi Tiket**: Simulasi *scan* tiket untuk akses masuk acara.
+* **Queue & Waiting List**: Sistem antrean untuk mengakomodasi lonjakan pemesanan.
+* **Email Notification**: Pengiriman otomatis detail e-ticket dan QR Code ke email pengguna.
 
-### Premium Partners
+### 📊 Dashboard & Reporting
+* **Statistik Penjualan**: Rekapitulasi penjualan tiket yang mudah dibaca.
+* **Grafik Transaksi**: Visualisasi tren penjualan harian maupun bulanan.
+* **Total Revenue**: Ringkasan keseluruhan pendapatan yang dihasilkan.
+* **Event Performance Analytics**: Evaluasi performa dari masing-masing acara yang diselenggarakan.
+* **Export Report**: Kemudahan mengunduh laporan ke dalam format Excel atau PDF.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 💳 Payment Integration
+* **Simulasi Pembayaran**: Uji coba integrasi proses transaksi pembayaran.
+* **Status Transaksi**: Pemantauan status pemesanan secara langsung (*pending, paid, failed*).
 
-## Contributing
+## Teknologi
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Platform & Framework pembuatan aplikasi:
+* **Frontend**: Blade Templates, Tailwind CSS, Alpine.js, charts.js
+* **Backend**: Laravel 12 (PHP 8.2+)
+* **Database**: PostgreSQL
+* **External API**: QRServer, Html5-QRCode
 
-## Code of Conduct
+Suggested System Requirement:
+* **PHP**: 8.5.4
+* **Database**: PostgreSQL 18.3
+* **Node.js**: 24.11.1
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Instalasi dan Penggunaan
 
-## Security Vulnerabilities
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi di lokal:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1.  **Clone Repository**
+    ```bash
+    git clone [https://github.com/motoric-o/tixxy.git](https://github.com/motoric-o/tixxy.git)
+    cd tixxy
+    ```
 
-## License
+2.  **Install Dependensi PHP & JavaScript**
+    ```bash
+    composer install
+    npm install
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+3.  **Konfigurasi Environment**
+    Salin file contoh konfigurasi dan buat file `.env` baru.
+    ```bash
+    cp .env.example .env
+    ```
+
+4.  **Generate Application Key**
+    ```bash
+    php artisan key:generate
+    ```
+
+5.  **Migrasi & Seeding Database**
+    ```bash
+    php artisan migrate --seed
+    ```
+
+6.  **Storage Link**
+    Menghubungkan direktori penyimpanan publik.
+    ```bash
+    php artisan storage:link
+    ```
+
+7.  **Interval Automated Work**
+    Menjalankan *task scheduler* untuk proses otomatisasi di latar belakang.
+    ```bash
+    php artisan schedule:work
+    ```
+
+8.  **Jalankan Aplikasi**
+    Jalan server development untuk frontend:
+    ```bash
+    npm run dev
+    ```
+    Dan di terminal baru, jalankan server backend:
+    ```bash
+    php artisan serve
+    ```
+
+Aplikasi dapat diakses di `http://localhost:8000`.
+
+## Lisensi
+
+[MIT license](https://opensource.org/licenses/MIT).

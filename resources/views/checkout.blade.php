@@ -49,7 +49,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-12">
                     <!-- Left: Event Summary Mini -->
                     <div
-                        class="col-span-1 md:col-span-4 bg-indigo-50 dark:bg-gray-800/50 p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-700">
+                        class="col-span-1 md:col-span-4 bg-indigo-50 dark:bg-gray-800/50 p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-700 flex flex-col">
                         <span
                             class="px-3 py-1 bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
                             {{ $event->category->name ?? 'Event' }}
@@ -84,11 +84,26 @@
                                 <span>{{ $event->location }}</span>
                             </div>
                         </div>
+
+                        <!-- Cancel Booking -->
+                        <form action="{{ route('queue.cancel', $event->id) }}" method="POST" class="mt-auto pt-6"
+                            onsubmit="return confirm('Cancel your booking? You will lose your queue position and your spot will be given to the next person in line.');">
+                            @csrf
+                            <button type="submit"
+                                class="w-full py-3.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold rounded-2xl border border-red-200 dark:border-red-800/50 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all duration-300 flex justify-center items-center gap-2 px-6">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                <span>Cancel Booking</span>
+                            </button>
+                        </form>
                     </div>
 
                     <!-- Right: Form Wizard -->
                     <div class="col-span-1 md:col-span-8 p-6 md:p-8">
-                        <form id="checkout-form" action="{{ route('checkout.store', $event->id) }}" method="POST" class="relative">
+                        <form id="checkout-form" action="{{ route('checkout.store', $event->id) }}" method="POST"
+                            class="relative">
                             @csrf
                             <!-- We POST to CheckoutController to create the order, which then redirects to payment -->
 
@@ -102,35 +117,61 @@
                                         <!-- Initial Row -->
                                         <div class="flex flex-col sm:flex-row gap-4 ticket-row items-end">
                                             <div class="flex-grow w-full">
-                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ticket Type</label>
-                                                <select name="tickets[0][event_ticket_type_id]" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-base ticket-type-select">
+                                                <label
+                                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ticket
+                                                    Type</label>
+                                                <select name="tickets[0][event_ticket_type_id]"
+                                                    class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-base ticket-type-select">
                                                     @foreach($event->eventTicketTypes as $tt)
                                                         @if($tt->ticketType)
-                                                        <option value="{{ $tt->id }}">{{ $tt->ticketType->name }} - Rp {{ number_format($tt->price, 0, ',', '.') }}</option>
+                                                            <option value="{{ $tt->id }}">{{ $tt->ticketType->name }} - Rp
+                                                                {{ number_format($tt->price, 0, ',', '.') }}</option>
                                                         @endif
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="w-full sm:w-32 shrink-0">
-                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount</label>
-                                                <input type="number" name="tickets[0][qty]" value="1" min="1" max="10" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-base ticket-qty-input" required onchange="checkMaxTickets(this)" oninput="checkMaxTickets(this)">
+                                                <label
+                                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount</label>
+                                                <input type="number" name="tickets[0][qty]" value="1" min="1" max="10"
+                                                    class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-base ticket-qty-input"
+                                                    required onchange="checkMaxTickets(this)"
+                                                    oninput="checkMaxTickets(this)">
                                             </div>
                                             <div class="shrink-0">
-                                                <button type="button" onclick="removeTicketRow(this)" class="p-4 text-red-500 hover:text-red-700 transition self-end bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40" style="display:none;" title="Remove this ticket type">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                <button type="button" onclick="removeTicketRow(this)"
+                                                    class="p-4 text-red-500 hover:text-red-700 transition self-end bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40"
+                                                    style="display:none;" title="Remove this ticket type">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="mt-4 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
-                                        <button type="button" onclick="addTicketRow()" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors">
-                                            <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mr-1">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                    <div
+                                        class="mt-4 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                        <button type="button" onclick="addTicketRow()"
+                                            class="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                                            <div
+                                                class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mr-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                </svg>
                                             </div>
                                             Add Another Type
                                         </button>
-                                        <div class="text-sm text-gray-600 dark:text-gray-400 font-semibold px-4 py-2 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">Total: <span id="total-tickets-count" class="text-indigo-600 dark:text-indigo-400 font-bold">1</span> / 10 limit</div>
+                                        <div
+                                            class="text-sm text-gray-600 dark:text-gray-400 font-semibold px-4 py-2 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                                            Total: <span id="total-tickets-count"
+                                                class="text-indigo-600 dark:text-indigo-400 font-bold">1</span> / 10 limit
+                                        </div>
                                     </div>
 
 
@@ -164,8 +205,8 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email
                                             Address</label>
-                                        <input type="email" name="email" id="email-input" required placeholder="john@example.com"
-                                            value="{{ auth()->user()->email ?? '' }}"
+                                        <input type="email" name="email" id="email-input" required
+                                            placeholder="john@example.com" value="{{ auth()->user()->email ?? '' }}"
                                             class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                                         <p class="text-xs text-gray-500 mt-2">We'll send your tickets to this email.</p>
                                     </div>
@@ -173,8 +214,8 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone
                                             Number</label>
-                                        <input type="tel" name="phone" id="phone-input" required placeholder="+1 (555) 000-0000"
-                                            value="{{ auth()->user()->phone ?? '' }}"
+                                        <input type="tel" name="phone" id="phone-input" required
+                                            placeholder="+1 (555) 000-0000" value="{{ auth()->user()->phone ?? '' }}"
                                             class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                                     </div>
 
@@ -252,7 +293,7 @@
                 let val = parseInt(el.value);
                 if (val < 1 || isNaN(val)) {
                     val = 1; // force minimum 1 if edited to something else
-                    el.value = 1; 
+                    el.value = 1;
                 }
                 total += val;
             });
@@ -283,7 +324,7 @@
             // Update names to use new index
             const select = newRow.querySelector('.ticket-type-select');
             select.name = `tickets[${ticketRowIndex}][event_ticket_type_id]`;
-            
+
             const input = newRow.querySelector('.ticket-qty-input');
             input.name = `tickets[${ticketRowIndex}][qty]`;
             input.value = "1";

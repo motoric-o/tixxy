@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureQueueAccess;
 use App\Http\Middleware\UserRoleGiver;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => UserRoleGiver::class,
+            'queue.access' => EnsureQueueAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

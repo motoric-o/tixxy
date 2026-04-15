@@ -144,26 +144,7 @@
                     </div>
                 </template>
 
-                {{-- Divider --}}
-                <template x-if="status === 'queued' || status === 'waitlisted'">
-                    <div>
-                        <div class="w-full h-px bg-gray-100 dark:bg-gray-700 my-6"></div>
 
-                        {{-- Cancel Button --}}
-                        <form action="{{ route('queue.cancel', $event->id) }}" method="POST"
-                              onsubmit="return confirm('Are you sure you want to leave the queue? You will lose your position.');">
-                            @csrf
-                            <button type="submit"
-                                class="w-full py-3.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold rounded-2xl border border-red-200 dark:border-red-800/50 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all duration-300 flex justify-center items-center gap-2 px-6">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                                <span>Leave Queue</span>
-                            </button>
-                        </form>
-                    </div>
-                </template>
 
             </div>
         </div>

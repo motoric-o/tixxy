@@ -72,12 +72,10 @@ class Order extends Model
         parent::boot();
 
         static::updated(function ($order) {
-            // Mark tickets as ready or decrement quota when the order is marked completed
+            // Logic to handle order completion status changes
             if ($order->isDirty('status') && $order->status === 'completed') {
-                if ($order->event) {
-                    $order->loadMissing('tickets');
-                    $order->event->decrement('quota', $order->tickets->count());
-                }
+                // We no longer decrement the event quota here.
+                // Availability is now calculated dynamically in the Event model.
             }
         });
     }

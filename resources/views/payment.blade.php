@@ -95,8 +95,12 @@
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Order Summary</h3>
                         
                         <div class="flex items-center mb-6 border-b border-gray-100 dark:border-gray-700 pb-6">
-                            @if($order->event->image_path)
-                                <img src="{{ asset('storage/' . $order->event->image_path) }}" alt="Event" class="w-16 h-16 rounded-xl object-cover mr-4">
+                            @if($order->event->banner_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($order->event->banner_path))
+                                <img src="{{ asset('storage/' . $order->event->banner_path) }}" alt="Event" class="w-16 h-16 rounded-xl object-cover mr-4">
+                            @else
+                                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center mr-4 shrink-0 border border-gray-100 dark:border-gray-700">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </div>
                             @endif
                             <div>
                                 <p class="font-bold text-gray-900 dark:text-white">{{ $order->event->title }}</p>
@@ -118,11 +122,34 @@
                             </div>
                         </div>
 
-                        <form action="{{ route('payment.store', $order->id) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('payment.store', $order->id) }}" method="POST" enctype="multipart/form-data" id="payment-form" onsubmit="document.getElementById('submit-btn').disabled = true; document.getElementById('submit-btn').innerHTML = 'Uploading...';">
                             @csrf
+                            
+                            {{-- Global Errors --}}
+                            @if (session('error'))
+                                <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="text-xs font-semibold">{{ session('error') }}</span>
+                                </div>
+                            @endif
+
+                            @if ($errors->any())
+                                <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <span class="text-xs font-bold uppercase tracking-wider">Validation Errors</span>
+                                    </div>
+                                    <ul class="text-xs space-y-1 list-disc list-inside opacity-90 font-medium">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Proof of Payment</label>
-                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl relative hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors overflow-hidden group">
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 @if($errors->has('payment_proof')) border-red-300 dark:border-red-800/50 @else border-gray-300 dark:border-gray-600 @endif border-dashed rounded-xl relative hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors overflow-hidden group">
                                     <img id="image-preview" src="#" alt="Preview" class="hidden absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 opacity-50 group-hover:opacity-20" />
                                     
                                     <div id="upload-container" class="space-y-1 text-center relative z-10 p-4 transition-all duration-300">
@@ -135,7 +162,7 @@
                                                 <input id="proof" name="payment_proof" type="file" class="sr-only" required accept="image/*" onchange="previewImage(event)">
                                             </label>
                                         </div>
-                                        <p id="upload-hint" class="text-xs text-gray-500 bg-white/80 dark:bg-gray-800/80 px-2 py-1 rounded inline-block">PNG, JPG, up to 2MB</p>
+                                        <p id="upload-hint" class="text-xs text-gray-500 bg-white/80 dark:bg-gray-800/80 px-2 py-1 rounded inline-block">PNG, JPG, up to 5MB</p>
                                     </div>
                                 </div>
                             </div>
@@ -157,8 +184,22 @@
                                 }
                             </script>
                             
-                            <button type="submit" class="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-2xl shadow-lg hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white transition-all duration-300 transform hover:-translate-y-1">
+                            <button type="submit" id="submit-btn" class="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-2xl shadow-lg hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                                 Submit Proof of Payment
+                            </button>
+                        </form>
+
+                        {{-- Cancel Order --}}
+                        <form action="{{ route('payment.cancel', $order->id) }}" method="POST" class="mt-3"
+                            onsubmit="return confirm('Are you sure you want to cancel this order? Your tickets will be released and your spot will be given to the next person in line.');">
+                            @csrf
+                            <button type="submit"
+                                class="w-full py-3.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold rounded-2xl border border-red-200 dark:border-red-800/50 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all duration-300 flex justify-center items-center gap-2 px-6">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                <span>Cancel Order</span>
                             </button>
                         </form>
                         

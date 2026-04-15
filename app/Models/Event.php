@@ -103,12 +103,14 @@ class Event extends Model
             return 0;
         }
 
-        $reservedTickets = \App\Models\Ticket::whereHas('order', function ($q) {
-            $q->where('status', 'pending')
-              ->where('event_id', $this->id)
-              ->where('expired_at', '>', now());
+        $takenTickets = $this->tickets()->whereHas('order', function ($q) {
+            $q->where('status', 'completed')
+              ->orWhere(function ($pending) {
+                  $pending->where('status', 'pending')
+                          ->where('expired_at', '>', now());
+              });
         })->count();
 
-        return max(0, $this->quota - $reservedTickets);
+        return max(0, $this->quota - $takenTickets);
     }
 }

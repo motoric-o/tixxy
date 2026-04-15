@@ -6,13 +6,13 @@
         <div x-data="{ 
                 activeTab: window.location.hash ? window.location.hash.substring(1) : 'setup',
                 quota: {{ (int)($item->quota ?? 0) }},
-                totalCapacity: 0,
+                allocatedQuota: 0,
                 init() {
-                    this.recalculateCapacity();
+                    this.recalculateAllocation();
                 },
-                recalculateCapacity() {
+                recalculateAllocation() {
                     const inputs = Array.from(document.querySelectorAll('#ticketContainer input[name*=\'[capacity]\']'));
-                    this.totalCapacity = inputs.reduce((acc, input) => acc + (parseInt(input.value) || 0), 0);
+                    this.allocatedQuota = inputs.reduce((acc, input) => acc + (parseInt(input.value) || 0), 0);
                 },
                 addTicket() {
                     const emptyMsg = document.getElementById('emptyTicketMsg');
@@ -27,13 +27,13 @@
                     const newRowHtml = template.replace(/__INDEX__/g, index);
                     
                     container.insertAdjacentHTML('beforeend', newRowHtml);
-                    this.recalculateCapacity();
+                    this.recalculateAllocation();
                 },
                 removeTicket(el) {
                     const row = el.closest('.ticket-row');
                     row.remove();
                     
-                    this.recalculateCapacity();
+                    this.recalculateAllocation();
                     
                     const container = document.getElementById('ticketContainer');
                     if (container.querySelectorAll('.ticket-row').length === 0) {
@@ -46,15 +46,13 @@
         <div
             class="mb-8 flex flex-row justify-between items-center sticky top-4 z-20 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-5 rounded-2xl border border-white/20 dark:border-gray-800/50 shadow-xl shadow-purple-500/5 ring-1 ring-black/5 dark:ring-white/5">
             <div class="flex flex-row items-center gap-6">
-                <a href="{{ $backUrl }}"
-                    class="group p-2.5 text-purple-100 hover:text-white rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 hover:-translate-y-0.5 active:scale-95 border border-white/10"
-                    title="Back">
+                <x-admin.button variant="action-purple" :href="$backUrl" title="Back" class="group">
                     <svg class="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                             d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
-                </a>
+                </x-admin.button>
                 <div class="flex flex-col">
                     <h2 class="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
                         Manage Event: <span
@@ -123,15 +121,14 @@
 
 
                 @if(Auth::user()->role === 'admin')
-                <button type="submit" form="eventForm" x-show="activeTab === 'setup'"
-                    class="h-12 w-54 group inline-flex items-center gap-2.5 px-7 py-3 text-sm font-bold text-white rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-[length:200%_auto] hover:bg-[position:right_center] shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all duration-500 hover:-translate-y-0.5 active:scale-95">
+                <x-admin.button type="submit" form="eventForm" x-show="activeTab === 'setup'" class="h-12 w-54">
                     <svg class="w-4.5 h-4.5 transition-transform duration-500 group-hover:rotate-12" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7">
                         </path>
                     </svg>
                     <span>Save Changes</span>
-                </button>
+                </x-admin.button>
                 @endif
             </div>
         </div>
@@ -164,177 +161,79 @@
                 class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="space-y-8 animate-in fade-in slide-in-from-left-4 duration-500">
                     {{-- Event Details --}}
-                    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div
-                            class="flex flex-row items-center justify-between px-8 py-6 border-b border-gray-50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/50">
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-[0.1em]">Event Details</h3>
-                        </div>
-                        <div class="p-8">
-                            <div class="space-y-6">
-                                <div class="group">
-                                    <label class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-purple-500 transition-colors">Event
-                                        Name</label>
-                                    <input type="text" name="title" value="{{ old('title', $item->title) }}"
-                                        class="w-full h-[50px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block px-4 transition-all duration-300"
-                                        required {{ Auth::user()->role === 'organizer' ? 'disabled' : '' }}>
-                                </div>
-                                <div class="group">
-                                    <label
-                                        class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-purple-500 transition-colors">Category</label>
-                                    <div class="relative">
-                                        <select name="category_id"
-                                            class="appearance-none w-full h-[50px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block pl-4 pr-11 transition-all duration-300 cursor-pointer !bg-none"
-                                            required {{ Auth::user()->role === 'organizer' ? 'disabled' : '' }}>
-                                            <option value="">Select Category</option>
-                                            @foreach ($categories as $id => $name)
-                                                <option value="{{ $id }}"
-                                                    @if (old('category_id', $item->category_id) == $id) selected @endif>{{ $name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="group">
-                                        <label class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-purple-500 transition-colors">Start
-                                            Time</label>
-                                        <input type="datetime-local" name="start_time"
-                                            value="{{ old('start_time', $item->start_time ? $item->start_time->format('Y-m-d\TH:i') : '') }}"
-                                            class="w-full h-[50px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block px-4 transition-all duration-300"
-                                            required {{ Auth::user()->role === 'organizer' ? 'disabled' : '' }}>
-                                    </div>
-                                    <div class="group">
-                                        <label class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-purple-500 transition-colors">End
-                                            Time</label>
-                                        <input type="datetime-local" name="end_time"
-                                            value="{{ old('end_time', $item->end_time ? $item->end_time->format('Y-m-d\TH:i') : '') }}"
-                                            class="w-full h-[50px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block px-4 transition-all duration-300"
-                                            required {{ Auth::user()->role === 'organizer' ? 'disabled' : '' }}>
-                                    </div>
-                                </div>
-                                <div class="group">
-                                    <label
-                                        class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-purple-500 transition-colors">Location</label>
-                                    <input type="text" name="location" value="{{ old('location', $item->location) }}"
-                                        class="w-full h-[50px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block px-4 transition-all duration-300"
-                                        required {{ Auth::user()->role === 'organizer' ? 'disabled' : '' }}>
-                                </div>
-                                <div class="group" x-data="{ 
-                                    preview: '{{ $item->banner_path ? asset('storage/' . $item->banner_path) : '' }}',
-                                    handleFile(e) {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                            const reader = new FileReader();
-                                            reader.onload = (e) => this.preview = e.target.result;
-                                            reader.readAsDataURL(file);
-                                        }
-                                    }
-                                }">
-                                    <label class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-purple-500 transition-colors">Event Banner</label>
-                                    <div class="relative group/file">
-                                        <div :class="preview ? 'border-purple-200 dark:border-purple-900/50 bg-white dark:bg-gray-900' : 'border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50'"
-                                            class="p-4 rounded-2xl border-2 transition-all duration-300 {{ Auth::user()->role === 'admin' ? 'hover:border-purple-400/50' : '' }}">
-                                            
-                                            <template x-if="preview">
-                                                <div class="relative rounded-xl overflow-hidden aspect-video bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-                                                    <img :src="preview" class="w-full h-full object-cover">
-                                                    @if(Auth::user()->role === 'admin')
-                                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/file:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                                                            <span class="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl text-xs font-bold text-white border border-white/20">Change Image</span>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </template>
+                    <x-admin.card header="Event Details">
+                        <div class="space-y-6">
+                            <x-admin.input label="Event Name" name="title" :value="$item->title" required :disabled="Auth::user()->role === 'organizer'" />
+                            
+                            <x-admin.select label="Category" name="category_id" required :disabled="Auth::user()->role === 'organizer'">
+                                <option value="">Select Category</option>
+                                @foreach ($categories as $id => $name)
+                                    <option value="{{ $id }}" @if (old('category_id', $item->category_id) == $id) selected @endif>
+                                        {{ $name }}
+                                    </option>
+                                @endforeach
+                            </x-admin.select>
 
-                                            <template x-if="!preview">
-                                                <div class="py-8 flex flex-col items-center justify-center">
-                                                    <div class="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-3">
-                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                                    </div>
-                                                    <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center px-4">
-                                                        {{ Auth::user()->role === 'admin' ? 'Drag and drop banner or click to browse' : 'No banner provided' }}
-                                                    </p>
-                                                </div>
-                                            </template>
-
-                                            @if(Auth::user()->role === 'admin')
-                                                <input type="file" name="banner_path" @change="handleFile"
-                                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                            @endif
-                                        </div>
-                                        @error('banner_path')
-                                            <p class="mt-2 text-xs text-rose-500 font-bold ml-1">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="group">
-                                    <label
-                                        class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-purple-500 transition-colors">Description</label>
-                                    <textarea name="description" rows="4"
-                                        class="w-full bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block p-4 transition-all duration-300"
-                                        {{ Auth::user()->role === 'organizer' ? 'disabled' : '' }}>{{ old('description', $item->description) }}</textarea>
-                                </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <x-admin.input type="datetime-local" label="Start Time" name="start_time" 
+                                    :value="$item->start_time ? $item->start_time->format('Y-m-d\TH:i') : ''" 
+                                    required :disabled="Auth::user()->role === 'organizer'" />
+                                
+                                <x-admin.input type="datetime-local" label="End Time" name="end_time" 
+                                    :value="$item->end_time ? $item->end_time->format('Y-m-d\TH:i') : ''" 
+                                    required :disabled="Auth::user()->role === 'organizer'" />
                             </div>
+
+                            <x-admin.input label="Location" name="location" :value="$item->location" required :disabled="Auth::user()->role === 'organizer'" />
+
+                            <x-admin.image-upload label="Event Banner" name="banner_path" :value="$item->banner_path" :disabled="Auth::user()->role !== 'admin'" />
+
+                            <x-admin.textarea label="Description" name="description" :value="$item->description" rows="4" :disabled="Auth::user()->role === 'organizer'" />
                         </div>
-                    </div>
+                    </x-admin.card>
 
                     {{-- Event Settings --}}
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div class="px-8 py-6 border-b border-gray-50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/50">
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-[0.1em]">Event Settings</h3>
+                    <x-admin.card header="Event Settings">
+                        <div class="space-y-6">
+                            <x-admin.select label="Status" name="status" :disabled="Auth::user()->role === 'organizer'">
+                                @foreach ($statuses as $value => $label)
+                                    <option value="{{ $value }}" @if (old('status', $item->status) == $value) selected @endif>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </x-admin.select>
+
+                            <x-admin.input type="number" label="Total Event Capacity" name="quota" id="eventQuota" 
+                                x-model.number="quota" :disabled="Auth::user()->role === 'organizer'" />
                         </div>
-                        <div class="p-8">
-                            <div class="space-y-6">
-                                <div class="group">
-                                    <label
-                                        class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-purple-500 transition-colors">Status</label>
-                                    <div class="relative">
-                                        <select name="status"
-                                            class="appearance-none w-full h-[50px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block pl-4 pr-11 transition-all duration-300 cursor-pointer !bg-none"
-                                            {{ Auth::user()->role === 'organizer' ? 'disabled' : '' }}>
-                                            @foreach ($statuses as $value => $label)
-                                                <option value="{{ $value }}"
-                                                    @if (old('status', $item->status) == $value) selected @endif>
-                                                    {{ $label }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="group">
-                                    <label
-                                        class="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-purple-500 transition-colors">Event Quota</label>
-                                    <input type="number" name="quota" id="eventQuota" x-model.number="quota"
-                                        class="w-full h-[50px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block px-4 transition-all duration-300"
-                                        {{ Auth::user()->role === 'organizer' ? 'disabled' : '' }}>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </x-admin.card>
 
                     {{-- Ticket Types --}}
                     <div
                         class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                         <div
                             class="px-8 py-6 border-b border-gray-50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-                            <div class="flex items-center gap-4">
+                            <div class="flex flex-wrap items-center gap-3">
                                 <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-[0.1em]">Ticket Types</h3>
+                                
+                                {{-- Allocation Badge --}}
                                 <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700" 
-                                     :class="totalCapacity > quota ? 'rose-50 dark:rose-900/20 border-rose-200 dark:border-rose-800' : ''">
-                                    <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Capacity:</span>
-                                    <span class="text-xs font-black" :class="totalCapacity > quota ? 'text-rose-600 dark:text-rose-400' : 'text-purple-600 dark:text-purple-400'">
-                                        <span x-text="totalCapacity"></span> / <span x-text="quota"></span>
+                                     :class="allocatedQuota > quota ? 'rose-50 dark:rose-900/20 border-rose-200 dark:border-rose-800' : ''">
+                                    <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Allocation:</span>
+                                    <span class="text-xs font-black" :class="allocatedQuota > quota ? 'text-rose-600 dark:text-rose-400' : 'text-purple-600 dark:text-purple-400'">
+                                        <span x-text="allocatedQuota"></span> / <span x-text="quota"></span>
                                     </span>
-                                    <template x-if="totalCapacity > quota">
+                                    <template x-if="allocatedQuota > quota">
                                         <svg class="w-3 h-3 text-rose-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                                     </template>
+                                </div>
+
+                                {{-- Sold Badge --}}
+                                <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-500/30">
+                                    <span class="text-[10px] font-bold text-indigo-400 dark:text-indigo-500 uppercase tracking-widest">Sold:</span>
+                                    <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                                        {{ number_format($performanceData['totalTicketsSold'] ?? 0) }} / {{ $item->quota }}
+                                    </span>
                                 </div>
                             </div>
                             @if(Auth::user()->role === 'admin')
@@ -398,7 +297,7 @@
                                                     @endif
                                                 </label>
                                                 <input type="number" name="ticket_types[{{ $index }}][capacity]"
-                                                    @input="recalculateCapacity()"
+                                                    @input="recalculateAllocation()"
                                                     value="{{ $ticket['capacity'] ?? 0 }}" min="{{ $soldCount }}"
                                                     class="w-full h-[46px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block px-4 transition-all duration-300"
                                                     required {{ Auth::user()->role === 'organizer' ? 'disabled' : '' }}>
@@ -441,31 +340,22 @@
 
                 <div class="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 delay-75">
                     {{-- Quick Stats --}}
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div class="px-8 py-6 border-b border-gray-50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/50">
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-[0.1em]">Quick Stats</h3>
-                        </div>
-                        <div class="p-8">
-                            <div class="space-y-6">
-                                <div class="flex justify-between items-center group">
-                                    <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Total Tickets Sold</span>
-                                    <span
-                                        class="font-black text-gray-900 dark:text-white text-lg tracking-tight">{{ number_format($performanceData['totalTicketsSold'] ?? 0) }}</span>
-                                </div>
-                                <div class="flex justify-between items-center group">
-                                    <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Revenue</span>
-                                    <span class="font-black text-purple-600 dark:text-purple-400 text-lg tracking-tight">Rp
-                                        {{ number_format($performanceData['totalRevenue'] ?? 0, 0, ',', '.') }}</span>
-                                </div>
-                                <div class="flex justify-between items-center group border-t border-gray-50 dark:border-gray-700/50 pt-4 mt-4">
-                                    <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Active Orders</span>
-                                    <span
-                                        class="font-black text-gray-900 dark:text-white text-lg tracking-tight">{{ number_format($performanceData['totalOrdersPending'] ?? 0) }}</span>
-                                </div>
+                    <x-admin.card header="Quick Stats">
+                        <div class="space-y-6">
+                            <div class="flex justify-between items-center group">
+                                <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Total Tickets Sold</span>
+                                <span class="font-black text-gray-900 dark:text-white text-lg tracking-tight">{{ number_format($performanceData['totalTicketsSold'] ?? 0) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center group">
+                                <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Revenue</span>
+                                <span class="font-black text-purple-600 dark:text-purple-400 text-lg tracking-tight">Rp {{ number_format($performanceData['totalRevenue'] ?? 0, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex justify-between items-center group border-t border-gray-50 dark:border-gray-700/50 pt-4 mt-4">
+                                <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Active Orders</span>
+                                <span class="font-black text-gray-900 dark:text-white text-lg tracking-tight">{{ number_format($performanceData['totalOrdersPending'] ?? 0) }}</span>
                             </div>
                         </div>
-                    </div>
+                    </x-admin.card>
                 </div>
             </div>
         </form>
@@ -491,206 +381,80 @@
             </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+                <x-admin.stat-card 
+                    title="Gross Revenue" 
+                    value="Rp {{ number_format($performanceData['totalRevenue'] ?? 0, 0, ',', '.') }}" 
+                    color="emerald"
+                    iconPath="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                    From <span class="text-emerald-400 font-semibold">{{ number_format($performanceData['totalOrdersCompleted'] ?? 0) }}</span> orders 
+                    &bull; <span class="text-amber-400 font-semibold">Rp {{ number_format($performanceData['pendingOrdersValue'] ?? 0, 0, ',', '.') }} pending</span>
+                </x-admin.stat-card>
 
-                {{-- Total Gross Revenue --}}
-                <div
-                    class="stat-card relative overflow-hidden rounded-2xl
-                        bg-gradient-to-br from-emerald-500/20 to-emerald-700/10
-                        border border-emerald-500/20 dark:border-emerald-500/10
-                        p-5 shadow-sm dark:bg-gray-700/40">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-emerald-400">Gross Revenue</p>
-                            <p id="stat-revenue" class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                                Rp {{ number_format($performanceData['totalRevenue'] ?? 0, 0, ',', '.') }}
-                            </p>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p id="stat-revenue-sub" class="text-xs text-gray-500 dark:text-gray-400">
-                        From <span
-                            class="text-emerald-400 font-semibold">{{ number_format($performanceData['totalOrdersCompleted'] ?? 0) }}</span>
-                        orders
-                        &bull; <span class="text-amber-400">Rp
-                            {{ number_format($performanceData['pendingOrdersValue'] ?? 0, 0, ',', '.') }}
-                            pending</span>
-                    </p>
-                    <div
-                        class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-emerald-500/10">
-                    </div>
-                </div>
-
-                {{-- Sell-Through Rate --}}
-                <div
-                    class="stat-card relative overflow-hidden rounded-2xl
-                        bg-gradient-to-br from-blue-500/20 to-blue-700/10
-                        border border-blue-500/20 dark:border-blue-500/10
-                        p-5 shadow-sm dark:bg-gray-700/40">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-blue-400">Sell-Through Rate</p>
-                            <p id="stat-sellthrough" class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                                {{ $performanceData['sellThroughRate'] ?? 0 }}%
-                            </p>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-blue-500/20 text-blue-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="mb-1">
+                <x-admin.stat-card 
+                    title="Sell-Through Rate" 
+                    value="{{ $performanceData['sellThroughRate'] ?? 0 }}%" 
+                    color="blue"
+                    iconPath="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z">
+                    <div class="mb-1 mt-1">
                         <div class="h-1.5 w-full bg-blue-900/30 rounded-full overflow-hidden">
-                            <div id="stat-sellthrough-bar"
-                                class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-700"
+                            <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-700"
                                 style="width: {{ $performanceData['sellThroughRate'] ?? 0 }}%"></div>
                         </div>
                     </div>
-                    <p id="stat-sellthrough-sub" class="text-xs text-gray-500 dark:text-gray-400">
-                        <span
-                            class="text-blue-400 font-semibold">{{ number_format($performanceData['totalTicketsSold'] ?? 0) }}</span>
-                        / {{ number_format($performanceData['totalCapacity'] ?? 0) }} tickets sold
-                    </p>
-                    <div
-                        class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-blue-500/10">
-                    </div>
-                </div>
+                    <span class="text-blue-400 font-semibold">{{ number_format($performanceData['totalTicketsSold'] ?? 0) }}</span> / {{ number_format($performanceData['totalCapacity'] ?? 0) }} sold
+                </x-admin.stat-card>
 
-                {{-- Average Order Value --}}
-                <div
-                    class="stat-card relative overflow-hidden rounded-2xl
-                        bg-gradient-to-br from-purple-500/20 to-purple-700/10
-                        border border-purple-500/20 dark:border-purple-500/10
-                        p-5 shadow-sm dark:bg-gray-700/40">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-purple-400">Avg. Order Value</p>
-                            <p id="stat-aov" class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                                Rp {{ number_format($performanceData['avgOrderValue'] ?? 0, 0, ',', '.') }}
-                            </p>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-purple-500/20 text-purple-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p id="stat-aov-sub" class="text-xs text-gray-500 dark:text-gray-400">
-                        Per completed order &bull;
-                        <span
-                            class="text-purple-400 font-semibold">{{ number_format($performanceData['totalOrdersCompleted'] ?? 0) }}</span>
-                        orders
-                    </p>
-                    <div
-                        class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-purple-500/10">
-                    </div>
-                </div>
+                <x-admin.stat-card 
+                    title="Avg. Order Value" 
+                    value="Rp {{ number_format($performanceData['avgOrderValue'] ?? 0, 0, ',', '.') }}" 
+                    color="purple"
+                    iconPath="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    Per completed order &bull; <span class="text-purple-400 font-semibold">{{ number_format($performanceData['totalOrdersCompleted'] ?? 0) }}</span> orders
+                </x-admin.stat-card>
 
-                {{-- Conversion Rate --}}
-                <div
-                    class="stat-card relative overflow-hidden rounded-2xl
-                        bg-gradient-to-br from-amber-500/20 to-amber-700/10
-                        border border-amber-500/20 dark:border-amber-500/10
-                        p-5 shadow-sm dark:bg-gray-700/40">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-amber-400">Conversion Rate</p>
-                            <p id="stat-conversion" class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                                {{ $performanceData['conversionRate'] ?? 0 }}%
-                            </p>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p id="stat-conversion-sub" class="text-xs text-gray-500 dark:text-gray-400">
-                        <span
-                            class="text-emerald-400 font-semibold">{{ $performanceData['totalOrdersCompleted'] ?? 0 }}</span>
-                        completed
-                        &bull; <span class="text-amber-400">{{ $performanceData['totalOrdersPending'] ?? 0 }}</span>
-                        pending
-                        &bull; <span class="text-red-400">{{ $performanceData['totalOrdersCanceled'] ?? 0 }}</span>
-                        canceled
-                    </p>
-                    <div
-                        class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-amber-500/10">
-                    </div>
-                </div>
-
-            </div>{{-- end row 1 --}}
+                <x-admin.stat-card 
+                    title="Conversion Rate" 
+                    value="{{ $performanceData['conversionRate'] ?? 0 }}%" 
+                    color="amber"
+                    iconPath="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
+                    <span class="text-emerald-400 font-semibold">{{ $performanceData['totalOrdersCompleted'] ?? 0 }}</span> completed
+                    &bull; <span class="text-amber-400 font-semibold">{{ $performanceData['totalOrdersPending'] ?? 0 }}</span> pending
+                    &bull; <span class="text-red-400 font-semibold">{{ $performanceData['totalOrdersCanceled'] ?? 0 }}</span> canceled
+                </x-admin.stat-card>
+            </div>
+{{-- end row 1 --}}
 
             {{-- ═══════════════════════════════════════════════════════════════
     ROW 2 – Sales Velocity + Revenue Trend
     ═══════════════════════════════════════════════════════════════ --}}
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                <x-admin.chart-card 
+                    title="Sales Velocity" 
+                    subtitle="Tickets sold over time" 
+                    totalValue="{{ number_format($performanceData['totalTicketsSold'] ?? 0) }}" 
+                    totalLabel="tickets" 
+                    canvasId="velocityChart" 
+                    color="indigo" />
 
-                {{-- Sales Velocity Line Chart (1/2) --}}
-                <div
-                    class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm backdrop-blur-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Sales Velocity</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Tickets sold over time</p>
-                        </div>
-                        <span id="velocity-total-badge"
-                            class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 font-medium border border-indigo-500/20">
-                            {{ number_format($performanceData['totalTicketsSold'] ?? 0) }} tickets
-                        </span>
-                    </div>
-                    <div class="relative h-56">
-                        <canvas id="velocityChart"></canvas>
-                    </div>
-                </div>
-
-                {{-- Revenue Trend Line Chart (1/2) --}}
-                <div
-                    class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm backdrop-blur-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Revenue Trend</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Revenue generated over time</p>
-                        </div>
-                        <span
-                            class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-medium border border-emerald-500/20">
-                            Rp {{ number_format($performanceData['totalRevenue'] ?? 0, 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="relative h-56">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-
+                <x-admin.chart-card 
+                    title="Revenue Trend" 
+                    subtitle="Revenue generated over time" 
+                    totalValue="Rp {{ number_format($performanceData['totalRevenue'] ?? 0, 0, ',', '.') }}" 
+                    canvasId="revenueChart" 
+                    color="emerald" />
             </div>
 
             {{-- ═══════════════════════════════════════════════════════════════
     ROW 2.5 – Attendance Mix
     ═══════════════════════════════════════════════════════════════ --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-
-                {{-- Attendance Doughnut (1/3) --}}
-                <div
-                    class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm backdrop-blur-sm">
-                    <div class="mb-4">
-                        <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Attendance Summary</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Checked-in vs. No-show</p>
-                    </div>
+                {{-- Attendance Summary --}}
+                <x-admin.card header="Attendance Summary">
                     <div class="flex flex-col items-center gap-4">
                         <div class="relative w-36 h-36">
                             <canvas id="attendanceChart"></canvas>
-                            {{-- Center label --}}
                             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span id="attendance-rate-label"
-                                    class="text-2xl font-extrabold text-gray-800 dark:text-white">{{ $performanceData['attendanceRate'] ?? 0 }}%</span>
+                                <span class="text-2xl font-extrabold text-gray-800 dark:text-white">{{ $performanceData['attendanceRate'] ?? 0 }}%</span>
                                 <span class="text-[10px] text-gray-400 uppercase tracking-wider">Check-in</span>
                             </div>
                         </div>
@@ -700,105 +464,91 @@
                                     <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 inline-block"></span>
                                     <span class="text-gray-500 dark:text-gray-400">Checked In</span>
                                 </div>
-                                <span id="stat-scanned"
-                                    class="font-semibold text-gray-800 dark:text-white">{{ number_format($performanceData['totalTicketsScanned'] ?? 0) }}</span>
+                                <span class="font-semibold text-gray-800 dark:text-white">{{ number_format($performanceData['totalTicketsScanned'] ?? 0) }}</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1.5">
-                                    <span
-                                        class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600 inline-block"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600 inline-block"></span>
                                     <span class="text-gray-500 dark:text-gray-400">No-show</span>
                                 </div>
-                                <span id="stat-noshow"
-                                    class="font-semibold text-gray-800 dark:text-white">{{ number_format(($performanceData['totalTicketsSold'] ?? 0) - ($performanceData['totalTicketsScanned'] ?? 0)) }}</span>
+                                <span class="font-semibold text-gray-800 dark:text-white">{{ number_format(($performanceData['totalTicketsSold'] ?? 0) - ($performanceData['totalTicketsScanned'] ?? 0)) }}</span>
                             </div>
                         </div>
                     </div>
+                </x-admin.card>
+
+                {{-- Ticket Tier Performance --}}
+                <div class="lg:col-span-2">
+                    <x-admin.card>
+                        <x-slot name="header">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Ticket Tier Performance</h3>
+                                    <p class="text-xs text-gray-400 mt-0.5">Breakdown by ticket type</p>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M10 6h4m-4 12h4M3 6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6z" />
+                                </svg>
+                            </div>
+                        </x-slot>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700">
+                                        <th class="pb-3 px-2">Tier</th>
+                                        <th class="pb-3 px-2 text-right">Price</th>
+                                        <th class="pb-3 px-2 text-right">Capacity</th>
+                                        <th class="pb-3 px-2 text-right">Sold</th>
+                                        <th class="pb-3 px-2 text-right">Revenue</th>
+                                        <th class="pb-3 px-2">Fill Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tier-table-body" class="divide-y divide-gray-50 dark:divide-gray-700/50">
+                                    @forelse ($performanceData['tierBreakdown'] as $tier)
+                                        <tr class="transition-colors duration-150">
+                                            <td class="py-3.5 px-2">
+                                                <span class="inline-flex items-center gap-1.5">
+                                                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                                                    <span class="font-medium text-gray-800 dark:text-white">{{ $tier['name'] }}</span>
+                                                </span>
+                                            </td>
+                                            <td class="py-3.5 px-2 text-right text-gray-600 dark:text-gray-300">
+                                                Rp {{ number_format($tier['price'], 0, ',', '.') }}
+                                            </td>
+                                            <td class="py-3.5 px-2 text-right text-gray-600 dark:text-gray-300">
+                                                {{ number_format($tier['capacity']) }}
+                                            </td>
+                                            <td class="py-3.5 px-2 text-right font-semibold text-gray-800 dark:text-white">
+                                                {{ number_format($tier['sold']) }}
+                                            </td>
+                                            <td class="py-3.5 px-2 text-right text-emerald-500 font-semibold">
+                                                Rp {{ number_format($tier['revenue'], 0, ',', '.') }}
+                                            </td>
+                                            <td class="py-3.5 px-2 min-w-[120px]">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                        <div class="h-full rounded-full transition-all duration-700
+                                                                    {{ $tier['fill'] >= 90 ? 'bg-emerald-400' : ($tier['fill'] >= 60 ? 'bg-blue-400' : 'bg-amber-400') }}"
+                                                            style="width: {{ $tier['fill'] }}%"></div>
+                                                    </div>
+                                                    <span class="text-xs font-medium {{ $tier['fill'] >= 90 ? 'text-emerald-400' : ($tier['fill'] >= 60 ? 'text-blue-400' : 'text-amber-400') }}">
+                                                        {{ $tier['fill'] }}%
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="py-12 text-center text-sm text-gray-400 italic">No ticket tiers configured for this event.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </x-admin.card>
                 </div>
-
-            </div>
-
-            {{-- ═══════════════════════════════════════════════════════════════
-    ROW 3 – Ticket Tier Breakdown
-    ═══════════════════════════════════════════════════════════════ --}}
-            <div
-                class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 p-5 shadow-sm backdrop-blur-sm mb-6">
-
-                <div class="flex items-center justify-between mb-5">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Ticket Tier Performance</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Breakdown by ticket type</p>
-                    </div>
-                    <svg class="w-5 h-5 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 10h18M3 14h18M10 6h4m-4 12h4M3 6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6z" />
-                    </svg>
-                </div>
-
-                <div class="overflow-x-auto -mx-1">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr
-                                class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700">
-                                <th class="pb-3 px-2">Tier</th>
-                                <th class="pb-3 px-2 text-right">Price</th>
-                                <th class="pb-3 px-2 text-right">Capacity</th>
-                                <th class="pb-3 px-2 text-right">Sold</th>
-                                <th class="pb-3 px-2 text-right">Revenue</th>
-                                <th class="pb-3 px-2">Fill Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tier-table-body" class="divide-y divide-gray-50 dark:divide-gray-700/50">
-                            @forelse ($performanceData['tierBreakdown'] as $tier)
-                                <tr
-                                    class="transition-colors duration-150">
-                                    <td class="py-3.5 px-2">
-                                        <span class="inline-flex items-center gap-1.5">
-                                            <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
-                                            <span
-                                                class="font-medium text-gray-800 dark:text-white">{{ $tier['name'] }}</span>
-                                        </span>
-                                    </td>
-                                    <td class="py-3.5 px-2 text-right text-gray-600 dark:text-gray-300">
-                                        Rp {{ number_format($tier['price'], 0, ',', '.') }}
-                                    </td>
-                                    <td class="py-3.5 px-2 text-right text-gray-600 dark:text-gray-300">
-                                        {{ number_format($tier['capacity']) }}
-                                    </td>
-                                    <td class="py-3.5 px-2 text-right font-semibold text-gray-800 dark:text-white">
-                                        {{ number_format($tier['sold']) }}
-                                    </td>
-                                    <td class="py-3.5 px-2 text-right text-emerald-500 font-semibold">
-                                        Rp {{ number_format($tier['revenue'], 0, ',', '.') }}
-                                    </td>
-                                    <td class="py-3.5 px-2 min-w-[120px]">
-                                        <div class="flex items-center gap-2">
-                                            <div
-                                                class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                <div class="h-full rounded-full transition-all duration-700
-                                                            {{ $tier['fill'] >= 90 ? 'bg-emerald-400' : ($tier['fill'] >= 60 ? 'bg-blue-400' : 'bg-amber-400') }}"
-                                                    style="width: {{ $tier['fill'] }}%"></div>
-                                            </div>
-                                            <span
-                                                class="text-xs font-medium {{ $tier['fill'] >= 90 ? 'text-emerald-400' : ($tier['fill'] >= 60 ? 'text-blue-400' : 'text-amber-400') }}">
-                                                {{ $tier['fill'] }}%
-                                            </span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="py-6 text-center text-sm text-gray-400">No ticket tiers
-                                        configured for this
-                                        event.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>{{-- end row 3 --}}
+            </div>{{-- end row 2.5 --}}
 
         </div>{{-- end analytics tab --}}
 
@@ -809,41 +559,29 @@
 
 
         {{-- Orders Tab --}}
-        <div x-cloak x-show="activeTab === 'orders'" x-transition.opacity.duration.300ms
-            class="mt-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            {{-- Header & Title --}}
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">All Orders</h3>
-                <p class="text-sm text-gray-500 mt-1">Complete history of transactions for this event.</p>
-            </div>
-
-            {{-- Filters Section --}}
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
-                <form action="{{ url()->current() }}#orders" method="GET"
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                    {{-- Status --}}
-                    <div class="space-y-1.5">
-                        <label
-                            class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Status</label>
-                        <select name="status"
-                            class="w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-200 focus:ring-purple-500/20 focus:border-purple-500 transition-all">
-                            <option value="">All Status</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending
-                            </option>
-                            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed
-                            </option>
-                            <option value="canceled" {{ request('status') == 'canceled' ? 'selected' : '' }}>Canceled
-                            </option>
-                        </select>
+        <div x-cloak x-show="activeTab === 'orders'" x-transition.opacity.duration.300ms class="mt-6">
+            <x-admin.card>
+                <x-slot name="header">
+                    <div class="flex flex-col">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">All Orders</h3>
+                        <p class="text-sm text-gray-500 mt-1">Complete history of transactions for this event.</p>
                     </div>
+                </x-slot>
 
-                    {{-- Ticket Type --}}
-                    <div class="space-y-1.5">
-                        <label
-                            class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Ticket
-                            Type</label>
-                        <select name="ticket_type_id"
-                            class="w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-200 focus:ring-purple-500/20 focus:border-purple-500 transition-all">
+                {{-- Filters Section --}}
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
+                    <form action="{{ url()->current() }}#orders" method="GET"
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                        {{-- Status --}}
+                        <x-admin.select label="Status" name="status">
+                            <option value="">All Status</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                            <option value="canceled" {{ request('status') == 'canceled' ? 'selected' : '' }}>Canceled</option>
+                        </x-admin.select>
+
+                        {{-- Ticket Type --}}
+                        <x-admin.select label="Ticket Type" name="ticket_type_id">
                             <option value="">All Types</option>
                             @foreach ($item->eventTicketTypes as $tt)
                                 <option value="{{ $tt->id }}"
@@ -851,146 +589,118 @@
                                     {{ $tt->ticketType->name }}
                                 </option>
                             @endforeach
-                        </select>
-                    </div>
+                        </x-admin.select>
 
-                    {{-- Payment Proof --}}
-                    <div class="space-y-1.5">
-                        <label
-                            class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Payment
-                            Proof</label>
-                        <select name="has_payment_proof"
-                            class="w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-200 focus:ring-purple-500/20 focus:border-purple-500 transition-all">
+                        {{-- Payment Proof --}}
+                        <x-admin.select label="Payment Proof" name="has_payment_proof">
                             <option value="">All</option>
-                            <option value="yes" {{ request('has_payment_proof') == 'yes' ? 'selected' : '' }}>Has Proof
-                            </option>
-                            <option value="no" {{ request('has_payment_proof') == 'no' ? 'selected' : '' }}>No Proof
-                            </option>
-                        </select>
-                    </div>
+                            <option value="yes" {{ request('has_payment_proof') == 'yes' ? 'selected' : '' }}>Has Proof</option>
+                            <option value="no" {{ request('has_payment_proof') == 'no' ? 'selected' : '' }}>No Proof</option>
+                        </x-admin.select>
 
-                    {{-- Sort --}}
-                    <div class="space-y-1.5">
-                        <label class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Sort
-                            By</label>
-                        <select name="sort"
-                            class="w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-gray-200 focus:ring-purple-500/20 focus:border-purple-500 transition-all">
-                            <option value="newest"
-                                {{ request('sort') == 'newest' || !request('sort') ? 'selected' : '' }}>
-                                Newest First</option>
-                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First
-                            </option>
-                            <option value="amount_desc" {{ request('sort') == 'amount_desc' ? 'selected' : '' }}>Highest
-                                Amount</option>
-                            <option value="amount_asc" {{ request('sort') == 'amount_asc' ? 'selected' : '' }}>Lowest
-                                Amount
-                            </option>
-                        </select>
-                    </div>
+                        {{-- Sort --}}
+                        <x-admin.select label="Sort By" name="sort">
+                            <option value="newest" {{ request('sort') == 'newest' || !request('sort') ? 'selected' : '' }}>Newest First</option>
+                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                            <option value="amount_desc" {{ request('sort') == 'amount_desc' ? 'selected' : '' }}>Highest Amount</option>
+                            <option value="amount_asc" {{ request('sort') == 'amount_asc' ? 'selected' : '' }}>Lowest Amount</option>
+                        </x-admin.select>
 
-                    {{-- Apply Button --}}
-                    <div class="lg:col-span-2 flex items-end gap-2">
-                        <button type="submit"
-                            class="flex-1 h-[42px] bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2 group">
-                            <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                            </svg>
-                            Filter
-                        </button>
-                        @if (request()->anyFilled(['status', 'ticket_type_id', 'has_payment_proof', 'sort']))
-                            <a href="{{ url()->current() }}#orders"
-                                class="h-[42px] px-4 bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-xl flex items-center justify-center transition-all border border-gray-200 dark:border-gray-600">
-                                Reset
-                            </a>
-                        @endif
-                    </div>
-                </form>
-            </div>
-
-            {{-- Table Section --}}
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead
-                        class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                        <tr>
-                            <th class="py-3.5 px-6">Order ID</th>
-                            <th class="py-3.5 px-6">Customer</th>
-                            <th class="py-3.5 px-6">Tickets</th>
-                            <th class="py-3.5 px-6">Date</th>
-                            <th class="py-3.5 px-6 text-right">Amount</th>
-                            <th class="py-3.5 px-6 text-center">Status</th>
-                            <th class="py-3.5 px-6 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700/50 text-gray-900 dark:text-white">
-                        @forelse ($orders as $order)
-                            <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors duration-150 cursor-pointer"
-                                @click="window.location.href='/manage/orders/{{ $order->id }}/approve'">
-                                <td class="py-4 px-6">
-                                    <span
-                                        class="font-bold text-indigo-600 dark:text-indigo-400">#{{ $order->id }}</span>
-                                </td>
-                                <td class="py-4 px-6">
-                                    <div class="flex flex-col">
-                                        <span
-                                            class="font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $order->user->name }}</span>
-                                        <span class="text-[10px] text-gray-400">{{ $order->user->email }}</span>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6">
-                                    <div class="flex flex-wrap gap-1.5">
-                                        @foreach ($order->orderDetails->groupBy('event_ticket_type_id') as $typeId => $details)
-                                            @php $first = $details->first(); @endphp
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600">
-                                                {{ $details->count() }}x {{ $first->eventTicketType->ticketType->name }}
-                                            </span>
-                                        @endforeach
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 text-gray-500 dark:text-gray-400 text-xs text-nowrap">
-                                    {{ $order->created_at->format('M d, Y H:i') }}</td>
-                                <td class="py-4 px-6 text-right font-bold text-gray-900 dark:text-white">Rp
-                                    {{ number_format($order->amount, 0, ',', '.') }}</td>
-                                <td class="py-4 px-6 text-center">
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
-                                    @if ($order->status == 'completed') bg-emerald-100/80 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400
-                                    @elseif($order->status == 'pending') bg-amber-100/80 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400
-                                    @else bg-red-100/80 text-red-800 dark:bg-red-900/30 dark:text-red-400 @endif">
-                                        {{ $order->status }}
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-center" @click.stop>
-                                    <a href="/manage/orders/{{ $order->id }}/approve"
-                                        class="inline-flex items-center justify-center p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
-                                        title="View Approval Details">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="py-12 text-center text-gray-400 italic">
-                                    No orders matching the criteria.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            @if ($orders->hasPages())
-                <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
-                    {{ $orders->fragment('orders')->links() }}
+                        {{-- Apply Button --}}
+                        <div class="lg:col-span-2 flex items-end gap-2">
+                            <x-admin.button type="submit" class="flex-1 h-[42px]">
+                                <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                Filter
+                            </x-admin.button>
+                            @if (request()->anyFilled(['status', 'ticket_type_id', 'has_payment_proof', 'sort']))
+                                <x-admin.button variant="secondary" :href="url()->current() . '#orders'" class="h-[42px] px-4">
+                                    Reset
+                                </x-admin.button>
+                            @endif
+                        </div>
+                    </form>
                 </div>
-            @endif
+
+                {{-- Table Section --}}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead
+                            class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                            <tr>
+                                <th class="py-3.5 px-6">Order ID</th>
+                                <th class="py-3.5 px-6">Customer</th>
+                                <th class="py-3.5 px-6">Tickets</th>
+                                <th class="py-3.5 px-6">Date</th>
+                                <th class="py-3.5 px-6 text-right">Amount</th>
+                                <th class="py-3.5 px-6 text-center">Status</th>
+                                <th class="py-3.5 px-6 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50 dark:divide-gray-700/50 text-gray-900 dark:text-white">
+                            @forelse ($orders as $order)
+                                <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors duration-150 cursor-pointer"
+                                    @click="window.location.href='/manage/orders/{{ $order->id }}/approve'">
+                                    <td class="py-4 px-6">
+                                        <span class="font-bold text-indigo-600 dark:text-indigo-400">#{{ $order->id }}</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex flex-col">
+                                            <span class="font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $order->user->name }}</span>
+                                            <span class="text-[10px] text-gray-400">{{ $order->user->email }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            @foreach ($order->orderDetails->groupBy('event_ticket_type_id') as $typeId => $details)
+                                                @php $first = $details->first(); @endphp
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600">
+                                                    {{ $details->count() }}x {{ $first->eventTicketType->ticketType->name }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-500 dark:text-gray-400 text-xs text-nowrap">
+                                        {{ $order->created_at->format('M d, Y H:i') }}</td>
+                                    <td class="py-4 px-6 text-right font-bold text-gray-900 dark:text-white">Rp
+                                        {{ number_format($order->amount, 0, ',', '.') }}</td>
+                                    <td class="py-4 px-6 text-center">
+                                        <x-admin.badge :type="$order->status === 'completed' ? 'success' : ($order->status === 'pending' ? 'warning' : 'danger')">
+                                            {{ $order->status }}
+                                        </x-admin.badge>
+                                    </td>
+                                    <td class="py-4 px-6 text-center" @click.stop>
+                                        <a href="/manage/orders/{{ $order->id }}/approve"
+                                            class="inline-flex items-center justify-center p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                            title="View Approval Details">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="py-12 text-center text-gray-400 italic">
+                                        No orders matching the criteria.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if ($orders->hasPages())
+                    <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
+                        {{ $orders->fragment('orders')->links() }}
+                    </div>
+                @endif
+            </x-admin.card>
         </div>
 
 
@@ -1000,41 +710,22 @@
             <div class="ticket-row border border-gray-100 dark:border-gray-700/50 rounded-2xl p-6 bg-gray-50/30 dark:bg-gray-900/20 relative group overflow-hidden animate-in zoom-in-95 duration-300">
                 <input type="hidden" name="ticket_types[__INDEX__][id]" value="">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end relative z-10">
-                    <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Type</label>
-                        <div class="relative">
-                            <select name="ticket_types[__INDEX__][ticket_type_id]"
-                                class="appearance-none w-full h-[46px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block pl-4 pr-10 transition-all duration-300 cursor-pointer !bg-none"
-                                required>
-                                <option value="">Select</option>
-                                @foreach ($ticketTypes as $tt)
-                                    <option value="{{ $tt->id }}">{{ $tt->name }}</option>
-                                @endforeach
-                            </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Price (Rp)</label>
-                        <input type="number" step="0.01" name="ticket_types[__INDEX__][price]" value="0"
-                            class="w-full h-[46px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block px-4 transition-all duration-300"
-                            required>
-                    </div>
-                    <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Capacity</label>
-                        <input type="number" name="ticket_types[__INDEX__][capacity]" value="0" min="0"
-                            @input="recalculateCapacity()"
-                            class="w-full h-[46px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white text-sm rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 block px-4 transition-all duration-300"
-                            required>
-                    </div>
+                    <x-admin.select label="Type" name="ticket_types[__INDEX__][ticket_type_id]" required containerClass="col-span-2 md:col-span-1">
+                        <option value="">Select</option>
+                        @foreach ($ticketTypes as $tt)
+                            <option value="{{ $tt->id }}">{{ $tt->name }}</option>
+                        @endforeach
+                    </x-admin.select>
+                    
+                    <x-admin.input type="number" step="0.01" label="Price (Rp)" name="ticket_types[__INDEX__][price]" value="0" required containerClass="col-span-2 md:col-span-1" />
+                    
+                    <x-admin.input type="number" label="Capacity" name="ticket_types[__INDEX__][capacity]" value="0" min="0" @input="recalculateCapacity()" required containerClass="col-span-2 md:col-span-1" />
+                    
                     <div class="col-span-2 md:col-span-1 flex justify-end pb-1 h-[46px] items-center">
-                        <button type="button" @click="removeTicket($el)"
-                            class="btn-remove-ticket group/btn w-full h-full flex items-center justify-center gap-2 text-[10px] font-bold text-rose-500 border border-rose-100 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-900/10 hover:bg-rose-500 hover:text-white rounded-xl transition-all duration-300 uppercase tracking-widest">
+                        <x-admin.button variant="danger" @click="removeTicket($el)" class="w-full h-full text-[10px]">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             Remove
-                        </button>
+                        </x-admin.button>
                     </div>
                 </div>
             </div>
@@ -1045,17 +736,7 @@
         </script>
         <script>
             (function() {
-                // Theme helpers
-                const isDark = () => document.documentElement.classList.contains('dark');
-                const gridColor = () => isDark() ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
-                const labelColor = () => isDark() ? '#9ca3af' : '#6b7280';
-                const tooltipOpts = () => ({
-                    backgroundColor: isDark() ? '#1f2937' : '#ffffff',
-                    titleColor: isDark() ? '#e5e7eb' : '#111827',
-                    bodyColor: isDark() ? '#9ca3af' : '#6b7280',
-                    borderColor: isDark() ? '#374151' : '#e5e7eb',
-                    borderWidth: 1,
-                });
+                const T = window.ChartThemes;
 
                 // Format helpers
                 const fmtRp = v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v);
@@ -1066,9 +747,7 @@
                 function buildVelocityChart(labels, data) {
                     const ctx = document.getElementById('velocityChart');
                     if (!ctx) return;
-                    const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
-                    grad.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
-                    grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+                    const cctx = ctx.getContext('2d');
 
                     velocityChart = new Chart(ctx, {
                         type: 'line',
@@ -1078,11 +757,11 @@
                                 label: 'Tickets Sold',
                                 data: data,
                                 fill: true,
-                                backgroundColor: grad,
+                                backgroundColor: T.getGradient(cctx, 'indigo'),
                                 borderColor: 'rgba(99,102,241,0.9)',
                                 borderWidth: 2,
                                 pointBackgroundColor: 'rgba(99,102,241,1)',
-                                pointRadius: 4,
+                                pointRadius: 0,
                                 pointHoverRadius: 6,
                                 tension: 0.4,
                             }]
@@ -1091,11 +770,9 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: {
-                                    display: false
-                                },
+                                legend: { display: false },
                                 tooltip: {
-                                    ...tooltipOpts(),
+                                    ...T.getTooltipStyle(),
                                     callbacks: {
                                         label: c => fmtNum(c.raw) + ' tickets'
                                     }
@@ -1103,26 +780,12 @@
                             },
                             scales: {
                                 x: {
-                                    grid: {
-                                        color: gridColor()
-                                    },
-                                    ticks: {
-                                        color: labelColor(),
-                                        font: {
-                                            size: 11
-                                        }
-                                    }
+                                    grid: { color: T.getGridColor(), display: false },
+                                    ticks: { color: T.getLabelColor(), font: { size: 10 } }
                                 },
                                 y: {
-                                    grid: {
-                                        color: gridColor()
-                                    },
-                                    ticks: {
-                                        color: labelColor(),
-                                        font: {
-                                            size: 11
-                                        }
-                                    },
+                                    grid: { color: T.getGridColor() },
+                                    ticks: { color: T.getLabelColor(), font: { size: 10 } },
                                     beginAtZero: true
                                 }
                             }
@@ -1133,9 +796,7 @@
                 function buildRevenueChart(labels, data) {
                     const ctx = document.getElementById('revenueChart');
                     if (!ctx) return;
-                    const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
-                    grad.addColorStop(0, 'rgba(52, 211, 153, 0.35)');
-                    grad.addColorStop(1, 'rgba(52, 211, 153, 0)');
+                    const cctx = ctx.getContext('2d');
 
                     revenueChart = new Chart(ctx, {
                         type: 'line',
@@ -1145,11 +806,11 @@
                                 label: 'Revenue',
                                 data: data,
                                 fill: true,
-                                backgroundColor: grad,
-                                borderColor: 'rgba(52,211,153,0.9)',
+                                backgroundColor: T.getGradient(cctx, 'emerald'),
+                                borderColor: 'rgba(16, 185, 129, 0.9)',
                                 borderWidth: 2,
-                                pointBackgroundColor: 'rgba(52,211,153,1)',
-                                pointRadius: 4,
+                                pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                                pointRadius: 0,
                                 pointHoverRadius: 6,
                                 tension: 0.4,
                             }]
@@ -1158,11 +819,9 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: {
-                                    display: false
-                                },
+                                legend: { display: false },
                                 tooltip: {
-                                    ...tooltipOpts(),
+                                    ...T.getTooltipStyle(),
                                     callbacks: {
                                         label: c => fmtRp(c.raw)
                                     }
@@ -1170,25 +829,14 @@
                             },
                             scales: {
                                 x: {
-                                    grid: {
-                                        color: gridColor()
-                                    },
-                                    ticks: {
-                                        color: labelColor(),
-                                        font: {
-                                            size: 11
-                                        }
-                                    }
+                                    grid: { color: T.getGridColor(), display: false },
+                                    ticks: { color: T.getLabelColor(), font: { size: 10 } }
                                 },
                                 y: {
-                                    grid: {
-                                        color: gridColor()
-                                    },
+                                    grid: { color: T.getGridColor() },
                                     ticks: {
-                                        color: labelColor(),
-                                        font: {
-                                            size: 11
-                                        },
+                                        color: T.getLabelColor(),
+                                        font: { size: 10 },
                                         callback: v => window.innerWidth > 768 ? fmtRp(v) : v
                                     },
                                     beginAtZero: true
@@ -1207,10 +855,11 @@
                             labels: ['Checked In', 'No-show'],
                             datasets: [{
                                 data: [scanned, noshow || 0.001],
-                                backgroundColor: ['rgba(99,102,241,0.85)', isDark() ? 'rgba(75,85,99,0.4)' :
-                                    'rgba(229,231,235,0.8)'
+                                backgroundColor: [
+                                    'rgba(99,102,241,0.85)', 
+                                    T.isDark() ? 'rgba(75,85,99,0.4)' : 'rgba(229,231,235,0.8)'
                                 ],
-                                borderColor: isDark() ? '#1f2937' : '#ffffff',
+                                borderColor: T.isDark() ? '#1f2937' : '#ffffff',
                                 borderWidth: 3,
                                 hoverOffset: 6,
                             }]
@@ -1220,10 +869,8 @@
                             maintainAspectRatio: false,
                             cutout: '72%',
                             plugins: {
-                                legend: {
-                                    display: false
-                                },
-                                tooltip: tooltipOpts()
+                                legend: { display: false },
+                                tooltip: T.getTooltipStyle()
                             }
                         }
                     });

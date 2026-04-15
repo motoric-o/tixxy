@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/checkout/{id}', [CheckoutController::class, 'store'])->name('checkout.store');
         Route::get('/payment/{id}', [PaymentController::class, 'show'])->name('payment.show');
         Route::post('/payment/{id}', [PaymentController::class, 'store'])->name('payment.store');
+        Route::post('/payment/{id}/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
     });
 
     // ticketing

@@ -41,7 +41,7 @@ class EventCrudViewModel implements Arrayable
         return [
             ['name' => 'title',       'label' => 'Event Name',  'type' => 'text',           'required' => true, 'wide' => true],
             ['name' => 'category_id', 'label' => 'Category',    'type' => 'select',          'options' => $this->categories, 'required' => true],
-            ['name' => 'quota',       'label' => 'Quota',       'type' => 'number'],
+            ['name' => 'quota',       'label' => 'Total Capacity',  'type' => 'number'],
             ['name' => 'start_time',  'label' => 'Start Time',  'type' => 'datetime-local',  'required' => true],
             ['name' => 'end_time',    'label' => 'End Time',    'type' => 'datetime-local',  'required' => true],
             ['name' => 'location',    'label' => 'Location',    'type' => 'text',            'required' => true, 'wide' => true],
@@ -79,7 +79,7 @@ class EventCrudViewModel implements Arrayable
             ['key' => 'location', 'label' => 'Location'],
             ['key' => 'start_time', 'label' => 'Start Time'],
             ['key' => 'end_time', 'label' => 'End Time'],
-            ['key' => 'quota', 'label' => 'Quota'],
+            ['key' => 'quota', 'label' => 'Total Capacity'],
             ['key' => 'status', 'label' => 'Status'],
         ];
     }

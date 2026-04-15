@@ -85,19 +85,6 @@
                             </div>
                         </div>
 
-                        <!-- Cancel Booking -->
-                        <form action="{{ route('queue.cancel', $event->id) }}" method="POST" class="mt-auto pt-6"
-                            onsubmit="return confirm('Cancel your booking? You will lose your queue position and your spot will be given to the next person in line.');">
-                            @csrf
-                            <button type="submit"
-                                class="w-full py-3.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold rounded-2xl border border-red-200 dark:border-red-800/50 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all duration-300 flex justify-center items-center gap-2 px-6">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                                <span>Cancel Booking</span>
-                            </button>
-                        </form>
                     </div>
 
                     <!-- Right: Form Wizard -->

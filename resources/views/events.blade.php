@@ -71,8 +71,8 @@
             <div class="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 dark:hover:shadow-indigo-900/20 border border-gray-100 dark:border-gray-700/50 transition-all duration-300 transform hover:-translate-y-2 overflow-hidden flex flex-col h-full">
                 <!-- Image Container -->
                 <div class="relative h-56 overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    @if(isset($event->image_path))
-                        <img src="{{ asset('storage/' . $event->image_path) }}" alt="{{ $event->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    @if($event->banner_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($event->banner_path))
+                        <img src="{{ asset('storage/' . $event->banner_path) }}" alt="{{ $event->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                     @else
                         <!-- Fallback Pattern -->
                         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20"></div>

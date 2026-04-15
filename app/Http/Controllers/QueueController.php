@@ -124,9 +124,9 @@ class QueueController extends Controller
             return redirect("/checkout?event_id={$eventId}");
         }
 
-        // If they already purchased, redirect to their tickets
+        // If they already purchased, let them rejoin the queue for additional tickets
         if ($queueEntry->status === Queue::STATUS_PURCHASED) {
-            return redirect('/tickets')->with('info', 'You have already purchased tickets for this event.');
+            return redirect()->route('queue.join', $eventId);
         }
 
         // Calculate their position in line
@@ -151,6 +151,14 @@ class QueueController extends Controller
 
         if (!$queueEntry) {
             return response()->json(['status' => 'not_found'], 404);
+        }
+
+        // If the user is still waiting, check if a spot has opened up and promote them
+        if (in_array($queueEntry->status, [Queue::STATUS_QUEUED, Queue::STATUS_WAITLISTED])) {
+            $promoted = $this->tryPromote($queueEntry, $eventId);
+            if ($promoted) {
+                $queueEntry->refresh();
+            }
         }
 
         // Calculate position if still waiting
@@ -313,6 +321,35 @@ class QueueController extends Controller
     }
 
     /**
+     * Try to promote a specific queue entry if spots are available.
+     * Returns true if the entry was promoted.
+     */
+    private function tryPromote(Queue $entry, int $eventId): bool
+    {
+        return DB::transaction(function () use ($entry, $eventId) {
+            $event = Event::lockForUpdate()->find($eventId);
+            if (!$event) return false;
+
+            $availableSpots = $this->calculateAvailableSpots($event);
+            if ($availableSpots <= 0) return false;
+
+            // Only promote if this user is next in line (fairness)
+            $nextInLine = Queue::where('event_id', $eventId)
+                ->promotable()
+                ->first();
+
+            if (!$nextInLine || $nextInLine->id !== $entry->id) return false;
+
+            $entry->update([
+                'status'     => Queue::STATUS_ACTIVE,
+                'expires_at' => now()->addMinutes(Queue::ACTIVE_MINUTES),
+            ]);
+
+            return true;
+        });
+    }
+
+    /**
      * Handle a user who already has a queue entry for this event.
      */
     private function handleExistingEntry(Queue $entry, int $eventId)
@@ -321,10 +358,7 @@ class QueueController extends Controller
             Queue::STATUS_ACTIVE, Queue::STATUS_PROCESSING
                 => redirect("/checkout?event_id={$eventId}"),
 
-            Queue::STATUS_PURCHASED
-                => redirect('/tickets')->with('info', 'You have already purchased tickets for this event.'),
-
-            Queue::STATUS_EXPIRED, Queue::STATUS_CANCELED
+            Queue::STATUS_PURCHASED, Queue::STATUS_EXPIRED, Queue::STATUS_CANCELED
                 => $this->rejoinQueue($entry, $eventId),
 
             default
@@ -337,10 +371,32 @@ class QueueController extends Controller
      */
     private function rejoinQueue(Queue $entry, int $eventId)
     {
-        $entry->update([
-            'status'     => Queue::STATUS_QUEUED,
-            'expires_at' => null,
-        ]);
+        $result = DB::transaction(function () use ($entry, $eventId) {
+            $lockedEvent = Event::lockForUpdate()->find($eventId);
+            $availableSpots = $this->calculateAvailableSpots($lockedEvent);
+
+            $hasWaitlist = Queue::where('event_id', $eventId)
+                ->whereIn('status', [Queue::STATUS_WAITLISTED, Queue::STATUS_NOTIFIED])
+                ->exists();
+
+            if ($availableSpots > 0 && !$hasWaitlist) {
+                $entry->update([
+                    'status'     => Queue::STATUS_ACTIVE,
+                    'expires_at' => now()->addMinutes(Queue::ACTIVE_MINUTES),
+                ]);
+                return 'active';
+            }
+
+            $entry->update([
+                'status'     => Queue::STATUS_QUEUED,
+                'expires_at' => null,
+            ]);
+            return 'queued';
+        });
+
+        if ($result === 'active') {
+            return redirect("/checkout?event_id={$eventId}");
+        }
 
         return redirect("/queue/{$eventId}");
     }

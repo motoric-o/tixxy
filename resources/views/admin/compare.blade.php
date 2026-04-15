@@ -27,19 +27,24 @@
 </div>
 
 {{-- Chart Comparison Section --}}
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
-        <h3 class="text-sm font-bold text-gray-800 dark:text-white mb-4 uppercase tracking-wider">Revenue Comparison</h3>
-        <div class="h-64">
-            <canvas id="revenueCompareChart"></canvas>
-        </div>
-    </div>
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
-        <h3 class="text-sm font-bold text-gray-800 dark:text-white mb-4 uppercase tracking-wider">Attendance Rate (%)</h3>
-        <div class="h-64">
-            <canvas id="attendanceCompareChart"></canvas>
-        </div>
-    </div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+    <x-admin.chart-card 
+        title="Revenue Comparison" 
+        subtitle="Gross revenue across completed events"
+        canvasId="revenueCompareChart"
+        totalValue="Rp {{ number_format(collect($events ?? [])->sum('orders_sum_amount'), 0, ',', '.') }}"
+        totalLabel=""
+        color="emerald">
+    </x-admin.chart-card>
+
+    <x-admin.chart-card 
+        title="Attendance Performance" 
+        subtitle="Check-in rate relative to tickets sold"
+        canvasId="attendanceCompareChart"
+        totalValue="Rate"
+        totalLabel="%"
+        color="blue">
+    </x-admin.chart-card>
 </div>
 
 {{-- Detailed Comparison Table --}}
@@ -102,60 +107,98 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const isDark = () => document.documentElement.classList.contains('dark');
-    const labelColor = () => isDark() ? '#9ca3af' : '#6b7280';
-    const gridColor = () => isDark() ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-
+    const T = window.ChartThemes;
     const eventLabels = @json(collect($events ?? [])->pluck('title'));
     
     // Revenue Chart
-    new Chart(document.getElementById('revenueCompareChart'), {
+    const revenueCtx = document.getElementById('revenueCompareChart').getContext('2d');
+    new Chart(revenueCtx, {
         type: 'bar',
         data: {
             labels: eventLabels,
             datasets: [{
                 label: 'Revenue (Rp)',
                 data: @json(collect($events ?? [])->pluck('orders_sum_amount')),
-                backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                borderColor: 'rgb(16, 185, 129)',
+                backgroundColor: T.getGradient(revenueCtx, 'emerald'),
+                borderColor: 'rgba(16, 185, 129, 0.8)',
                 borderWidth: 1,
-                borderRadius: 8
+                borderRadius: 12,
+                borderSkipped: false,
+                barPercentage: 0.6,
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, grid: { color: gridColor() }, ticks: { color: labelColor() } },
-                x: { grid: { display: false }, ticks: { color: labelColor() } }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    ...T.getTooltipStyle(),
+                    callbacks: {
+                        label: ctx => 'Rp ' + new Intl.NumberFormat('id-ID').format(ctx.raw),
+                    }
+                }
             },
-            plugins: { legend: { display: false } }
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: T.getGridColor() }, 
+                    ticks: { 
+                        color: T.getLabelColor(),
+                        callback: v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v),
+                    } 
+                },
+                x: { 
+                    grid: { display: false }, 
+                    ticks: { color: T.getLabelColor() } 
+                }
+            }
         }
     });
 
     // Attendance Rate Chart
-    new Chart(document.getElementById('attendanceCompareChart'), {
+    const attendanceCtx = document.getElementById('attendanceCompareChart').getContext('2d');
+    new Chart(attendanceCtx, {
         type: 'line',
         data: {
             labels: eventLabels,
             datasets: [{
                 label: 'Attendance %',
                 data: @json(collect($events ?? [])->map(fn($e) => $e->total_sold > 0 ? round(($e->total_scanned / $e->total_sold) * 100) : 0)),
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderColor: 'rgba(59, 130, 246, 0.9)',
+                backgroundColor: T.getGradient(attendanceCtx, 'blue'),
                 fill: true,
                 tension: 0.4,
-                pointRadius: 4
+                pointRadius: 0,
+                pointHoverRadius: 6,
+                pointHoverBackgroundColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 2,
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                y: { min: 0, max: 100, grid: { color: gridColor() }, ticks: { color: labelColor(), callback: v => v + '%' } },
-                x: { grid: { display: false }, ticks: { color: labelColor() } }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    ...T.getTooltipStyle(),
+                    callbacks: {
+                        label: ctx => ctx.raw + '%'
+                    }
+                }
             },
-            plugins: { legend: { display: false } }
+            scales: {
+                y: { 
+                    min: 0, 
+                    max: 100, 
+                    grid: { color: T.getGridColor() }, 
+                    ticks: { color: T.getLabelColor(), callback: v => v + '%' } 
+                },
+                x: { 
+                    grid: { display: false }, 
+                    ticks: { color: T.getLabelColor() } 
+                }
+            }
         }
     });
 });

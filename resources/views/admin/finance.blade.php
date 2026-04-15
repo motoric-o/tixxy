@@ -21,11 +21,11 @@
         </p>
     </div>
     <div class="flex gap-3">
-        <a href="/manage/finances/export/csv" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-emerald-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm active:scale-95">
+        <a href="/manage/finances/export/csv" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-purple-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm active:scale-95">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             Export CSV
         </a>
-        <a href="/manage/finances/export/pdf" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 border border-transparent rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/20 active:scale-95">
+        <a href="/manage/finances/export/pdf" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-purple-600 border border-transparent rounded-xl hover:bg-purple-700 dark:hover:bg-purple-500 transition-colors shadow-lg shadow-purple-500/20 active:scale-95">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             Export PDF
         </a>
@@ -141,10 +141,10 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
 
     {{-- 30-Day Sales Trend (Line Chart) --}}
-    <div class="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+    <div class="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-                <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Sales Trend</h3>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-[0.1em]">Sales Trend</h3>
                 <p class="text-xs text-gray-400 mt-0.5">Revenue performance over time</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
@@ -164,26 +164,30 @@
                 </div>
             </div>
         </div>
-        <div class="relative h-[400px]" style="height: 400px;">
-            <canvas id="salesTrendChart"></canvas>
+        <div class="p-5">
+            <div class="relative h-[400px]" style="height: 400px;">
+                <canvas id="salesTrendChart"></canvas>
+            </div>
         </div>
     </div>
 
     {{-- Revenue by Category (Doughnut Chart) --}}
-    <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
-        <div class="mb-4">
-            <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Revenue by Category</h3>
+    <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/50">
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-[0.1em]">Revenue by Category</h3>
             <p class="text-xs text-gray-400 mt-0.5">Income distribution across categories</p>
         </div>
-        <div class="relative h-48 flex items-center justify-center">
-            <canvas id="categoryChart"></canvas>
-        </div>
-        <div class="mt-4 flex flex-wrap gap-2 justify-center">
-            @foreach ($revenueByCategory as $cat)
-            <span class="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                {{ $cat['name'] }}: Rp {{ number_format($cat['revenue'], 0, ',', '.') }}
-            </span>
-            @endforeach
+        <div class="p-5">
+            <div class="relative h-48 flex items-center justify-center">
+                <canvas id="categoryChart"></canvas>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2 justify-center">
+                @foreach ($revenueByCategory as $cat)
+                <span class="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    {{ $cat['name'] }}: Rp {{ number_format($cat['revenue'], 0, ',', '.') }}
+                </span>
+                @endforeach
+            </div>
         </div>
     </div>
 
@@ -195,13 +199,14 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
 
     {{-- Ticket Type Breakdown --}}
-    <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
+    <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/50 flex items-center justify-between">
             <div>
-                <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Ticket Type Analysis</h3>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-[0.1em]">Ticket Type Analysis</h3>
                 <p class="text-xs text-gray-400 mt-0.5">Revenue and volume by ticket tier</p>
             </div>
         </div>
+        <div class="p-5">
         @if($ticketTypeBreakdown->count() > 0)
         <div class="relative h-52 mb-4">
             <canvas id="ticketTypeChart"></canvas>
@@ -223,16 +228,18 @@
         @else
         <div class="flex items-center justify-center h-48 text-sm text-gray-400">No ticket type data available</div>
         @endif
+        </div>
     </div>
 
     {{-- Top Events (Profitability Leaderboard) --}}
-    <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
+    <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-900/50 flex items-center justify-between">
             <div>
-                <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Profitability Leaderboard</h3>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-[0.1em]">Profitability Leaderboard</h3>
                 <p class="text-xs text-gray-400 mt-0.5">Top 10 events by revenue</p>
             </div>
         </div>
+        <div class="p-5">
         @if($topEvents->count() > 0)
         <div class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
             @foreach ($topEvents as $index => $event)
@@ -271,6 +278,7 @@
         @else
         <div class="flex items-center justify-center h-48 text-sm text-gray-400">No profitable events yet</div>
         @endif
+        </div>
     </div>
 
 </div>{{-- end row 3 --}}
@@ -437,17 +445,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
 (function () {
-    const isDark = () => document.documentElement.classList.contains('dark');
-    const gridColor  = () => isDark() ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
-    const labelColor = () => isDark() ? '#9ca3af' : '#6b7280';
-
-    const tooltipStyle = () => ({
-        backgroundColor: isDark() ? '#1f2937' : '#ffffff',
-        titleColor: isDark() ? '#e5e7eb' : '#111827',
-        bodyColor:  isDark() ? '#9ca3af' : '#6b7280',
-        borderColor: isDark() ? '#374151' : '#e5e7eb',
-        borderWidth: 1,
-    });
+    const T = window.ChartThemes;
 
     // ── Sales Trend (Line Chart) ───────────────────────────
     const trendCtx = document.getElementById('salesTrendChart').getContext('2d');
@@ -460,10 +458,6 @@
         yearly:     { data: @json($yearlySalesTrend->pluck('total')),    labels: @json($yearlySalesTrend->pluck('date')),    sumLabel: '1y' }
     };
 
-    const trendGradient = trendCtx.createLinearGradient(0, 0, 0, 400);
-    trendGradient.addColorStop(0, 'rgba(52, 211, 153, 0.3)');
-    trendGradient.addColorStop(1, 'rgba(52, 211, 153, 0.02)');
-
     const salesTrendChart = new Chart(trendCtx, {
         type: 'line',
         data: {
@@ -472,7 +466,7 @@
                 label: 'Revenue (Rp)',
                 data: trendDatasets.monthly.data,
                 borderColor: 'rgba(52, 211, 153, 0.9)',
-                backgroundColor: trendGradient,
+                backgroundColor: T.getGradient(trendCtx, 'emerald', 400),
                 borderWidth: 2,
                 fill: true,
                 tension: 0.4,
@@ -489,7 +483,7 @@
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    ...tooltipStyle(),
+                    ...T.getTooltipStyle(),
                     callbacks: {
                         label: ctx => 'Rp ' + new Intl.NumberFormat('id-ID').format(ctx.raw),
                     },
@@ -497,18 +491,18 @@
             },
             scales: {
                 x: {
-                    grid: { color: gridColor(), display: false },
+                    grid: { color: T.getGridColor(), display: false },
                     ticks: {
-                        color: labelColor(),
+                        color: T.getLabelColor(),
                         font: { size: 10 },
                         maxTicksLimit: 12,
                     },
                 },
                 y: {
-                    grid: { color: gridColor() },
+                    grid: { color: T.getGridColor() },
                     beginAtZero: true,
                     ticks: {
-                        color: labelColor(),
+                        color: T.getLabelColor(),
                         font: { size: 10 },
                         callback: v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v),
                     },
@@ -545,7 +539,7 @@
         'rgba(139, 92, 246, 0.85)',
         'rgba(59, 130, 246, 0.85)',
         'rgba(245, 158, 11, 0.85)',
-        'rgba(52, 211, 153, 0.85)',
+        'rgba(16, 185, 129, 0.85)',
         'rgba(248, 113, 113, 0.85)',
         'rgba(236, 72, 153, 0.85)',
         'rgba(34, 211, 238, 0.85)',
@@ -559,7 +553,7 @@
             datasets: [{
                 data: catData,
                 backgroundColor: catColors.slice(0, catLabels.length),
-                borderColor: isDark() ? '#374151' : '#ffffff',
+                borderColor: T.isDark() ? '#374151' : '#ffffff',
                 borderWidth: 2,
                 hoverOffset: 8,
             }]
@@ -572,15 +566,15 @@
                 legend: {
                     position: 'bottom',
                     labels: {
-                        color: labelColor(),
+                        color: T.getLabelColor(),
                         padding: 12,
                         usePointStyle: true,
                         pointStyle: 'circle',
-                        font: { size: 11 },
+                        font: { size: 10 },
                     }
                 },
                 tooltip: {
-                    ...tooltipStyle(),
+                    ...T.getTooltipStyle(),
                     callbacks: {
                         label: ctx => ctx.label + ': Rp ' + new Intl.NumberFormat('id-ID').format(ctx.raw),
                     },
@@ -594,11 +588,6 @@
     const ttCtx = document.getElementById('ticketTypeChart').getContext('2d');
     const ttLabels  = @json($ticketTypeBreakdown->pluck('name'));
     const ttRevenue = @json($ticketTypeBreakdown->pluck('total_revenue'));
-    const ttSold    = @json($ticketTypeBreakdown->pluck('total_sold'));
-
-    const ttGradient = ttCtx.createLinearGradient(0, 0, 400, 0);
-    ttGradient.addColorStop(0, 'rgba(139, 92, 246, 0.9)');
-    ttGradient.addColorStop(1, 'rgba(59, 130, 246, 0.6)');
 
     new Chart(ttCtx, {
         type: 'bar',
@@ -607,11 +596,12 @@
             datasets: [{
                 label: 'Revenue (Rp)',
                 data: ttRevenue,
-                backgroundColor: ttGradient,
-                borderColor: 'rgba(139, 92, 246, 0.8)',
+                backgroundColor: T.getGradient(ttCtx, 'indigo', 400),
+                borderColor: 'rgba(99, 102, 241, 0.8)',
                 borderWidth: 1,
-                borderRadius: 6,
+                borderRadius: 12,
                 borderSkipped: false,
+                barPercentage: 0.6,
             }]
         },
         options: {
@@ -621,7 +611,7 @@
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    ...tooltipStyle(),
+                    ...T.getTooltipStyle(),
                     callbacks: {
                         label: ctx => 'Rp ' + new Intl.NumberFormat('id-ID').format(ctx.raw),
                     },
@@ -629,9 +619,9 @@
             },
             scales: {
                 x: {
-                    grid: { color: gridColor() },
+                    grid: { color: T.getGridColor() },
                     ticks: {
-                        color: labelColor(),
+                        color: T.getLabelColor(),
                         font: { size: 10 },
                         callback: v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v),
                     },
@@ -639,7 +629,7 @@
                 },
                 y: {
                     grid: { display: false },
-                    ticks: { color: labelColor(), font: { size: 11 } },
+                    ticks: { color: T.getLabelColor(), font: { size: 11 } },
                 }
             }
         }

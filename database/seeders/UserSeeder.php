@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
             'name'          => 'Admin Tixxy',
             'email'         => 'admin@tixxy.com',
             'date_of_birth' => '1990-01-01',
+            'email_verified_at' => now(),
             'password_hash' => Hash::make('password'),
         ]);
 
@@ -32,6 +33,7 @@ class UserSeeder extends Seeder
                 'name'          => $org['name'],
                 'email'         => $org['email'],
                 'date_of_birth' => $org['dob'],
+                'email_verified_at' => now(),
                 'password_hash' => Hash::make('password'),
             ]);
         }
@@ -56,6 +58,7 @@ class UserSeeder extends Seeder
                 'name'          => $cust['name'],
                 'email'         => $cust['email'],
                 'date_of_birth' => $cust['dob'],
+                'email_verified_at' => now(),
                 'password_hash' => Hash::make('password'),
             ]);
         }

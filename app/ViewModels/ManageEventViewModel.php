@@ -14,25 +14,27 @@ class ManageEventViewModel implements Arrayable
     private $organizers;
     private $ticketTypesData;
     private $eventTicketTypesData;
+    private $performanceData;
     private $orders;
     private $statuses;
 
-    public function __construct($event, $action = 'index', $categories = [], $ticketTypes = [], $organizers = [], $ticketTypesData = [], $eventTicketTypesData = [])
+    public function __construct($event, $action = 'index', $categories = [], $ticketTypes = [], $organizers = [], $ticketTypesData = [], $eventTicketTypesData = [], $performanceData = [], $orders = null)
     {
-        $this->event               = $event;
-        $this->action              = $action;
-        $this->categories          = $categories;
-        $this->ticketTypes         = $ticketTypes;
-        $this->organizers          = $organizers;
-        $this->ticketTypesData     = $ticketTypesData;
+        $this->event                = $event;
+        $this->action               = $action;
+        $this->categories           = $categories;
+        $this->ticketTypes          = $ticketTypes;
+        $this->organizers           = $organizers;
+        $this->ticketTypesData      = $ticketTypesData;
         $this->eventTicketTypesData = $eventTicketTypesData;
+        $this->performanceData      = $performanceData;
+        $this->orders               = $orders;
         $this->statuses             = Event::getStatuses();
     }
 
     public function toArray(): array
     {
         return [
-            'title'                => $this->action == 'index' ? 'Manage Event: ' . ($this->event?->title ?? 'Unknown') : 'Edit Event: ' . ($this->event?->title ?? 'Unknown'),
             'backUrl'              => '/manage/events',
             'action'               => $this->action,
             'item'                 => $this->event,
@@ -41,12 +43,15 @@ class ManageEventViewModel implements Arrayable
             'organizers'           => $this->organizers,
             'ticketTypesData'      => $this->ticketTypesData,
             'eventTicketTypesData' => $this->eventTicketTypesData,
+            'performanceData'      => $this->performanceData,
+            'orders'               => $this->orders,
             'fields'               => $this->fields(),
             'statuses'             => $this->statuses,
         ];
     }
 
-    private function fields() : array {
+    private function fields(): array
+    {
         return [
             ['name' => 'title',       'label' => 'Event Name',  'type' => 'text',          'required' => true],
             ['name' => 'user_id',     'label' => 'Organizer',   'type' => 'select',        'options' => $this->organizers],

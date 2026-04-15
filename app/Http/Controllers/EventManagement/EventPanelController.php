@@ -42,7 +42,18 @@ class EventPanelController extends Controller
             ];
         })->values();
 
-        $viewModel = new ManageEventViewModel($event, 'index', $categories, $ticketTypes, $organizers, $ticketTypesData, $eventTicketTypesData);
+        // Fetch performance data for the unified dashboard
+        $events = Event::orderBy('start_time', 'desc')->get(['id', 'title', 'status']);
+        $perfViewModel = new \App\ViewModels\EventPerformanceViewModel($events, $id, '30d');
+        $performanceData = $perfViewModel->toArray();
+
+        // Fetch full paginated orders for the new Orders tab
+        $orders = \App\Models\Order::with('user')
+            ->where('event_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        $viewModel = new ManageEventViewModel($event, 'index', $categories, $ticketTypes, $organizers, $ticketTypesData, $eventTicketTypesData, $performanceData, $orders);
         return view('admin.event', $viewModel->toArray());
     }
 

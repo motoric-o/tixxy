@@ -16,6 +16,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Management\QRController;
+use App\Http\Controllers\Management\EventPerformanceController;
 
 use App\Http\Controllers\EventListController;
 use App\Http\Controllers\CheckoutController;
@@ -26,6 +27,7 @@ use App\Models\Event;
 /*
  * Test Routes
  */
+
 Route::get('/test-email', function () {
     app(EmailController::class)->sendOrderEmail('1');
     return 'Order email sent for order #1!';
@@ -93,6 +95,9 @@ Route::middleware(['auth', 'verified', 'role:organizer,admin'])->prefix('manage'
     // --- Event Management Panel (edit + update) ---
     Route::get('/events/{id}/edit', [EventPanelController::class, 'index']);
     Route::put('/events/{id}', [EventPanelController::class, 'update']);
+
+    // --- Event Performance Analytics ---
+    Route::get('/events/{id}/performance/data', [EventPerformanceController::class, 'data'])->name('manage.events.performance.data');
 
 
     // --- Orders CRUD ---

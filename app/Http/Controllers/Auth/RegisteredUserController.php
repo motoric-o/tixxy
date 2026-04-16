@@ -37,7 +37,7 @@ class RegisteredUserController extends Controller
         ]);
 
         // Cek apakah ini pendaftar pertama
-        $role = User::count() === 0 ? 'admin' : 'user';
+        $role = User::count() === 0 ? 'admin' : 'customer';
 
         $user = User::create([
             'name' => $request->name,
@@ -56,6 +56,6 @@ class RegisteredUserController extends Controller
             return redirect()->route('manage.home');
         }
 
-        return redirect(url('/'));
+        return redirect()->route('verification.notice');
     }
 }

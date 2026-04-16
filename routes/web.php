@@ -64,6 +64,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/queue/status/{event_id}', [QueueController::class, 'status'])->name('queue.status');
     Route::get('/queue/claim/{event_id}', [QueueController::class, 'claim'])->name('queue.claim');
     Route::post('/queue/cancel/{event_id}', [QueueController::class, 'cancel'])->name('queue.cancel');
+    Route::post('/queue/cancel-checkout/{event_id}', [QueueController::class, 'cancelFromCheckout'])->name('queue.cancel.checkout');
 
     // checkout & payment flow (protected by queue access)
     Route::middleware(['queue.access'])->group(function () {

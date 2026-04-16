@@ -4,14 +4,17 @@
 <div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-12" x-data="queueWaiting()" x-init="startPolling()">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {{-- Back Link --}}
-        <a href="/events"
-            class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2 font-medium hover:underline mb-8">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Back to Events
-        </a>
+        {{-- Back Link / Cancel Queue --}}
+        <form action="{{ route('queue.cancel', $event->id) }}" method="POST" class="mb-8">
+            @csrf
+            <button type="submit"
+                class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2 font-medium hover:underline transition-all duration-300">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Leave Queue & Back to Events
+            </button>
+        </form>
 
         {{-- Main Card --}}
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
@@ -96,7 +99,24 @@
                             </svg>
                         </div>
                         <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">A Ticket is Available!</h2>
-                        <p class="text-gray-500 dark:text-gray-400 mb-6">Click the button below to claim your spot. You will have 15 minutes to complete checkout.</p>
+                        <p class="text-gray-500 dark:text-gray-400 mb-6">Claim your spot now before time runs out. You have 15 minutes to complete checkout once claimed.</p>
+
+                        {{-- Countdown Timer --}}
+                        <template x-if="countdown">
+                            <div class="mb-6">
+                                <div class="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl"
+                                     :class="countdown <= '1:00' ? 'bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-700' : 'bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-700'">
+                                    <span class="text-xs font-bold uppercase tracking-widest"
+                                          :class="countdown <= '1:00' ? 'text-red-500 dark:text-red-400' : 'text-amber-500 dark:text-amber-400'">
+                                        Time to Claim
+                                    </span>
+                                    <span class="text-4xl font-black tabular-nums"
+                                          :class="countdown <= '1:00' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'"
+                                          x-text="countdown"></span>
+                                </div>
+                            </div>
+                        </template>
+
                         <a href="/queue/claim/{{ $event->id }}"
                            class="inline-flex px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                             Claim Your Ticket →
@@ -156,12 +176,32 @@ function queueWaiting() {
     return {
         status: '{{ $queueEntry->status }}',
         position: {{ $position ?? 'null' }},
-        expiresAt: null,
+        expiresAt: @if($queueEntry->expires_at) '{{ $queueEntry->expires_at->toIso8601String() }}' @else null @endif,
         pollInterval: null,
+        countdownInterval: null,
+        countdown: '',
 
         startPolling() {
             // Poll every 5 seconds
             this.pollInterval = setInterval(() => this.checkStatus(), 5000);
+            // Update countdown every second
+            this.countdownInterval = setInterval(() => this.tickCountdown(), 1000);
+            this.tickCountdown();
+        },
+
+        tickCountdown() {
+            if (!this.expiresAt) {
+                this.countdown = '';
+                return;
+            }
+            const diff = Math.max(0, Math.floor((new Date(this.expiresAt) - Date.now()) / 1000));
+            if (diff === 0) {
+                this.countdown = '0:00';
+                return;
+            }
+            const mins = Math.floor(diff / 60);
+            const secs = String(diff % 60).padStart(2, '0');
+            this.countdown = `${mins}:${secs}`;
         },
 
         async checkStatus() {
@@ -177,12 +217,14 @@ function queueWaiting() {
                 // Auto-redirect if the user has been activated
                 if (data.status === 'active') {
                     clearInterval(this.pollInterval);
+                    clearInterval(this.countdownInterval);
                     window.location.href = '/checkout?event_id={{ $event->id }}';
                 }
 
                 // Stop polling if the queue entry has reached a terminal state
                 if (['purchased', 'expired', 'canceled'].includes(data.status)) {
                     clearInterval(this.pollInterval);
+                    clearInterval(this.countdownInterval);
                 }
             } catch (e) {
                 // Silently ignore network errors — will retry on next poll

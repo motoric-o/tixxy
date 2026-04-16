@@ -18,13 +18,14 @@ return new class extends Migration {
                 'queued',       // waiting in line for their turn
                 'active',       // allowed into checkout (15 min timer)
                 'waitlisted',   // tickets sold out while in queue
-                'notified',     // promoted from waitlist, email sent (1 hr to claim)
+                'notified',     // promoted from waitlist, email sent (60 min to claim)
                 'processing',   // currently submitting payment (protected from expiry)
                 'purchased',    // order successfully created
                 'expired',      // timer ran out
                 'canceled',     // user voluntarily left the queue
             ])->default('queued');
             $table->timestamp('expires_at')->nullable();
+            $table->timestamp('last_active_at')->nullable(); // tracks heartbeat for inactivity detection
             $table->timestamps();
 
             $table->unique(['user_id', 'event_id']);

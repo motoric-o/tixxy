@@ -21,10 +21,14 @@ class Queue extends Model
     const HOLDING_STATUSES = [self::STATUS_ACTIVE, self::STATUS_PROCESSING];
     const ACTIVE_MINUTES = 15;
     const NOTIFIED_MINUTES = 60;
+    const INACTIVITY_TIMEOUT_MINUTES = 1;
 
-    protected $fillable = ['event_id', 'user_id', 'status', 'expires_at'];
+    protected $fillable = ['event_id', 'user_id', 'status', 'expires_at', 'last_active_at'];
 
-    protected $casts = ['expires_at' => 'datetime'];
+    protected $casts = [
+        'expires_at' => 'datetime',
+        'last_active_at' => 'datetime',
+    ];
 
     public function event()
     {
@@ -64,8 +68,16 @@ class Queue extends Model
 
     public function scopeExpirable($query)
     {
-        return $query->whereIn('status', [self::STATUS_ACTIVE, self::STATUS_NOTIFIED])
-                     ->whereNotNull('expires_at')
-                     ->where('expires_at', '<=', now());
+        return $query->where(function ($q) {
+            // Standard timer expiry
+            $q->whereIn('status', [self::STATUS_ACTIVE, self::STATUS_NOTIFIED])
+              ->whereNotNull('expires_at')
+              ->where('expires_at', '<=', now());
+        })->orWhere(function ($q) {
+            // Inactivity expiry
+            $q->whereIn('status', [self::STATUS_ACTIVE, self::STATUS_NOTIFIED])
+              ->whereNotNull('last_active_at')
+              ->where('last_active_at', '<=', now()->subMinutes(self::INACTIVITY_TIMEOUT_MINUTES));
+        });
     }
 }

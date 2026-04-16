@@ -161,6 +161,11 @@ class QueueController extends Controller
             }
         }
 
+        // Update last active heartbeat if they are holding a spot
+        if (in_array($queueEntry->status, [Queue::STATUS_ACTIVE, Queue::STATUS_NOTIFIED])) {
+            $queueEntry->update(['last_active_at' => now()]);
+        }
+
         // Calculate position if still waiting
         $position = null;
         if (in_array($queueEntry->status, [Queue::STATUS_QUEUED, Queue::STATUS_WAITLISTED])) {
@@ -205,8 +210,9 @@ class QueueController extends Controller
 
         // Transition to active with a fresh 15-minute checkout timer
         $queueEntry->update([
-            'status'     => Queue::STATUS_ACTIVE,
-            'expires_at' => now()->addMinutes(Queue::ACTIVE_MINUTES),
+            'status'         => Queue::STATUS_ACTIVE,
+            'expires_at'     => now()->addMinutes(Queue::ACTIVE_MINUTES),
+            'last_active_at' => now(),
         ]);
 
         return redirect("/checkout?event_id={$eventId}");
@@ -238,7 +244,7 @@ class QueueController extends Controller
 
             // If they were holding a spot, immediately promote the next person
             if ($wasHolding) {
-                $this->promoteNext($eventId);
+                $this->promoteNext($eventId, directActivate: true);
             }
         }
 
@@ -247,12 +253,40 @@ class QueueController extends Controller
     }
 
     /**
+     * Called when a user abandons the checkout page (via sendBeacon).
+     * Cancels their active spot and promotes the next person DIRECTLY to active,
+     * bypassing the email/notified step so they are redirected immediately via polling.
+     */
+    public function cancelFromCheckout(int $eventId)
+    {
+        $user = Auth::user();
+
+        $queueEntry = Queue::where('user_id', $user->id)
+            ->where('event_id', $eventId)
+            ->where('status', Queue::STATUS_ACTIVE)
+            ->first();
+
+        if ($queueEntry) {
+            $queueEntry->update(['status' => Queue::STATUS_CANCELED]);
+            $this->promoteNext($eventId, directActivate: true);
+        }
+
+        // beacon requests don't need a response body
+        return response()->noContent();
+    }
+
+    /**
      * Immediately promote the next eligible person in line for an event.
      * Called when someone cancels and frees up a spot.
+     *
+     * @param bool $directActivate  When true, promotes waitlisted users straight to
+     *                              STATUS_ACTIVE (checkout) instead of STATUS_NOTIFIED
+     *                              (email). Use this when the spot opener was on checkout,
+     *                              so the next person can redirect immediately via polling.
      */
-    private function promoteNext(int $eventId): void
+    private function promoteNext(int $eventId, bool $directActivate = false): void
     {
-        DB::transaction(function () use ($eventId) {
+        DB::transaction(function () use ($eventId, $directActivate) {
             $event = Event::lockForUpdate()->find($eventId);
             if (!$event) return;
 
@@ -267,7 +301,14 @@ class QueueController extends Controller
 
             $wasWaitlisted = $next->status === Queue::STATUS_WAITLISTED;
 
-            if ($wasWaitlisted) {
+            // If directActivate, promote all waitlisted straight to active
+            if ($directActivate || !$wasWaitlisted) {
+                $next->update([
+                    'status'         => Queue::STATUS_ACTIVE,
+                    'expires_at'     => now()->addMinutes(Queue::ACTIVE_MINUTES),
+                    'last_active_at' => now(),
+                ]);
+            } else {
                 $next->update([
                     'status'     => Queue::STATUS_NOTIFIED,
                     'expires_at' => now()->addMinutes(Queue::NOTIFIED_MINUTES),
@@ -280,11 +321,6 @@ class QueueController extends Controller
                         new \App\Mail\WaitlistTicketAvailable($next)
                     );
                 }
-            } else {
-                $next->update([
-                    'status'     => Queue::STATUS_ACTIVE,
-                    'expires_at' => now()->addMinutes(Queue::ACTIVE_MINUTES),
-                ]);
             }
         });
     }
@@ -300,9 +336,25 @@ class QueueController extends Controller
             ->get()
             ->sum('tickets_count');
 
-        $holdingCount = Queue::where('event_id', $event->id)->holding()->count();
+        $timeoutMinutes = Queue::INACTIVITY_TIMEOUT_MINUTES;
 
-        $notifiedCount = Queue::where('event_id', $event->id)->notified()->count();
+        // Count holding spots but ignore those that are inactive ('ghosts')
+        $holdingCount = Queue::where('event_id', $event->id)
+            ->holding()
+            ->where(function ($q) use ($timeoutMinutes) {
+                $q->whereNull('last_active_at')
+                  ->orWhere('last_active_at', '>', now()->subMinutes($timeoutMinutes));
+            })
+            ->count();
+
+        // Count notified spots but ignore those that are inactive
+        $notifiedCount = Queue::where('event_id', $event->id)
+            ->notified()
+            ->where(function ($q) use ($timeoutMinutes) {
+                $q->whereNull('last_active_at')
+                  ->orWhere('last_active_at', '>', now()->subMinutes($timeoutMinutes));
+            })
+            ->count();
 
         $pendingOrderCount = Order::where('event_id', $event->id)
             ->where('status', 'pending')
@@ -380,16 +432,22 @@ class QueueController extends Controller
                 ->exists();
 
             if ($availableSpots > 0 && !$hasWaitlist) {
+                // Reset position timestamp so they go to the back of any future queue
+                \Illuminate\Support\Facades\DB::table('queues')->where('id', $entry->id)->update(['created_at' => now()]);
                 $entry->update([
-                    'status'     => Queue::STATUS_ACTIVE,
-                    'expires_at' => now()->addMinutes(Queue::ACTIVE_MINUTES),
+                    'status'         => Queue::STATUS_ACTIVE,
+                    'expires_at'     => now()->addMinutes(Queue::ACTIVE_MINUTES),
+                    'last_active_at' => now(),
                 ]);
                 return 'active';
             }
 
+            // Back of the line — reset timestamp so they don't retain their old position
+            \Illuminate\Support\Facades\DB::table('queues')->where('id', $entry->id)->update(['created_at' => now()]);
             $entry->update([
-                'status'     => Queue::STATUS_QUEUED,
-                'expires_at' => null,
+                'status'         => Queue::STATUS_QUEUED,
+                'expires_at'     => null,
+                'last_active_at' => null,
             ]);
             return 'queued';
         });

@@ -47,6 +47,10 @@ class CheckoutController extends Controller
             ->where('status', Queue::STATUS_ACTIVE)
             ->first();
 
+        if ($queueEntry) {
+            $queueEntry->update(['last_active_at' => now()]);
+        }
+
         return view('checkout', compact('event', 'queueEntry'));
     }
 

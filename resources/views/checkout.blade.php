@@ -3,18 +3,72 @@
 @section('content')
     {{-- $event is now passed from CheckoutController --}}
 
+    {{-- Queue Countdown Banner (only shown for users coming from the queue) --}}
+    @if($queueEntry && $queueEntry->expires_at)
+    <div id="queue-countdown-banner"
+         x-data="checkoutCountdown('{{ $queueEntry->expires_at->toIso8601String() }}')"
+         x-init="start()"
+         class="sticky top-0 z-50 text-center py-3 px-4 text-sm font-semibold transition-colors duration-500"
+         :class="isUrgent ? 'bg-red-600 text-white' : 'bg-amber-500 text-white'">
+        <span>⏱ Your checkout session expires in:</span>
+        <span class="font-black tabular-nums ml-1" x-text="countdown"></span>
+        <span class="ml-2 font-normal opacity-80">— Complete your booking before time runs out!</span>
+    </div>
+
+    <script>
+    function checkoutCountdown(expiresAt) {
+        return {
+            countdown: '',
+            isUrgent: false,
+            interval: null,
+            heartbeatInterval: null,
+
+            start() {
+                this.tick();
+                this.interval = setInterval(() => this.tick(), 1000);
+                // Heartbeat to keep session alive (every 10 seconds)
+                this.heartbeatInterval = setInterval(() => this.sendHeartbeat(), 10000);
+            },
+
+            async sendHeartbeat() {
+                try {
+                    await fetch('/api/queue/status/{{ $event->id }}');
+                } catch (e) {}
+            },
+
+            tick() {
+                const diff = Math.max(0, Math.floor((new Date(expiresAt) - Date.now()) / 1000));
+                const mins = Math.floor(diff / 60);
+                const secs = String(diff % 60).padStart(2, '0');
+                this.countdown = `${mins}:${secs}`;
+                this.isUrgent = diff <= 120; // red for last 2 minutes
+                if (diff === 0) {
+                    clearInterval(this.interval);
+                    clearInterval(this.heartbeatInterval);
+                    // Redirect them to the queue/expired page
+                    window.location.href = '/queue/{{ $event->id }}';
+                }
+            }
+        };
+    }
+    </script>
+    @endif
+
     <div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-12">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <a href="/events"
-                        class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2 font-medium hover:underline mb-4">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                        </svg>
-                        Back to Events
-                    </a>
+                    <form action="{{ route('queue.cancel', $event->id) }}" method="POST" class="mb-4">
+                        @csrf
+                        <button type="submit"
+                            class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2 font-medium hover:underline transition-all duration-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Leave Line & Back to Events
+                        </button>
+                    </form>
                     <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-2">Complete Your Booking</h1>
                     <p class="text-gray-500 dark:text-gray-400 mt-2">Follow the steps to secure your tickets.</p>
                 </div>

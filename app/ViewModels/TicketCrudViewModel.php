@@ -18,7 +18,7 @@ class TicketCrudViewModel implements Arrayable
     public function toArray(): array
     {
         $isIndex = $this->action === 'index';
-        
+
         return [
             'title' => $isIndex ? 'Tickets' : 'Edit Ticket',
             'subtitle' => $isIndex ? 'Manage all event tickets' : 'Edit Ticket #' . ($this->tickets?->id ?? ''),
@@ -28,6 +28,7 @@ class TicketCrudViewModel implements Arrayable
             'createUrl' => null,
             'editUrl' => '/manage/tickets',
             'backUrl' => '/manage/tickets',
+            'canDelete' => false,
             'action' => $this->action === 'index' ? '/manage/tickets' : '/manage/tickets/' . ($this->tickets?->id ?? ''),
             'method' => $this->action === 'edit' ? 'PUT' : 'POST',
             'item' => $this->tickets,

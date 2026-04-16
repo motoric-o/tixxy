@@ -47,7 +47,7 @@
         <div>
             <p class="text-xs font-semibold uppercase tracking-widest {{ $c['text'] }}">{{ $title }}</p>
             <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                {{ $value }}
+                {!! $valueSlot ?? $value !!}
             </p>
         </div>
         <div class="p-2.5 rounded-xl {{ $c['icon_bg'] }} {{ $c['text'] }}">
@@ -66,7 +66,7 @@
         </div>
     @elseif(isset($slot) && $slot->isNotEmpty())
         <div class="text-xs text-gray-500 dark:text-gray-400">
-            {{ $slot }}
+            {!! $slot !!}
         </div>
     @endif
     <div class="absolute -bottom-3 -right-3 w-20 h-20 rounded-full {{ $c['circle'] }}"></div>

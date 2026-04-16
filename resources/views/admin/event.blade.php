@@ -7,8 +7,36 @@
                 activeTab: window.location.hash ? window.location.hash.substring(1) : 'setup',
                 quota: {{ (int)($item->quota ?? 0) }},
                 allocatedQuota: 0,
+                performanceData: {{ json_encode($performanceData) }},
                 init() {
                     this.recalculateAllocation();
+                    setInterval(() => {
+                        this.fetchPerformance();
+                    }, 15000);
+                },
+                fetchPerformance() {
+                    fetch(`/manage/events/{{ $item->id }}/performance/data`)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.performanceData = data;
+                            // Update charts globally if they exist
+                            if (window.velocityChart) {
+                                window.velocityChart.data.labels = data.chartLabels;
+                                window.velocityChart.data.datasets[0].data = data.chartVelocity;
+                                window.velocityChart.update();
+                            }
+                            if (window.revenueChart) {
+                                window.revenueChart.data.labels = data.chartLabels;
+                                window.revenueChart.data.datasets[0].data = data.chartRevenueVelocity;
+                                window.revenueChart.update();
+                            }
+                            if (window.attendanceChart) {
+                                const noshow = data.totalTicketsSold - data.totalTicketsScanned;
+                                window.attendanceChart.data.datasets[0].data = [data.totalTicketsScanned, noshow || 0.001];
+                                window.attendanceChart.update();
+                            }
+                        })
+                        .catch(error => console.error('Error fetching performance data:', error));
                 },
                 recalculateAllocation() {
                     const inputs = Array.from(document.querySelectorAll('#ticketContainer input[name*=\'[capacity]\']'));
@@ -40,6 +68,12 @@
                         const emptyMsg = document.getElementById('emptyTicketMsg');
                         if (emptyMsg) emptyMsg.style.display = 'block';
                     }
+                },
+                formatRp(value) {
+                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+                },
+                formatNum(value) {
+                    return new Intl.NumberFormat('id-ID').format(value);
                 }
             }" @hashchange.window="activeTab = window.location.hash.substring(1) || 'setup'">
 
@@ -232,7 +266,7 @@
                                 <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-500/30">
                                     <span class="text-[10px] font-bold text-indigo-400 dark:text-indigo-500 uppercase tracking-widest">Sold:</span>
                                     <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">
-                                        {{ number_format($performanceData['totalTicketsSold'] ?? 0) }} / {{ $item->quota }}
+                                        <span x-text="formatNum(performanceData.totalTicketsSold)"></span> / <span x-text="quota"></span>
                                     </span>
                                 </div>
                             </div>
@@ -344,15 +378,15 @@
                         <div class="space-y-6">
                             <div class="flex justify-between items-center group">
                                 <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Total Tickets Sold</span>
-                                <span class="font-black text-gray-900 dark:text-white text-lg tracking-tight">{{ number_format($performanceData['totalTicketsSold'] ?? 0) }}</span>
+                                <span class="font-black text-gray-900 dark:text-white text-lg tracking-tight" x-text="formatNum(performanceData.totalTicketsSold)"></span>
                             </div>
                             <div class="flex justify-between items-center group">
                                 <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Revenue</span>
-                                <span class="font-black text-purple-600 dark:text-purple-400 text-lg tracking-tight">Rp {{ number_format($performanceData['totalRevenue'] ?? 0, 0, ',', '.') }}</span>
+                                <span class="font-black text-purple-600 dark:text-purple-400 text-lg tracking-tight" x-text="formatRp(performanceData.totalRevenue)"></span>
                             </div>
                             <div class="flex justify-between items-center group border-t border-gray-50 dark:border-gray-700/50 pt-4 mt-4">
                                 <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Active Orders</span>
-                                <span class="font-black text-gray-900 dark:text-white text-lg tracking-tight">{{ number_format($performanceData['totalOrdersPending'] ?? 0) }}</span>
+                                <span class="font-black text-gray-900 dark:text-white text-lg tracking-tight" x-text="formatNum(performanceData.totalOrdersPending)"></span>
                             </div>
                         </div>
                     </x-admin.card>
@@ -383,43 +417,55 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
                 <x-admin.stat-card 
                     title="Gross Revenue" 
-                    value="Rp {{ number_format($performanceData['totalRevenue'] ?? 0, 0, ',', '.') }}" 
+                    value="" 
                     color="emerald"
                     iconPath="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                    From <span class="text-emerald-400 font-semibold">{{ number_format($performanceData['totalOrdersCompleted'] ?? 0) }}</span> orders 
-                    &bull; <span class="text-amber-400 font-semibold">Rp {{ number_format($performanceData['pendingOrdersValue'] ?? 0, 0, ',', '.') }} pending</span>
+                    <x-slot name="valueSlot">
+                        <span x-text="formatRp(performanceData.totalRevenue)"></span>
+                    </x-slot>
+                    From <span class="text-emerald-400 font-semibold" x-text="formatNum(performanceData.totalOrdersCompleted)"></span> orders 
+                    &bull; <span class="text-amber-400 font-semibold"><span x-text="formatRp(performanceData.pendingOrdersValue)"></span> pending</span>
                 </x-admin.stat-card>
 
                 <x-admin.stat-card 
                     title="Sell-Through Rate" 
-                    value="{{ $performanceData['sellThroughRate'] ?? 0 }}%" 
+                    value="" 
                     color="blue"
                     iconPath="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z">
+                    <x-slot name="valueSlot">
+                        <span x-text="performanceData.sellThroughRate + '%'"></span>
+                    </x-slot>
                     <div class="mb-1 mt-1">
                         <div class="h-1.5 w-full bg-blue-900/30 rounded-full overflow-hidden">
                             <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-700"
-                                style="width: {{ $performanceData['sellThroughRate'] ?? 0 }}%"></div>
+                                :style="`width: ${performanceData.sellThroughRate}%`"></div>
                         </div>
                     </div>
-                    <span class="text-blue-400 font-semibold">{{ number_format($performanceData['totalTicketsSold'] ?? 0) }}</span> / {{ number_format($performanceData['totalCapacity'] ?? 0) }} sold
+                    <span class="text-blue-400 font-semibold" x-text="formatNum(performanceData.totalTicketsSold)"></span> / <span x-text="formatNum(performanceData.totalCapacity)"></span> sold
                 </x-admin.stat-card>
 
                 <x-admin.stat-card 
                     title="Avg. Order Value" 
-                    value="Rp {{ number_format($performanceData['avgOrderValue'] ?? 0, 0, ',', '.') }}" 
+                    value="" 
                     color="purple"
                     iconPath="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                    Per completed order &bull; <span class="text-purple-400 font-semibold">{{ number_format($performanceData['totalOrdersCompleted'] ?? 0) }}</span> orders
+                    <x-slot name="valueSlot">
+                        <span x-text="formatRp(performanceData.avgOrderValue)"></span>
+                    </x-slot>
+                    Per completed order &bull; <span class="text-purple-400 font-semibold" x-text="formatNum(performanceData.totalOrdersCompleted)"></span> orders
                 </x-admin.stat-card>
 
                 <x-admin.stat-card 
                     title="Conversion Rate" 
-                    value="{{ $performanceData['conversionRate'] ?? 0 }}%" 
+                    value="" 
                     color="amber"
                     iconPath="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
-                    <span class="text-emerald-400 font-semibold">{{ $performanceData['totalOrdersCompleted'] ?? 0 }}</span> completed
-                    &bull; <span class="text-amber-400 font-semibold">{{ $performanceData['totalOrdersPending'] ?? 0 }}</span> pending
-                    &bull; <span class="text-red-400 font-semibold">{{ $performanceData['totalOrdersCanceled'] ?? 0 }}</span> canceled
+                    <x-slot name="valueSlot">
+                        <span x-text="performanceData.conversionRate + '%'"></span>
+                    </x-slot>
+                    <span class="text-emerald-400 font-semibold" x-text="formatNum(performanceData.totalOrdersCompleted)"></span> completed
+                    &bull; <span class="text-amber-400 font-semibold" x-text="formatNum(performanceData.totalOrdersPending)"></span> pending
+                    &bull; <span class="text-red-400 font-semibold" x-text="formatNum(performanceData.totalOrdersCanceled)"></span> canceled
                 </x-admin.stat-card>
             </div>
 {{-- end row 1 --}}
@@ -454,7 +500,7 @@
                         <div class="relative w-36 h-36">
                             <canvas id="attendanceChart"></canvas>
                             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span class="text-2xl font-extrabold text-gray-800 dark:text-white">{{ $performanceData['attendanceRate'] ?? 0 }}%</span>
+                                <span class="text-2xl font-extrabold text-gray-800 dark:text-white" x-text="performanceData.attendanceRate + '%'"></span>
                                 <span class="text-[10px] text-gray-400 uppercase tracking-wider">Check-in</span>
                             </div>
                         </div>
@@ -464,14 +510,14 @@
                                     <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 inline-block"></span>
                                     <span class="text-gray-500 dark:text-gray-400">Checked In</span>
                                 </div>
-                                <span class="font-semibold text-gray-800 dark:text-white">{{ number_format($performanceData['totalTicketsScanned'] ?? 0) }}</span>
+                                <span class="font-semibold text-gray-800 dark:text-white" x-text="formatNum(performanceData.totalTicketsScanned)"></span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600 inline-block"></span>
                                     <span class="text-gray-500 dark:text-gray-400">No-show</span>
                                 </div>
-                                <span class="font-semibold text-gray-800 dark:text-white">{{ number_format(($performanceData['totalTicketsSold'] ?? 0) - ($performanceData['totalTicketsScanned'] ?? 0)) }}</span>
+                                <span class="font-semibold text-gray-800 dark:text-white" x-text="formatNum(performanceData.totalTicketsSold - performanceData.totalTicketsScanned)"></span>
                             </div>
                         </div>
                     </div>
@@ -505,44 +551,40 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tier-table-body" class="divide-y divide-gray-50 dark:divide-gray-700/50">
-                                    @forelse ($performanceData['tierBreakdown'] as $tier)
+                                    <template x-for="tier in performanceData.tierBreakdown" :key="tier.name">
                                         <tr class="transition-colors duration-150">
                                             <td class="py-3.5 px-2">
                                                 <span class="inline-flex items-center gap-1.5">
                                                     <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
-                                                    <span class="font-medium text-gray-800 dark:text-white">{{ $tier['name'] }}</span>
+                                                    <span class="font-medium text-gray-800 dark:text-white" x-text="tier.name"></span>
                                                 </span>
                                             </td>
-                                            <td class="py-3.5 px-2 text-right text-gray-600 dark:text-gray-300">
-                                                Rp {{ number_format($tier['price'], 0, ',', '.') }}
+                                            <td class="py-3.5 px-2 text-right text-gray-600 dark:text-gray-300" x-text="formatRp(tier.price)">
                                             </td>
-                                            <td class="py-3.5 px-2 text-right text-gray-600 dark:text-gray-300">
-                                                {{ number_format($tier['capacity']) }}
+                                            <td class="py-3.5 px-2 text-right text-gray-600 dark:text-gray-300" x-text="formatNum(tier.capacity)">
                                             </td>
-                                            <td class="py-3.5 px-2 text-right font-semibold text-gray-800 dark:text-white">
-                                                {{ number_format($tier['sold']) }}
+                                            <td class="py-3.5 px-2 text-right font-semibold text-gray-800 dark:text-white" x-text="formatNum(tier.sold)">
                                             </td>
-                                            <td class="py-3.5 px-2 text-right text-emerald-500 font-semibold">
-                                                Rp {{ number_format($tier['revenue'], 0, ',', '.') }}
+                                            <td class="py-3.5 px-2 text-right text-emerald-500 font-semibold" x-text="formatRp(tier.revenue)">
                                             </td>
                                             <td class="py-3.5 px-2 min-w-[120px]">
                                                 <div class="flex items-center gap-2">
                                                     <div class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                        <div class="h-full rounded-full transition-all duration-700
-                                                                    {{ $tier['fill'] >= 90 ? 'bg-emerald-400' : ($tier['fill'] >= 60 ? 'bg-blue-400' : 'bg-amber-400') }}"
-                                                            style="width: {{ $tier['fill'] }}%"></div>
+                                                        <div class="h-full rounded-full transition-all duration-700"
+                                                            :class="tier.fill >= 90 ? 'bg-emerald-400' : (tier.fill >= 60 ? 'bg-blue-400' : 'bg-amber-400')"
+                                                            :style="`width: ${tier.fill}%`"></div>
                                                     </div>
-                                                    <span class="text-xs font-medium {{ $tier['fill'] >= 90 ? 'text-emerald-400' : ($tier['fill'] >= 60 ? 'text-blue-400' : 'text-amber-400') }}">
-                                                        {{ $tier['fill'] }}%
+                                                    <span class="text-xs font-medium"
+                                                          :class="tier.fill >= 90 ? 'text-emerald-400' : (tier.fill >= 60 ? 'text-blue-400' : 'text-amber-400')"
+                                                          x-text="tier.fill + '%'">
                                                     </span>
                                                 </div>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" class="py-12 text-center text-sm text-gray-400 italic">No ticket tiers configured for this event.</td>
-                                        </tr>
-                                    @endforelse
+                                    </template>
+                                    <tr x-show="!performanceData.tierBreakdown || performanceData.tierBreakdown.length === 0">
+                                        <td colspan="6" class="py-12 text-center text-sm text-gray-400 italic">No ticket tiers configured for this event.</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -719,7 +761,7 @@
                     
                     <x-admin.input type="number" step="0.01" label="Price (Rp)" name="ticket_types[__INDEX__][price]" value="0" required containerClass="col-span-2 md:col-span-1" />
                     
-                    <x-admin.input type="number" label="Capacity" name="ticket_types[__INDEX__][capacity]" value="0" min="0" @input="recalculateCapacity()" required containerClass="col-span-2 md:col-span-1" />
+                    <x-admin.input type="number" label="Capacity" name="ticket_types[__INDEX__][capacity]" value="0" min="0" @input="recalculateAllocation()" required containerClass="col-span-2 md:col-span-1" />
                     
                     <div class="col-span-2 md:col-span-1 flex justify-end pb-1 h-[46px] items-center">
                         <x-admin.button variant="danger" @click="removeTicket($el)" class="w-full h-full text-[10px]">
@@ -742,14 +784,12 @@
                 const fmtRp = v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v);
                 const fmtNum = v => new Intl.NumberFormat('id-ID').format(v);
 
-                let velocityChart, attendanceChart, revenueChart;
-
                 function buildVelocityChart(labels, data) {
                     const ctx = document.getElementById('velocityChart');
                     if (!ctx) return;
                     const cctx = ctx.getContext('2d');
 
-                    velocityChart = new Chart(ctx, {
+                    window.velocityChart = new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels: labels,
@@ -798,7 +838,7 @@
                     if (!ctx) return;
                     const cctx = ctx.getContext('2d');
 
-                    revenueChart = new Chart(ctx, {
+                    window.revenueChart = new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels: labels,
@@ -849,7 +889,7 @@
                 function buildAttendanceChart(scanned, noshow) {
                     const ctx = document.getElementById('attendanceChart');
                     if (!ctx) return;
-                    attendanceChart = new Chart(ctx.getContext('2d'), {
+                    window.attendanceChart = new Chart(ctx.getContext('2d'), {
                         type: 'doughnut',
                         data: {
                             labels: ['Checked In', 'No-show'],

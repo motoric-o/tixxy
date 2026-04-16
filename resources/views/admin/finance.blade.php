@@ -243,7 +243,8 @@
         @if($topEvents->count() > 0)
         <div class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
             @foreach ($topEvents as $index => $event)
-            <div class="flex items-center gap-3 py-3 px-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+            <div class="cursor-pointer flex items-center gap-3 py-3 px-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-600/50 transition-colors"
+                 onclick="window.location='{{ route('manage.events.edit', $event['id']) }}'">
                 {{-- Rank --}}
                 <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0
                     {{ $index === 0 ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white' :

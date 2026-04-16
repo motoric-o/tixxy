@@ -62,7 +62,8 @@
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                 @forelse($events ?? [] as $event)
-                <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                <tr class="cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors" 
+                    onclick="window.location='{{ route('manage.events.edit', $event->id) }}'">
                     <td class="px-6 py-4">
                         <p class="text-sm font-bold text-gray-800 dark:text-white">{{ $event->title }}</p>
                         <p class="text-xs text-gray-400 mt-0.5">{{ $event->category->name }} • {{ \Carbon\Carbon::parse($event->start_time)->format('M Y') }}</p>
